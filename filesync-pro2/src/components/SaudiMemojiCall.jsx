@@ -110,31 +110,42 @@ const fragmentShader = `
       }
     }
 
-    // 4. Perfect Eye Blink (Samples clean skin from the forehead)
-    vec2 leftEye = vec2(0.445, 0.545);
-    vec2 rightEye = vec2(0.555, 0.545);
-    vec2 eyeSize = vec2(0.030, 0.035);
+    // 4. Eye blink. Eyes measured on /memoji.jpg (centers y=0.568; the old
+    // y=0.545 ellipse sat on the under-eye). Lid skin is blended per pixel from
+    // the skin just above (y=0.622) and just below (y=0.525) each eye; the old
+    // fixed sample at y=0.60 hit the dark lash line and painted brown discs.
+    vec2 leftEye = vec2(0.436, 0.568);
+    vec2 rightEye = vec2(0.564, 0.568);
+    vec2 eyeSize = vec2(0.036, 0.029);
 
     float dL = length((vUv - leftEye) / eyeSize);
     float dR = length((vUv - rightEye) / eyeSize);
 
     if ((dL < 1.0 || dR < 1.0) && uBlink > 0.01) {
-      float activeD = min(dL, dR);
-      float eyeMask = smoothstep(1.0, 0.75, activeD);
-      float lidPos = 1.0 - uBlink * 2.0;
+      bool isLeft = dL < dR;
+      vec2 eyeC = isLeft ? leftEye : rightEye;
+      float eyeMask = smoothstep(1.0, 0.88, isLeft ? dL : dR);
+      float nx = (vUv.x - eyeC.x) / eyeSize.x;
+      float ny = (vUv.y - eyeC.y) / eyeSize.y;
 
-      // Determine which eye we are in
-      bool isLeft = dL < 1.0;
-      float eyeNormY = (vUv.y - (isLeft ? leftEye.y : rightEye.y)) / eyeSize.y;
+      // Upper and lower lids meet on a gently curved line below the eye center
+      float restLine = -0.18 - 0.30 * (1.0 - nx * nx);
+      float upperEdge = mix(1.05, restLine, uBlink);
+      float lowerEdge = mix(-1.05, restLine - 0.03, uBlink);
+      float cover = max(smoothstep(upperEdge - 0.06, upperEdge + 0.03, ny),
+                        smoothstep(lowerEdge + 0.06, lowerEdge - 0.03, ny));
 
-      if (eyeNormY > lidPos) {
-        // Sample clean forehead skin (safely high above the eye)
-        vec2 skinSample = isLeft ? vec2(0.445, 0.60) : vec2(0.555, 0.60);
-        vec3 eyelidSkin = texture2D(uTexture, skinSample).rgb * 0.95;
-        
-        float lidCover = smoothstep(lidPos - 0.1, lidPos + 0.05, eyeNormY);
-        finalColor.rgb = mix(finalColor.rgb, eyelidSkin, lidCover * eyeMask);
-      }
+      vec3 skinAbove = texture2D(uTexture, vec2(vUv.x, 0.622)).rgb;
+      vec3 skinBelow = texture2D(uTexture, vec2(vUv.x, 0.525)).rgb;
+      vec3 eyelidSkin = mix(skinBelow, skinAbove, smoothstep(-0.6, 0.6, ny));
+      // Rounded lid: a touch darker right at its moving edge
+      eyelidSkin *= mix(0.9, 1.0, smoothstep(0.0, 0.5, abs(ny - upperEdge)));
+
+      // Lash line along the upper lid edge, fading in as the lid comes down
+      float lash = smoothstep(0.12, 0.0, abs(ny - upperEdge)) * smoothstep(0.15, 0.45, uBlink);
+      eyelidSkin = mix(eyelidSkin, vec3(0.16, 0.10, 0.08), lash * 0.8);
+
+      finalColor.rgb = mix(finalColor.rgb, eyelidSkin, max(cover, lash * 0.8) * eyeMask);
     }
 
     gl_FragColor = finalColor;
