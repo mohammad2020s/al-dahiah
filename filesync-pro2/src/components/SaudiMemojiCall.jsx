@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, Suspense } from 'react';
+import React, { useRef, useMemo, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -54,47 +54,48 @@ const fragmentShader = `
     float horizMask = pow(smoothstep(mouthWidth, 0.0, abs(dx)), 1.2);
     float gap = clamp(uAudio * 0.045, 0.0, 0.045) * horizMask;
 
-    // 2. Slice and Shift the Lower Jaw
-    // Only pull pixels that are strictly below the lip line
-    float dy = vUv.y - lipLine;
-    if (dy < 0.0) {
-      // Fade out the UV shift towards the bottom of the neck (-0.15)
-      float jawWeight = smoothstep(-0.15, 0.0, dy);
-      uv.y += gap * jawWeight;
-    }
-
-    // Sample the texture AFTER shifting the jaw
-    vec4 finalColor = texture2D(uTexture, uv);
-
-    // 3. Draw 100% Opaque Mouth Cavity OVER the gap
+    // 2. Slice: the upper face never moves, only the lower jaw shifts down
     // The gap exists strictly between (lipLine - gap) and (lipLine)
     float gapTop = lipLine;
     float gapBottom = lipLine - gap;
 
-    if (gap > 0.001 && vUv.y < gapTop + 0.002 && vUv.y > gapBottom - 0.002) {
-      // Normalize Y inside the mouth hole (0.0 at bottom lip, 1.0 at top lip)
-      float normY = clamp((vUv.y - gapBottom) / max(0.0001, gap), 0.0, 1.0);
-      
-      // Strict masking to ensure it only renders horizontally within the mouth
-      float cavityMask = smoothstep(mouthWidth, mouthWidth * 0.85, abs(dx));
-      float verticalBlend = smoothstep(0.0, 0.15, normY) * smoothstep(1.0, 0.85, normY);
-      float finalMouthAlpha = cavityMask * verticalBlend;
+    if (vUv.y < gapBottom) {
+      // Fade out the UV shift towards the bottom of the neck (-0.15)
+      float jawWeight = smoothstep(-0.15, 0.0, vUv.y - gapBottom);
+      uv.y += gap * jawWeight;
+      // Never let the jaw sample pixels from above the lip (nose / eyes)
+      uv.y = min(uv.y, lipLine - 0.0005);
+    }
+    // Pixels inside the gap keep vUv: they are fully covered below
 
-      if (finalMouthAlpha > 0.0) {
-        vec3 cavityColor = vec3(0.12, 0.02, 0.03); // Deep dark red/black
+    vec4 finalColor = vec4(texture2D(uTexture, uv).rgb, 1.0);
+
+    // 3. Cover: 100% opaque mouth cavity over the whole gap
+    if (gap > 0.0005) {
+      // Anti-alias only outside the gap, never inside it
+      float aa = 0.0015;
+      float cover = smoothstep(gapBottom - aa, gapBottom, vUv.y)
+                  * (1.0 - smoothstep(gapTop, gapTop + aa, vUv.y));
+
+      if (cover > 0.0) {
+        // Normalize Y inside the mouth hole (0.0 at bottom lip, 1.0 at top lip)
+        float normY = clamp((vUv.y - gapBottom) / gap, 0.0, 1.0);
+        float normX = clamp(abs(dx) / mouthWidth, 0.0, 1.0);
+
+        // Deep dark red/black, darker towards the back of the throat
+        vec3 cavityColor = mix(vec3(0.05, 0.01, 0.015), vec3(0.14, 0.03, 0.04), normX);
         vec3 tongueColor = vec3(0.52, 0.20, 0.22);
         vec3 teethColor  = vec3(0.92, 0.90, 0.88);
 
-        // Add Tongue at the bottom
-        float tongueShape = smoothstep(0.45, 0.0, normY) * smoothstep(mouthWidth * 0.7, 0.0, abs(dx));
+        // Tongue at the bottom
+        float tongueShape = smoothstep(0.45, 0.0, normY) * smoothstep(0.7, 0.0, normX);
         cavityColor = mix(cavityColor, tongueColor, tongueShape);
 
-        // Add Teeth at the top
-        float teethShape = smoothstep(0.68, 0.85, normY);
+        // Upper teeth, only once the mouth is open enough
+        float teethShape = smoothstep(0.68, 0.85, normY) * smoothstep(0.008, 0.016, gap);
         cavityColor = mix(cavityColor, teethColor, teethShape);
 
-        // Overwrite the distorted pixels completely with the opaque mouth
-        finalColor.rgb = mix(finalColor.rgb, cavityColor, finalMouthAlpha);
+        finalColor.rgb = mix(finalColor.rgb, cavityColor, cover);
       }
     }
 
@@ -129,6 +130,8 @@ const fragmentShader = `
   }
 `;
 
+const SILENCE_THRESHOLD = 0.02;
+
 function MemojiScene({ imageUrl, audioLevel = 0, isSpeaking = false, analyserNode = null }) {
   const meshRef = useRef();
   const materialRef = useRef();
@@ -138,6 +141,14 @@ function MemojiScene({ imageUrl, audioLevel = 0, isSpeaking = false, analyserNod
   const texture = useLoader(THREE.TextureLoader, imageUrl);
   texture.colorSpace = THREE.SRGBColorSpace;
   const dataArray = useMemo(() => new Uint8Array(128), []);
+
+  // Close the mouth the instant speech ends, even before the next frame
+  useEffect(() => {
+    if (!isSpeaking) {
+      smoothAudioRef.current = 0;
+      if (materialRef.current) materialRef.current.uniforms.uAudio.value = 0;
+    }
+  }, [isSpeaking]);
 
   const uniforms = useMemo(
     () => ({
@@ -153,30 +164,39 @@ function MemojiScene({ imageUrl, audioLevel = 0, isSpeaking = false, analyserNod
     timeRef.current += delta;
     const t = timeRef.current;
 
-    let targetVol = Number(audioLevel) || 0;
+    // Mouth is closed unless the AI is speaking AND audio is actually audible
+    let targetVol = 0;
+    const externalLevel = Number(audioLevel) || 0;
 
-    if (analyserNode) {
-      try {
-        analyserNode.getByteTimeDomainData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          const v = (dataArray[i] - 128) / 128.0;
-          sum += v * v;
+    if (isSpeaking) {
+      if (analyserNode) {
+        try {
+          analyserNode.getByteTimeDomainData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const v = (dataArray[i] - 128) / 128.0;
+            sum += v * v;
+          }
+          const rms = Math.sqrt(sum / dataArray.length);
+          // Silence from the analyser means 0, never a stale external level
+          targetVol = rms > 0.01 ? Math.min(1.0, rms * 8.0) : 0;
+        } catch (e) {
+          targetVol = externalLevel;
         }
-        const rms = Math.sqrt(sum / dataArray.length);
-        if (rms > 0.01) targetVol = Math.min(1.0, rms * 8.0);
-      } catch (e) {}
-    } else if (isSpeaking) {
-      const wave = (Math.sin(t * 16.0) * 0.5 + 0.5) * (Math.cos(t * 22.0) * 0.5 + 0.5);
-      targetVol = (0.2 + 0.8 * wave) * (Math.sin(t * 5.5) > -0.6 ? 1.0 : 0.1);
+      } else if (externalLevel > SILENCE_THRESHOLD) {
+        targetVol = externalLevel;
+      } else {
+        const wave = (Math.sin(t * 16.0) * 0.5 + 0.5) * (Math.cos(t * 22.0) * 0.5 + 0.5);
+        targetVol = (0.2 + 0.8 * wave) * (Math.sin(t * 5.5) > -0.6 ? 1.0 : 0.1);
+      }
     }
 
-    smoothAudioRef.current = THREE.MathUtils.lerp(
-      smoothAudioRef.current,
-      targetVol,
-      targetVol > 0.01 ? 0.38 : 0.3
-    );
-    if (smoothAudioRef.current < 0.003) smoothAudioRef.current = 0;
+    if (targetVol <= SILENCE_THRESHOLD) {
+      // Snap strictly closed: no lerp tail that leaves the mouth half open
+      smoothAudioRef.current = 0;
+    } else {
+      smoothAudioRef.current = THREE.MathUtils.lerp(smoothAudioRef.current, targetVol, 0.38);
+    }
 
     const blinkCycle = t % 3.6;
     let blink = 0;

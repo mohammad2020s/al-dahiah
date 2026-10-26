@@ -68,6 +68,7 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   const isMutedRef = useRef<boolean>(false);
   const isSessionActiveRef = useRef<boolean>(false);
   const isGeminiSpeakingRef = useRef<boolean>(false);
+  const [isGeminiSpeaking, setIsGeminiSpeaking] = useState<boolean>(false);
   const turnCooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [audioAnalyser, setAudioAnalyser] = useState<AnalyserNode | null>(null);
@@ -127,6 +128,8 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
 
   const updateGeminiSpeaking = useCallback((speaking: boolean) => {
     isGeminiSpeakingRef.current = speaking;
+    // Mirror into state so the memoji re-renders (and closes its mouth) when speech ends
+    setIsGeminiSpeaking(speaking);
     if (workletNodeRef.current) {
       try {
         workletNodeRef.current.port.postMessage({
@@ -660,7 +663,7 @@ registerProcessor('mic-processor', MicProcessor);`;
             <SaudiMemojiCall
               imageUrl="/memoji.jpg"
               externalAudioLevel={outputAudioLevel}
-              isSpeaking={status === "speaking" || isGeminiSpeakingRef.current}
+              isSpeaking={status === "speaking" || isGeminiSpeaking}
               analyserNode={outputAnalyserRef.current || audioAnalyser}
             />
           </div>

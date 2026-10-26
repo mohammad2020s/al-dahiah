@@ -24,6 +24,7 @@ import {
   AL_QASAB_LANDMARKS,
   AL_QASAB_ROUTES,
   applyNajdiPhoneticDiacritics,
+  normalizeCityName,
   cleanText,
   isPureSalamGreeting,
   isSalamMessage,
@@ -102,7 +103,8 @@ apiRouter.post("/chat/stream", async (req: Request, res: Response) => {
 
   const requestStartTime = Date.now();
   try {
-    const userPrompt = (req.body?.message || "").trim();
+    // Correct «القصيب» → «القَصَب» before anything (guards, Gemini) sees the message
+    const userPrompt = normalizeCityName((req.body?.message || "").trim());
     const rawHistory = Array.isArray(req.body?.history) ? req.body.history : [];
     const requestedLang = req.body?.language || "ar";
 
@@ -215,7 +217,7 @@ apiRouter.post("/chat/stream", async (req: Request, res: Response) => {
         if (turn?.content) {
           contents.push({
             role: turn.role === "assistant" ? "model" : "user",
-            parts: [{ text: turn.content }],
+            parts: [{ text: normalizeCityName(turn.content) }],
           });
         }
       }
@@ -259,7 +261,7 @@ apiRouter.post("/chat/stream", async (req: Request, res: Response) => {
       }
     }
 
-    let finalAnswer = lang === "ar" ? applyNajdiPhoneticDiacritics(rawAnswer) : rawAnswer;
+    let finalAnswer = lang === "ar" ? applyNajdiPhoneticDiacritics(rawAnswer) : normalizeCityName(rawAnswer);
     finalAnswer = cleanText(finalAnswer);
 
     if (isSalamMessage(userPrompt)) {

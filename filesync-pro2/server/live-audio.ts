@@ -32,7 +32,8 @@ export function setupLiveAudio(server: Server) {
       return;
     }
 
-    const systemInstruction = buildAlQasabSystemPrompt(undefined, lang);
+    // Bilingual prompt: the caller may switch language mid-call (English → English, Arabic → Najdi only)
+    const systemInstruction = buildAlQasabSystemPrompt(undefined, "auto");
 
     // Official Gemini Live WebSocket endpoint
     const geminiWsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;

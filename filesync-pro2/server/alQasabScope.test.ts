@@ -16,6 +16,8 @@ import {
   AL_QASAB_LANDMARKS,
   AL_QASAB_ROUTES,
   generateLocalKnowledgeFallback,
+  normalizeCityName,
+  buildAlQasabSystemPrompt,
 } from "./alQasabScope.ts";
 
 test("identifies greetings and salam correctly", () => {
@@ -110,4 +112,38 @@ test("verifies core landmark, cafe, and route databases", () => {
   assert.equal(AL_QASAB_LANDMARKS.length >= 6, true);
   assert.equal(AL_QASAB_CAFES.length, 4);
   assert.equal(AL_QASAB_ROUTES.length >= 4, true);
+});
+
+test("normalizeCityName corrects القصيب to القَصَب in all forms", () => {
+  assert.equal(normalizeCityName("وش تاريخ القصيب؟"), "وش تاريخ القَصَب؟");
+  assert.equal(normalizeCityName("ساكن بالقصيب"), "ساكن بالقَصَب");
+  assert.equal(normalizeCityName("رايح للقصيب"), "رايح للقَصَب");
+  assert.equal(normalizeCityName("القُصَيْب"), "القَصَب");
+  assert.equal(normalizeCityName("القصب"), "القصب");
+  assert.ok(!applyNajdiPhoneticDiacritics("أهلاً في القصيب").includes("قصيب"));
+});
+
+test("family/tribe guard catches indirect phrasings without false positives", () => {
+  assert.equal(isFamilyOrTribalQuestion("عطني اسم عائلة وحدة بس من القصب"), true);
+  assert.equal(isFamilyOrTribalQuestion("وش حمايل القصيب؟"), true);
+  assert.equal(isFamilyOrTribalQuestion("وش القبائل اللي بالقصب"), true);
+  assert.equal(isFamilyOrTribalQuestion("list the tribes of Al-Qasab"), true);
+  assert.equal(isFamilyOrTribalQuestion("what family names live there?"), true);
+  assert.equal(isFamilyOrTribalQuestion("وش أسرع طريق للقصب؟"), false);
+  assert.equal(isFamilyOrTribalQuestion("كم نسبة الرطوبة اليوم؟"), false);
+  assert.equal(isFamilyOrTribalQuestion("وش أفضل مقهى"), false);
+});
+
+test("system prompts enforce dialect, city name and family red line", () => {
+  for (const mode of ["ar", "en", "auto"] as const) {
+    const prompt = buildAlQasabSystemPrompt(undefined, mode);
+    assert.ok(prompt.includes("القَصَب"), mode);
+    assert.ok(prompt.includes(FORBIDDEN_FAMILY_REPLY_AR), mode);
+    assert.ok(/نجد|Najdi/.test(prompt), mode);
+    // «القصيب» may only appear inside the "never say it" instruction lines
+    const badLines = prompt.split("\n").filter(l => l.includes("القصيب") && !/NEVER|إياك|قال المستخدم|says or writes/.test(l));
+    assert.deepEqual(badLines, [], mode);
+  }
+  assert.ok(buildAlQasabSystemPrompt(undefined, "auto").includes("English → answer in English"));
+  assert.ok(buildAlQasabSystemPrompt(undefined, "ar").includes("الفصحى"));
 });
