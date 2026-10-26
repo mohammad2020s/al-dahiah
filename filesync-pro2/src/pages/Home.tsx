@@ -25,6 +25,7 @@ import { VoiceCall } from "../components/VoiceCall";
 import { CallButtonAnimation } from "../components/CallButtonAnimation";
 import { LanguageModal } from "../components/LanguageModal";
 import { MapView } from "../components/Map";
+import { PlaceGallery, type PlaceImage } from "../components/PlaceGallery";
 import { Language, translations } from "../i18n";
 
 type WeatherData = {
@@ -50,6 +51,7 @@ type ChatMessage = {
   showMap?: boolean;
   locationData?: any;
   weather?: WeatherData | null;
+  images?: PlaceImage[];
   audio?: string;
 };
 
@@ -407,6 +409,7 @@ export default function Home() {
                         showMap: data.showMap,
                         locationData: data.locationData,
                         weather: data.weather,
+                        images: Array.isArray(data.images) ? data.images : undefined,
                       }
                     : m
                 )
@@ -622,6 +625,9 @@ export default function Home() {
                       <MessageBubble message={m} language={language} />
                       {m.role === "assistant" && m.weather && (
                         <WeatherCard weather={m.weather} language={language} />
+                      )}
+                      {m.role === "assistant" && m.images && m.images.length > 0 && (
+                        <PlaceGallery images={m.images} language={language} />
                       )}
                       {m.role === "assistant" && m.showMap && m.locationData && (
                         <LocationMapCard location={m.locationData} language={language} />

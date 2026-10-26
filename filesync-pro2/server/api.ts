@@ -35,6 +35,7 @@ import {
   FORBIDDEN_FAMILY_REPLY_EN,
 } from "./alQasabScope.ts";
 import { fetchAlQasabWeather } from "./weather.ts";
+import { getPlaceImages, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
 
 export const apiRouter = Router();
 
@@ -120,7 +121,7 @@ apiRouter.post("/chat/stream", async (req: Request, res: Response) => {
 
     // Fast-path: Instant Salam greeting
     if (isPureSalamGreeting(userPrompt, lang)) {
-      const instantAnswer = getInstantSalamReply(lang);
+      const instantAnswer = getInstantSalamReply(lang, userPrompt);
       sendEvent({ type: "chunk", content: instantAnswer });
       sendEvent({
         type: "done",
@@ -264,13 +265,13 @@ apiRouter.post("/chat/stream", async (req: Request, res: Response) => {
     let finalAnswer = lang === "ar" ? applyNajdiPhoneticDiacritics(rawAnswer) : normalizeCityName(rawAnswer);
     finalAnswer = cleanText(finalAnswer);
 
-    if (isSalamMessage(userPrompt)) {
-      if (lang === "ar") {
-        if (!finalAnswer.startsWith("وعليكم السلام") && !finalAnswer.includes("السلام عليكم")) {
-          finalAnswer = `وعليكم السلام ورحمة الله وبركاته.. ${finalAnswer}`;
-        }
-      }
+    // Opened with «السلام عليكم»: answer the greeting first, like a host welcoming a guest
+    if (isSalamMessage(userPrompt) && !/^\s*(وعليكم السلام|wa alaykum|wa alaikum)/i.test(finalAnswer)) {
+      finalAnswer = `${lang === "en" ? SALAM_PREFIX_EN : SALAM_PREFIX_AR} ${finalAnswer}`;
     }
+
+    // Real photos of the place being asked about (e.g. the salt pans), shown as a gallery under the answer
+    const images = getPlaceImages(userPrompt, lang);
 
     const showMap =
       isLocationQuestion(userPrompt) ||
@@ -290,6 +291,7 @@ apiRouter.post("/chat/stream", async (req: Request, res: Response) => {
         showMap,
         locationData,
         weather: null,
+        images,
         responseTimeMs: totalResponseTimeMs,
       });
       res.end();

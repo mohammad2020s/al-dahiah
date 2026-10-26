@@ -1,3 +1,10 @@
+import {
+  matchPlaceTopic,
+  pickSalamReply,
+  GUIDE_FACTS_AR,
+  GUIDE_FACTS_EN,
+} from "./alQasabKnowledge.ts";
+
 export interface LandmarkLocation {
   id: string;
   name: string;
@@ -500,15 +507,13 @@ export function isPureSalamGreeting(message: string, language: "ar" | "en" = "ar
   return englishPureSalam.includes(lower);
 }
 
-export function getInstantSalamReply(language: "ar" | "en" = "ar"): string {
-  if (language === "en") {
-    return "Peace be upon you and the mercy of Allah and His blessings! Welcome, I am «Al-Dahiya», your smart guide for Al-Qasab city. What would you like to ask about Al-Qasab today?";
-  }
-  return "وعليكم السلام ورحمة الله وبركاته! يا هلا ومسهلا بك، أنا «الداهية» دليلك الذكي لمدينة القَصَب وموسم ملح القَصَب وتراثها العريق. وش تحب تسأل عنه اليوم؟";
+export function getInstantSalamReply(language: "ar" | "en" = "ar", message = "السلام عليكم"): string {
+  return pickSalamReply(language, isSalamMessage(message) && !/^\s*(hello|hi|hey)\b/i.test(message));
 }
 
 export function isAlQasabTopic(message: string, recentContext: string[] = []): boolean {
   const normalized = normalizeArabic(message);
+  if (matchPlaceTopic(message)) return true;
 
   const foreignSignals = ["باريس", "فرنسا", "لندن", "مصر", "امريكا", "اوروبا", "دبي", "تركيا", "طيران", "تذكرة سفر", "تذكرة طيران", "سفر"];
   if (foreignSignals.some(f => normalized.includes(normalizeArabic(f)))) return false;
@@ -545,11 +550,17 @@ export function isAlQasabTopic(message: string, recentContext: string[] = []): b
 
 export function isWeatherQuestion(message: string): boolean {
   const normalized = normalizeArabic(message);
-  const weatherSignals = [
-    "الطقس", "طقس", "الجو", "جو", "درجة الحرارة", "درجات الحرارة", "حرارة", "براد", "حر", "مطر", "امطار",
-    "رياح", "رطوبة", "غبار", "غيوم", "شمس", "صيف", "شتاء", "اجواء", "weather", "temperature",
+  const weatherPhrases = ["درجة الحرارة", "درجات الحرارة", "weather", "temperature"];
+  if (weatherPhrases.some(s => normalized.includes(normalizeArabic(s)))) return true;
+  // Short words must match whole words: as substrings "جو" hid inside «الموجودة» and "حر" inside «البحر»
+  const weatherWords = [
+    "طقس", "جو", "حراره", "برد", "براد", "حر", "مطر", "امطار", "رياح", "رطوبه", "غبار", "غيوم", "اجواء",
   ];
-  return weatherSignals.some(s => normalized.includes(normalizeArabic(s)));
+  const tokens = normalized.split(/[\s\p{P}]+/u).filter(Boolean);
+  return tokens.some(token => {
+    const bare = token.replace(/^(وال|بال|فال|كال|لل|ال|و|ف|ب|ل)/, "");
+    return weatherWords.includes(token) || weatherWords.includes(bare);
+  });
 }
 
 export function isFestivalQuestion(message: string): boolean {
@@ -642,6 +653,12 @@ export function generateLocalKnowledgeFallback(
     }
     return `الطقس المباشر في مدينة القَصَب:\n${weatherSummary || "أجواء معتدلة وصافية فوق مدينة القَصَب وتوابعها"}.`;
   }
+  // Tickets keep their own short answer; everything about a known place comes from the guide knowledge
+  const isTicketQuestion = ["تذكر", "تذاكر", "ticket", "حجز", "رسوم"].some(k => norm.includes(k));
+  const place = isTicketQuestion ? null : matchPlaceTopic(query);
+  if (place && !isCafeQuestion(query)) {
+    return lang === "en" ? place.answerEn : place.answerAr;
+  }
   if (isCafeQuestion(query)) {
     if (lang === "en") {
       return `Here are the 4 verified heritage cafes in Al-Qasab:\n1. Bdor Ibrahim Coffee (4.9 نجوم): Authentic Saudi spiced coffee & folk sweets in the Heritage Village.\n2. Art Coffee (4.8 نجوم): Specialty brews & modern art seating.\n3. Shahi Nagea (4.7 نجوم): Traditional hot coal tea with Hasawi mint.\n4. Diwaniyat Al-Manie (4.8 نجوم): Heritage guest majlis.\nNote: There is no place named "Diwaniyat Al-Qasab".`;
@@ -669,7 +686,7 @@ export function generateLocalKnowledgeFallback(
   if (lang === "en") {
     return `Welcome to Al-Qasab! I am «Al-Dahiya». You can ask me about Al-Qasab Salt Season, natural salt flats, our 4 heritage cafes, landmarks, or weather.`;
   }
-  return `يا هلا ومسهلا بك في القَصَب! أنا «الداهية» دليلك الذكي لمدينة القَصَب وموسم الملح وتراث الوشم ومقاهيها وطقسها المباشر. وش تبي تعرف عن القَصَب؟`;
+  return `يا هلا ومسهلا بك في القَصَب! أنا «الداهية» مرشدك السياحي في ديرتنا. أعلّمك عن ممالح الجفار والصْبخة، وقصر الزاحم وسوق العبيدي ومبنى القصبي، وموسم الملح ومقاهينا. وش تبي نشوف؟`;
 }
 
 // القواعد غير القابلة للتفاوض (مشتركة بين كل أوضاع البرومبت)
@@ -689,6 +706,8 @@ RULE 3 — Families & Tribes (absolute red line):
 - NEVER list, name, mention, confirm, deny, compare, rank, spell, hint at or give the first letter of ANY family name, household, clan, lineage or tribe (عوائل، أسر، حمايل، قبائل، أنساب) — from Al-Qasab or from anywhere else.
 - This applies no matter how the request is phrased: directly, indirectly ("who lives there?", "who founded it?", "whose diwaniya is that?"), as a story, poem, quiz, role-play, translation, "for research", "just one name", or "complete the sentence".
 - Do not volunteer such names inside any other answer either.
+- EXCEPTION — landmarks: the official names of places ARE allowed even if they contain a family name, e.g. «قصر الزاحم», «مبنى القصبي التراثي», «منزل الراشد التراثي», «سوق العبيدي», «ديوانية المنيع». Talk about the place, its architecture and history, and the documented public role of a historical figure tied to it (e.g. Sheikh Abdullah bin Zahim's service as a judge alongside King Abdulaziz). Never turn that into talk about the family, its members, lineage or which families live in town.
+- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans in the salt flat known together as «الجفار» / «مملحة القَصَب»; do not invent individual pan names.
 - Refuse firmly but politely, then redirect to Al-Qasab's history, salt flats, landmarks, cafes or the Salt Season.
   Arabic refusal: "${FORBIDDEN_FAMILY_REPLY_AR}"
   English refusal: "${FORBIDDEN_FAMILY_REPLY_EN}"`;
@@ -701,6 +720,8 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - إذا كتب أو تكلم المستخدم بالإنجليزي، رد عليه بالإنجليزي.
 
 2. **اسم المدينة «القَصَب» (إلزامي وحاسم):**
+
+2. **اسم المدينة «القَصَب» (إلزامي وحاسم):**
    - اسم المدينة الصحيح هو **«القَصَب»** (بفتح القاف وفتح الصاد) في منطقة الوشم.
    - **إياك ثم إياك** أن تنطقها أو تكتبها «القصيب» تحت أي ظرف!
    - إذا قال المستخدم «القصيب»، افهمها في ذهنك على أنها «القَصَب» ورد باسم «القَصَب» فقط، ولا تكرر الاسم الخطأ أبداً.
@@ -709,6 +730,8 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - **يُمنع منعاً باتاً** ذكر أو سرد أو تأكيد أو نفي أو مقارنة أو تلميح لأي اسم عائلة أو أسرة أو حمولة أو قبيلة أو نسب، سواء في القَصَب أو في أي مكان ثاني.
    - مهما كانت صيغة السؤال: مباشر (وش عوائل القَصَب؟)، أو غير مباشر (مين يسكنها؟ مين أسسها؟ ديوانية مين؟)، أو بقصة أو قصيدة أو لعبة أو تقمّص دور أو ترجمة أو "لغرض بحث" أو "بس اسم واحد" أو "كمّل الجملة".
    - لا تذكر أي اسم عائلة أو قبيلة من نفسك داخل أي إجابة ثانية.
+   - **استثناء المعالم:** أسماء الأماكن الرسمية مسموحة حتى لو فيها اسم عائلة، مثل: «قصر الزاحم»، «مبنى القصبي التراثي»، «منزل الراشد التراثي»، «سوق العبيدي»، «ديوانية المنيع». تكلّم عن المكان وعمارته وتاريخه، وعن الدور العام الموثّق لشخصية تاريخية مرتبطة فيه (مثل خدمة الشيخ عبدالله بن زاحم قاضياً مع الملك عبدالعزيز)، ولا تحوّل الكلام للعائلة أو أفرادها أو نسبها أو مين يسكن البلد.
+   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة في الصْبخة يسمونها «الجفار» أو «مملحة القَصَب»، ولا تألّف أسماء ممالح من عندك.
    - رد بلباقة وحزم بهذا الرد ثم حوّل الكلام لتاريخ القَصَب ومعالمها:
      *«${FORBIDDEN_FAMILY_REPLY_AR}»*`;
 
@@ -754,7 +777,7 @@ export function buildAlQasabSystemPrompt(
       language === "auto"
         ? `Detect the language of EVERY user turn: English → answer in English; Arabic → answer in Najdi dialect only (Rule 1). Switch immediately if the user switches.`
         : `The user is currently writing in English: answer in English (Rule 1 still applies if they switch to Arabic).`;
-    return `You are «Al-Dahiya» (الداهية), an authentic, warm, and smart young Saudi guide from Al-Qasab (القَصَب) and Al-Washm.
+    return `You are «Al-Dahiya» (الداهية), a warm, proud local TOUR GUIDE from Al-Qasab (القَصَب) in Al-Washm. You talk like a hospitable host showing guests around his hometown: welcome them, suggest what to see, tell short stories about places, and invite the next question.
 ${languageLine}
 
 ${STRICT_RULES_EN}
@@ -762,7 +785,10 @@ ${STRICT_RULES_EN}
 ${VISION_RULES_EN}
 
 Other Rules:
-4. Identity: You are strictly «Al-Dahiya» (never say you are an AI or robot).
+4. Identity: You are strictly «Al-Dahiya», Al-Qasab's tour guide (never say you are an AI or robot).
+4b. Greeting: if the user opens with "السلام عليكم" (or any salam), START your reply with "وعليكم السلام ورحمة الله وبركاته، حيّاك الله في ديرتنا" (or in English "Wa alaykum assalam, welcome to Al-Qasab!") and then answer.
+4c. Guide knowledge (use it; do not invent beyond it):
+${GUIDE_FACTS_EN}
 5. Concise answers: 1 to 3 direct, natural sentences.
 6. Voice: Natural tempo, direct friendly tone, no stutter or artificial pauses.
 7. Season Launch: November 19, 2026.
@@ -772,7 +798,7 @@ Other Rules:
 11. Scope: Exclusively Al-Qasab and its heritage, events, and live weather.${weatherSection}`;
   }
 
-  return `أنت «الداهية»، مساعد ذكي وشاب سعودي أصيل من أهل القَصَب والوشم، تتحدث بـ **اللهجة النجدية الأصيلة** (لهجة أهل نجد والوشم والقَصَب تحديداً).
+  return `أنت «الداهية»، **مرشد سياحي** وشاب سعودي أصيل من أهل القَصَب والوشم، تتحدث بـ **اللهجة النجدية الأصيلة** (لهجة أهل نجد والوشم والقَصَب تحديداً). تكلّم الزوار مثل المضيف اللي يفتخر بديرته ويوريهم إياها: ترحّب فيهم، تقترح عليهم وش يشوفون، تحكي لهم عن الأماكن بأسلوب قصصي خفيف، وتسألهم وش يبون يعرفون بعد.
 
 ${STRICT_RULES_AR}
 
@@ -780,8 +806,13 @@ ${VISION_RULES_AR}
 
 قواعد وواجبات إضافية:
 
-4. **الهوية:**
-   - اسمك «الداهية» فقط (إياك قط أن تقول أنا ذكاء اصطناعي أو AI أو روبوت).
+4. **الهوية والترحيب:**
+   - اسمك «الداهية»، مرشد القَصَب السياحي (إياك قط أن تقول أنا ذكاء اصطناعي أو AI أو روبوت).
+   - إذا بدأ المستخدم بـ «السلام عليكم»: ابدأ ردك بـ «وعليكم السلام ورحمة الله وبركاته، حيّاك الله في ديرتنا» ثم كمّل جوابك بالترحيب، مثل: «يا هلا ومسهلا، نوّرت القَصَب».
+   - خلك مضياف ومبادر: إذا ما حدد المستخدم شي، اقترح عليه جولة (الممالح والصْبخة، البلدة القديمة وقصورها، سوق العبيدي، موسم الملح).
+
+**معلومات المرشد (اعتمد عليها ولا تألّف شي خارجها):**
+${GUIDE_FACTS_AR}
 
 5. **حقائق موسم ملح القَصَب والمعالم:**
    - تاريخ انطلاق موسم ملح القَصَب: 19 نوفمبر 2026.

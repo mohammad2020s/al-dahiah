@@ -21,6 +21,7 @@ import {
   normalizeSabkha,
   isSabkhaQuestion,
 } from "./alQasabScope.ts";
+import { getPlaceImages } from "./alQasabKnowledge.ts";
 
 test("identifies greetings and salam correctly", () => {
   assert.equal(isSalamMessage("السلام عليكم ورحمة الله"), true);
@@ -33,8 +34,8 @@ test("identifies greetings and salam correctly", () => {
 
   const replyAr = getInstantSalamReply("ar");
   assert.match(replyAr, /وعليكم السلام/);
-  const replyEn = getInstantSalamReply("en");
-  assert.match(replyEn, /Peace be upon you/);
+  assert.match(getInstantSalamReply("en", "salam"), /^Wa alaykum assalam/);
+  assert.match(getInstantSalamReply("en", "hello"), /^Hello!/);
 });
 
 test("identifies Al-Qasab domain topics accurately", () => {
@@ -168,4 +169,37 @@ test("prompts carry the pronunciation and camera rules", () => {
     assert.ok(prompt.includes("مملحة القَصَب"), mode);
     assert.ok(/CAMERA|الكاميرا/.test(prompt), mode);
   }
+});
+
+test("tour guide knowledge: salt pans, palaces and the weather false positive", () => {
+  // «الموجودة» contains «جو»; this used to return the weather
+  assert.equal(isWeatherQuestion("وش أسماء الممالح الموجودة في القصب"), false);
+  assert.equal(isWeatherQuestion("كيف الجو اليوم؟"), true);
+  assert.equal(isWeatherQuestion("وش درجة الحرارة"), true);
+
+  for (const q of ["وش اسامي المملحه؟", "اعطني أسماء الممالح", "وش أسماء الممالح الموجودة في القصب"]) {
+    assert.equal(isFamilyOrTribalQuestion(q), false, q);
+    const a = generateLocalKnowledgeFallback(q, "ar");
+    assert.ok(a.includes("الجفار"), q);
+    assert.ok(!a.includes("ما أذكر أسماء عوائل"), q);
+    assert.equal(getPlaceImages(q, "ar").length, 5, q);
+  }
+  assert.equal(isAlQasabTopic("علمني عن قصر الزاحم"), true);
+  assert.ok(generateLocalKnowledgeFallback("علمني عن قصر الزاحم", "ar").includes("١٤٣٦"));
+  assert.ok(generateLocalKnowledgeFallback("وش مبنى القصبي التراثي", "ar").includes("سوق العبيدي"));
+  assert.equal(getPlaceImages("علمني عن قصر الزاحم", "ar").length, 0);
+  // Families are still off limits
+  assert.equal(isFamilyOrTribalQuestion("وش عوائل القصب"), true);
+});
+
+test("salam is answered like a host", () => {
+  for (let i = 0; i < 10; i++) {
+    const r = getInstantSalamReply("ar");
+    assert.ok(r.startsWith("وعليكم السلام"));
+    assert.ok(r.includes("القَصَب"));
+  }
+  const prompt = buildAlQasabSystemPrompt(undefined, "ar");
+  assert.ok(prompt.includes("مرشد سياحي"));
+  assert.ok(prompt.includes("حيّاك الله في ديرتنا"));
+  assert.ok(prompt.includes("قصر الزاحم"));
 });

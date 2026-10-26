@@ -20,6 +20,8 @@ export const translations = {
     welcomeTitle: "يا هلا ومسهلا في الداهية",
     welcomeDesc: "مساحتك الذكية لاكتشاف مدينة القصب وموسم ملح القصب وتاريخها العريق ومعالمها ومقاهيها التراثية.",
     suggestedQuestions: [
+      "وش ممالح القصب؟ وريني صورها",
+      "علمني عن قصر الزاحم التاريخي",
       "أبرز المقاهي والديوانيات في القرية التراثية بالقصب؟",
       "أين يقع موسم ملح القصب على الخريطة وكيف أصل إليه؟",
       "كيف أحصل على تذكرة موسم ملح القصب؟",
@@ -89,6 +91,8 @@ export const translations = {
     welcomeTitle: "Welcome to Al-Dahiya",
     welcomeDesc: "Your smart space to discover Al-Qasab city, its ancient salt flats, salt season, notable figures, and live weather.",
     suggestedQuestions: [
+      "Show me the Al-Qasab salt pans",
+      "Tell me about Al-Zahim historic palace",
       "What are the prominent cafes and diwaniyas in Al-Qasab Heritage Village?",
       "Where is Al-Qasab Salt Season located on the map?",
       "How can I get a ticket for Al-Qasab Salt Season?",
