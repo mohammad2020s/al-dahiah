@@ -19,6 +19,7 @@ import {
   normalizeCityName,
   buildAlQasabSystemPrompt,
   normalizeSabkha,
+  normalizePlaceWords,
   isSabkhaQuestion,
 } from "./alQasabScope.ts";
 import { getPlaceImages } from "./alQasabKnowledge.ts";
@@ -202,4 +203,13 @@ test("salam is answered like a host", () => {
   assert.ok(prompt.includes("مرشد سياحي"));
   assert.ok(prompt.includes("حيّاك الله في ديرتنا"));
   assert.ok(prompt.includes("قصر الزاحم"));
+});
+
+test("place words get their dictionary vowels", () => {
+  assert.equal(normalizePlaceWords("زرت المملحة"), "زرت المَمْلَحة");
+  assert.equal(normalizePlaceWords("عشرين مملحه"), "عشرين مَمْلَحة");
+  assert.equal(normalizePlaceWords("بالمملحة والجفار"), "بالمَمْلَحة والجِفار");
+  assert.equal(normalizePlaceWords("مملحتها"), "مملحتها");
+  const out = applyNajdiPhoneticDiacritics("السبخة جنب المملحة والجفار في القصيب");
+  assert.ok(out.includes("الصْبخة") && out.includes("المَمْلَحة") && out.includes("الجِفار") && out.includes("القَصَب"), out);
 });

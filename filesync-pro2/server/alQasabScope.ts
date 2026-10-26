@@ -439,9 +439,18 @@ export function normalizeSabkha(text: string): string {
   );
 }
 
+// ضبط بقية كلمات المكان كما في المعاجم: «المَمْلَحة» (تاج العروس) و«الجِفار» (لسان العرب)
+export function normalizePlaceWords(text: string): string {
+  if (!text) return "";
+  const prefix = "(^|[\\s\\p{P}]|ال|[وفبلك]ال|لل)";
+  return text
+    .replace(new RegExp(`${prefix}مملح(?:ة|ه)(?![\\p{L}])`, "gu"), "$1مَمْلَحة")
+    .replace(new RegExp(`${prefix}جفار(?![\\p{L}])`, "gu"), "$1جِفار");
+}
+
 export function applyNajdiPhoneticDiacritics(text: string): string {
   if (!text) return "";
-  let s = normalizeSabkha(normalizeCityName(cleanText(text)));
+  let s = normalizePlaceWords(normalizeSabkha(normalizeCityName(cleanText(text))));
 
   // قصب -> قَصَب
   s = s.replace(/(?<![\p{L}\p{M}])(ق[\p{M}]*ص[\p{M}]*ب)(?![\p{L}\p{M}])/gu, "قَصَب");
@@ -736,7 +745,11 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
      *«${FORBIDDEN_FAMILY_REPLY_AR}»*`;
 
 // النطق + التعرف على ما تعرضه كاميرا المكالمة (مشتركة بين كل أوضاع البرومبت)
-const VISION_RULES_EN = `PRONUNCIATION: In Arabic, the salt flat is ALWAYS "الصْبخة" (Najdi: ṣād with sukūn — "aṣ-ṣbkha"), never "السبخة" with sīn. In English say "Al-Sabkha".
+const VISION_RULES_EN = `PRONUNCIATION (Arabic, especially in voice):
+- "الصْبخة" — ṣād with sukūn ("aṣ-ṣbkha"), never "السبخة" with sīn. In English say "Al-Sabkha".
+- "المَمْلَحة" (al-mamlaḥa, fatḥa on the first mīm), plural "المَمَالِح".
+- "الجِفار" (al-jifār, kasra on the jīm) — the salt pits; singular "جَفْر".
+- "القَصَب" (fatḥa on qāf and ṣād), "الوَشْم", "شَقْراء", "طُوَيْق", "الدَّهْناء".
 
 CAMERA (live call): The user may turn on their camera; you then receive frames of what is in front of them.
 - When the camera turns on, or the user asks "what is this?" / "وش هذا؟", say what you see in one short sentence, name it if it matches an Al-Qasab place below, then give 1–2 useful facts and invite a follow-up question.
@@ -751,7 +764,11 @@ Visual guide to Al-Qasab:
 5. A milky, pale-green pool with white crystals along its edge: brine concentrating as the water evaporates — the salt is crystallising there.
 6. White salt heaps or salt sacks: the harvested Al-Qasab salt, the heart of موسم ملح القَصَب (launching 19 November 2026; entry free).`;
 
-const VISION_RULES_AR = `**النطق:** تنطق وتكتب دائماً «الصْبخة» (بالصاد الساكنة على لهجة أهل نجد)، ولا تقول «السبخة» بالسين أبداً.
+const VISION_RULES_AR = `**النطق الصحيح (خصوصاً في الصوت):**
+- «الصْبخة» بالصاد الساكنة على لهجة أهل نجد، ولا تقول «السبخة» بالسين أبداً.
+- «المَمْلَحة» بفتح الميم الأولى، وجمعها «المَمَالِح».
+- «الجِفار» بكسر الجيم (حُفر الملح)، ومفردها «جَفْر».
+- «القَصَب» بفتح القاف والصاد، «الوَشْم»، «شَقْراء»، «طُوَيْق»، «الدَّهْناء».
 
 **الكاميرا في المكالمة:** ممكن المستخدم يشغّل الكاميرا وتوصلك صور لِلي قدامه.
 - أول ما تنفتح الكاميرا، أو إذا قال «وش هذا؟»: قل باختصار وش تشوف، وسمّه إذا طابق معلَم من معالم القَصَب تحت، وبعدها عطه معلومة أو ثنتين مفيدة واسأله إذا يبي يعرف أكثر.
