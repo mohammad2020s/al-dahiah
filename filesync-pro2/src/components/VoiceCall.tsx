@@ -7,7 +7,7 @@ import {
   Volume2,
   Sparkles,
 } from "lucide-react";
-import SaudiMemojiCall from "./SaudiMemojiCall";
+import SaltBagCall from "./SaltBagCall";
 
 interface VoiceCallProps {
   isOpen: boolean;
@@ -660,8 +660,8 @@ registerProcessor('mic-processor', MicProcessor);`;
               }}
               className="absolute size-64 sm:size-80 rounded-full bg-gradient-to-tr from-rose-700/50 via-amber-600/40 to-red-600/50 blur-3xl pointer-events-none transition-all duration-150"
             />
-            <SaudiMemojiCall
-              imageUrl="/memoji.jpg"
+            <SaltBagCall
+              imageUrl="/salt-bag.png"
               externalAudioLevel={outputAudioLevel}
               isSpeaking={status === "speaking" || isGeminiSpeaking}
               analyserNode={outputAnalyserRef.current || audioAnalyser}
