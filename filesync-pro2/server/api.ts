@@ -321,7 +321,8 @@ apiRouter.post("/speak", async (req: Request, res: Response) => {
 
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-tts-preview",
-      contents: [{ parts: [{ text: cleanText(text).slice(0, 400) }] }],
+      // Same Najdi corrections as the chat («القَصَب», «الصْبخة») so the voice says them right
+      contents: [{ parts: [{ text: applyNajdiPhoneticDiacritics(String(text)).slice(0, 400) }] }],
       config: {
         responseModalities: [Modality.AUDIO],
         speechConfig: {

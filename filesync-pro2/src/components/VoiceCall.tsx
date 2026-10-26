@@ -6,6 +6,9 @@ import {
   X,
   Volume2,
   Sparkles,
+  Camera,
+  CameraOff,
+  SwitchCamera,
 } from "lucide-react";
 import SaltBagCall from "./SaltBagCall";
 
@@ -80,6 +83,14 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   const nextStartTimeRef = useRef<number>(0);
 
   const streamRef = useRef<MediaStream | null>(null);
+
+  // Live camera: frames go to Gemini Live as realtimeInput.video so Al-Dahiya can see what the user shows him
+  const [isCameraOn, setIsCameraOn] = useState(false);
+  const [cameraFacing, setCameraFacing] = useState<"environment" | "user">("environment");
+  const cameraStreamRef = useRef<MediaStream | null>(null);
+  const cameraVideoRef = useRef<HTMLVideoElement | null>(null);
+  const cameraTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const cameraCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const workletNodeRef = useRef<AudioWorkletNode | null>(null);
 
   // Real-time audio volume analyzer for AI speech lip-sync (0.0 to 1.0)
@@ -210,8 +221,101 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
     }
   }, []);
 
+  const stopCamera = useCallback(() => {
+    if (cameraTimerRef.current) {
+      clearInterval(cameraTimerRef.current);
+      cameraTimerRef.current = null;
+    }
+    cameraStreamRef.current?.getTracks().forEach((track) => {
+      try { track.stop(); } catch {}
+    });
+    cameraStreamRef.current = null;
+    if (cameraVideoRef.current) cameraVideoRef.current.srcObject = null;
+    setIsCameraOn(false);
+  }, []);
+
+  const sendCameraFrame = useCallback(() => {
+    const video = cameraVideoRef.current;
+    const ws = wsRef.current;
+    if (!video || video.readyState < 2 || !video.videoWidth || !ws || ws.readyState !== WebSocket.OPEN) return false;
+    // Gemini Live takes ~1 fps of modest JPEGs; 640px on the long side is plenty to recognise a place
+    const scale = Math.min(1, 640 / Math.max(video.videoWidth, video.videoHeight));
+    const canvas = cameraCanvasRef.current || (cameraCanvasRef.current = document.createElement("canvas"));
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return false;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const data = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
+    ws.send(JSON.stringify({ realtimeInput: { video: { mimeType: "image/jpeg", data } } }));
+    return true;
+  }, []);
+
+  const startCamera = useCallback(async (facing: "environment" | "user") => {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      setErrorMessage(isEn ? "Wait for the call to connect, then turn on the camera." : "انتظر لين يتصل الداهية وبعدها شغّل الكاميرا.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      });
+      cameraStreamRef.current = stream;
+      setIsCameraOn(true);
+      setErrorMessage(null);
+      // The <video> mounts with isCameraOn; attach the stream on the next frame
+      requestAnimationFrame(() => {
+        const video = cameraVideoRef.current;
+        if (video) {
+          video.srcObject = stream;
+          video.play().catch(() => {});
+        }
+      });
+
+      let askedToLook = false;
+      cameraTimerRef.current = setInterval(() => {
+        const sent = sendCameraFrame();
+        if (sent && !askedToLook) {
+          askedToLook = true;
+          // Ask once per camera start, right after the first frame, so he describes what he sees without waiting
+          wsRef.current?.send(JSON.stringify({
+            clientContent: {
+              turns: [{
+                role: "user",
+                parts: [{
+                  text: isEn
+                    ? "I just turned on my camera. Tell me what you see, and if it's an Al-Qasab landmark, tell me about it."
+                    : "شغلت الكاميرا الحين، قل لي وش تشوف قدامي، وإذا هو من معالم القَصَب علّمني عنه.",
+                }],
+              }],
+              turnComplete: true,
+            },
+          }));
+        }
+      }, 1000);
+    } catch (err) {
+      console.warn("Camera access issue:", err);
+      stopCamera();
+      setErrorMessage(isEn ? "Camera access was denied or is unavailable." : "تعذر تشغيل الكاميرا. تأكد إنك سمحت للموقع يستخدمها.");
+    }
+  }, [isEn, sendCameraFrame, stopCamera]);
+
+  const toggleCamera = useCallback(() => {
+    if (isCameraOn) stopCamera();
+    else startCamera(cameraFacing);
+  }, [isCameraOn, cameraFacing, startCamera, stopCamera]);
+
+  const flipCamera = useCallback(() => {
+    const next = cameraFacing === "environment" ? "user" : "environment";
+    setCameraFacing(next);
+    stopCamera();
+    startCamera(next);
+  }, [cameraFacing, startCamera, stopCamera]);
+
   const disconnectLive = useCallback(() => {
     isSessionActiveRef.current = false;
+    stopCamera();
     stopCapture();
     stopPlayback();
     if (wsRef.current) {
@@ -227,7 +331,7 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
     }
     setStatus("idle");
     setMicLevel(0);
-  }, [stopCapture, stopPlayback]);
+  }, [stopCamera, stopCapture, stopPlayback]);
 
   const scheduleAudioChunk = useCallback((base64AudioData: string) => {
     if (!isSessionActiveRef.current) return;
@@ -666,6 +770,29 @@ registerProcessor('mic-processor', MicProcessor);`;
               isSpeaking={status === "speaking" || isGeminiSpeaking}
               analyserNode={outputAnalyserRef.current || audioAnalyser}
             />
+
+            {isCameraOn && (
+              <div className="absolute top-0 end-0 w-24 sm:w-36 aspect-[3/4] rounded-2xl overflow-hidden border-2 border-white/25 shadow-xl bg-black">
+                <video
+                  ref={cameraVideoRef}
+                  playsInline
+                  muted
+                  className={`size-full object-cover ${cameraFacing === "user" ? "-scale-x-100" : ""}`}
+                />
+                <span className="absolute top-1.5 start-1.5 flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white">
+                  <span className="size-1.5 rounded-full bg-rose-500 animate-pulse" />
+                  {isEn ? "Al-Dahiya sees" : "الداهية يشوف"}
+                </span>
+                <button
+                  type="button"
+                  onClick={flipCamera}
+                  className="absolute bottom-1.5 end-1.5 size-8 rounded-full bg-black/55 hover:bg-black/75 text-white flex items-center justify-center"
+                  title={isEn ? "Switch camera" : "تبديل الكاميرا"}
+                >
+                  <SwitchCamera className="size-4" />
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-center gap-1.5 h-8 px-4 my-4">
@@ -718,6 +845,10 @@ registerProcessor('mic-processor', MicProcessor);`;
             <p className="text-xs sm:text-sm text-[#e0b8b6] max-w-sm mt-1">
               {errorMessage ? (
                 <span className="text-rose-300 font-medium">{errorMessage}</span>
+              ) : isCameraOn ? (
+                <span className="text-emerald-300 font-semibold">
+                  {isEn ? "Al-Dahiya can see your camera • Ask him \"what is this?\"" : "الداهية يشوف كاميرتك • اسأله «وش هذا؟»"}
+                </span>
               ) : isMuted ? (
                 <span className="text-rose-300 font-semibold">
                   {isEn ? "Microphone is muted • Click mic button to un-mute" : "المايك مغلق • اضغط زر المايك للتحدث"}
@@ -751,6 +882,19 @@ registerProcessor('mic-processor', MicProcessor);`;
             ) : (
               <Mic className="size-5 sm:size-6 text-rose-300" />
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleCamera}
+            className={`size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl transition-all shadow-md flex items-center justify-center select-none ${
+              isCameraOn
+                ? "bg-emerald-600 hover:bg-emerald-700 text-white ring-4 ring-emerald-500/30"
+                : "bg-white/10 hover:bg-white/20 text-[#fef5f4]"
+            }`}
+            title={isCameraOn ? (isEn ? "Turn off camera" : "إيقاف الكاميرا") : (isEn ? "Show Al-Dahiya with your camera" : "شغّل الكاميرا وخل الداهية يشوف")}
+          >
+            {isCameraOn ? <CameraOff className="size-5 sm:size-6" /> : <Camera className="size-5 sm:size-6 text-rose-300" />}
           </button>
 
           <button

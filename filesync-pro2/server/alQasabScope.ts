@@ -79,7 +79,7 @@ export const AL_QASAB_ROUTES: DrivingRouteGuide[] = [
     estimatedDuration: "6 دقائق",
     recommendedRoad: "طريق الممالح المعبد جنوب شرق المدينة",
     steps: [
-      "التحرك جنوب شرق المدينة باتجاه سبخة القصب الشهيرة.",
+      "التحرك جنوب شرق المدينة باتجاه صْبخة القَصَب الشهيرة.",
       "طريق معبد ومضاء يوصلك مباشرة إلى أحواض التبخير وقرية الملح القديمة.",
       "الموقع متاح للزيارة والتصوير والاطلاع على استخراج الملح الطبيعي."
     ],
@@ -137,10 +137,10 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
   },
   {
     id: "sabkha",
-    name: "سبخة القصب الطبيعية",
+    name: "صْبخة القَصَب الطبيعية",
     category: "معالم طبيعية",
-    address: "سبخة القصب - إقليم الوشم",
-    description: "سبخة طبيعية تمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية.",
+    address: "صْبخة القَصَب - إقليم الوشم",
+    description: "صْبخة طبيعية تمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية.",
     geocodingQuery: "25.27544, 45.4807078",
     directionsUrl: "https://maps.app.goo.gl/HkziBCjrVqomTmop7",
     coordinates: {
@@ -423,9 +423,18 @@ export function normalizeCityName(text: string): string {
   return text.replace(/ق[ً-ٰٟ]*ص[ً-ٰٟ]*ي[ً-ٰٟ]*ب/g, "قَصَب");
 }
 
+// النطق النجدي: «الصْبخة» بالصاد الساكنة، لا «السبخة» بالسين
+export function normalizeSabkha(text: string): string {
+  if (!text) return "";
+  return text.replace(
+    /(^|[\s\p{P}]|ال|[وفبلك]ال|لل)[سص][\u064B-\u065F\u0670]*ب[\u064B-\u065F\u0670]*خ/gu,
+    "$1صْبخ"
+  );
+}
+
 export function applyNajdiPhoneticDiacritics(text: string): string {
   if (!text) return "";
-  let s = normalizeCityName(cleanText(text));
+  let s = normalizeSabkha(normalizeCityName(cleanText(text)));
 
   // قصب -> قَصَب
   s = s.replace(/(?<![\p{L}\p{M}])(ق[\p{M}]*ص[\p{M}]*ب)(?![\p{L}\p{M}])/gu, "قَصَب");
@@ -505,8 +514,8 @@ export function isAlQasabTopic(message: string, recentContext: string[] = []): b
   if (foreignSignals.some(f => normalized.includes(normalizeArabic(f)))) return false;
 
   const citySignals = [
-    "القصب", "قصب", "موسم الملح", "ملح القصب", "المملحة", "ممالح", "الجفار", "السبخة",
-    "سبخة", "الوشم", "شقراء", "حريملاء", "مرات", "ثرمداء", "القرية التراثية", "ابن زاحم", "المرقب",
+    "القصب", "قصب", "موسم الملح", "ملح القصب", "المملحة", "ممالح", "الجفار", "السبخة", "الصبخة",
+    "سبخة", "صبخة", "الوشم", "شقراء", "حريملاء", "مرات", "ثرمداء", "القرية التراثية", "ابن زاحم", "المرقب",
     "بدور", "شاي نقعه", "شاهي نقعه", "ارت كافيه", "ديوانية المنيع", "طريق صلبوخ",
     "تاريخ", "عوائل", "قبائل", "المقحم", "المنيع", "القاسم", "القصبي", "الفنتوخ",
   ];
@@ -562,7 +571,7 @@ export function isCafeQuestion(message: string): boolean {
 
 export function isSabkhaQuestion(message: string): boolean {
   const normalized = normalizeArabic(message);
-  return normalized.includes("سبخة") || normalized.includes("السبخة");
+  return ["سبخة", "صبخة", "سبخه", "صبخه"].some(w => normalized.includes(w));
 }
 
 export function isDirectionsQuestion(message: string): boolean {
@@ -643,7 +652,7 @@ export function generateLocalKnowledgeFallback(
     if (lang === "en") {
       return `Al-Sabkha in Al-Qasab is a natural salt flat. At night during summer, temperatures drop 5°C to 10°C lower than surrounding areas, offering a cool breeze.`;
     }
-    return `سبخة القَصَب الطبيعية من أروع الظواهر الطبيعية بالوشم، وتمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المناطق المجاورة مما يمنحها نسيمًا باردًا لطيفًا.`;
+    return `صْبخة القَصَب الطبيعية من أروع الظواهر الطبيعية بالوشم، وتمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المناطق المجاورة مما يمنحها نسيمًا باردًا لطيفًا.`;
   }
   if (norm.includes("تذكر") || norm.includes("تذاكر") || norm.includes("ticket") || norm.includes("حجز") || norm.includes("حصول") || norm.includes("احصل") || norm.includes("شراء") || norm.includes("رسوم")) {
     if (lang === "en") {
@@ -703,6 +712,37 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - رد بلباقة وحزم بهذا الرد ثم حوّل الكلام لتاريخ القَصَب ومعالمها:
      *«${FORBIDDEN_FAMILY_REPLY_AR}»*`;
 
+// النطق + التعرف على ما تعرضه كاميرا المكالمة (مشتركة بين كل أوضاع البرومبت)
+const VISION_RULES_EN = `PRONUNCIATION: In Arabic, the salt flat is ALWAYS "الصْبخة" (Najdi: ṣād with sukūn — "aṣ-ṣbkha"), never "السبخة" with sīn. In English say "Al-Sabkha".
+
+CAMERA (live call): The user may turn on their camera; you then receive frames of what is in front of them.
+- When the camera turns on, or the user asks "what is this?" / "وش هذا؟", say what you see in one short sentence, name it if it matches an Al-Qasab place below, then give 1–2 useful facts and invite a follow-up question.
+- Only name a place when the visual cues match. If you are not sure, say so ("يشبه مملحة القَصَب، بس ما أقدر أأكد") — never invent names, dates or numbers.
+- Never identify real people from their faces, and never read out family or tribe names that appear on signs (Rule 3 still applies).
+- If what you see is unrelated to Al-Qasab, describe it in one sentence and steer back to Al-Qasab.
+Visual guide to Al-Qasab:
+1. مملحة القَصَب / ممالح القَصَب (the historic salt pans, الجفار): grids of shallow rectangular evaporation basins separated by low earthen/clay ridges, a white salt crust on the bottom, shallow brine, and white salt heaps on the horizon. Among the oldest and best-known natural salt works in the Arabian Peninsula, where salt has been harvested for hundreds of years.
+2. The stone sign «مملحة القصب — Mamalahat Al Qasab» with an information board next to the pools: this is the entrance of the salt pans' visitor area.
+3. Round reed/straw shades (مظلات وعشش من القصب والخوص) with conical straw roofs standing at the edge of the pools, wooden plank walkways and small green seating floors: the shaded visitor seating of the salt pans.
+4. A pink-to-red lake ringed with white salt crust and eroded white-and-ochre banks: very salty brine in الصْبخة / the salt pools; the pink-red colour comes from salt-loving microorganisms that thrive in highly saline water.
+5. A milky, pale-green pool with white crystals along its edge: brine concentrating as the water evaporates — the salt is crystallising there.
+6. White salt heaps or salt sacks: the harvested Al-Qasab salt, the heart of موسم ملح القَصَب (launching 19 November 2026; entry free).`;
+
+const VISION_RULES_AR = `**النطق:** تنطق وتكتب دائماً «الصْبخة» (بالصاد الساكنة على لهجة أهل نجد)، ولا تقول «السبخة» بالسين أبداً.
+
+**الكاميرا في المكالمة:** ممكن المستخدم يشغّل الكاميرا وتوصلك صور لِلي قدامه.
+- أول ما تنفتح الكاميرا، أو إذا قال «وش هذا؟»: قل باختصار وش تشوف، وسمّه إذا طابق معلَم من معالم القَصَب تحت، وبعدها عطه معلومة أو ثنتين مفيدة واسأله إذا يبي يعرف أكثر.
+- لا تسمّي مكان إلا إذا العلامات واضحة، وإذا ما أنت متأكد قلها بصراحة («يشبه مملحة القَصَب، بس ما أقدر أأكد»). لا تألّف أسماء ولا تواريخ ولا أرقام.
+- لا تتعرف على هوية الأشخاص من وجيههم، ولا تقرأ أسماء عوائل أو قبائل مكتوبة على اللوحات (القاعدة 3 سارية).
+- إذا اللي قدامه ما له علاقة بالقَصَب، وصفه بجملة وحدة ورجّع السالفة للقَصَب.
+دليل التعرف على معالم القَصَب:
+1. مملحة القَصَب / ممالح القَصَب (الجفار): أحواض تبخير مستطيلة وضحلة مقسّمة بحواجز ترابية واطية، قاعها قشرة ملح بيضاء، وفيها ماء مالح قليل، وكثبان ملح بيضاء في الأفق. من أعرق وأشهر الملاحات الطبيعية في الجزيرة العربية، ويُستخرج منها الملح من مئات السنين.
+2. الصخرة المكتوب عليها «مملحة القصب — Mamalahat Al Qasab» وجنبها لوحة تعريفية عند الأحواض: هذي مدخل منطقة زوار المملحة.
+3. مظلات وعشش دائرية من القصب والخوص بسقوف مخروطية على أطراف الأحواض، وممرات خشبية وجلسات عشب صغيرة: جلسات الزوار المظللة في المملحة.
+4. بحيرة لونها وردي إلى أحمر حولها قشرة ملح بيضاء وضفاف بيضاء وبنية متآكلة: ماء شديد الملوحة في الصْبخة وأحواض الملح، واللون الوردي سببه كائنات دقيقة تعيش في الماء شديد الملوحة.
+5. حوض ماؤه حليبي أو أخضر فاتح وعلى طرفه بلورات بيضاء: ماء مالح يتركّز مع التبخر والملح قاعد يتبلور فيه.
+6. أكوام ملح بيضاء أو أكياس ملح: ملح القَصَب المستخرج، وهو قلب موسم ملح القَصَب (ينطلق 19 نوفمبر 2026 والدخول مجاني).`;
+
 export function buildAlQasabSystemPrompt(
   weatherSummary?: string,
   language: "ar" | "en" | "auto" = "ar"
@@ -719,6 +759,8 @@ ${languageLine}
 
 ${STRICT_RULES_EN}
 
+${VISION_RULES_EN}
+
 Other Rules:
 4. Identity: You are strictly «Al-Dahiya» (never say you are an AI or robot).
 5. Concise answers: 1 to 3 direct, natural sentences.
@@ -734,6 +776,8 @@ Other Rules:
 
 ${STRICT_RULES_AR}
 
+${VISION_RULES_AR}
+
 قواعد وواجبات إضافية:
 
 4. **الهوية:**
@@ -742,7 +786,7 @@ ${STRICT_RULES_AR}
 5. **حقائق موسم ملح القَصَب والمعالم:**
    - تاريخ انطلاق موسم ملح القَصَب: 19 نوفمبر 2026.
    - التذاكر: مجانية تماماً، ويمكن الحصول عليها من البوابة الرئيسية أو عند الموقع.
-   - سبخة القَصَب: تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
+   - صْبخة القَصَب: تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
    - المقاهي التراثية المعتمدة 4 فقط: قهوة بدور إبراهيم، آرت كافيه، شاهي ناقع، ديوانية المنيع التراثية (تنبيه: لا يوجد مكان باسم ديوانية القَصَب).
    - إجاباتك موجزة ومباشرة (من جملة إلى 3 جمل واضحة دون إطالة مملة).
    - في الصوت المباشر: انطق الكلمات بوضوح وسرعة طبيعية دون تمطيط أو تكرار.${weatherSection}`;

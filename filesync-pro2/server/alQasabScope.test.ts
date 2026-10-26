@@ -18,6 +18,8 @@ import {
   generateLocalKnowledgeFallback,
   normalizeCityName,
   buildAlQasabSystemPrompt,
+  normalizeSabkha,
+  isSabkhaQuestion,
 } from "./alQasabScope.ts";
 
 test("identifies greetings and salam correctly", () => {
@@ -146,4 +148,24 @@ test("system prompts enforce dialect, city name and family red line", () => {
   }
   assert.ok(buildAlQasabSystemPrompt(undefined, "auto").includes("English → answer in English"));
   assert.ok(buildAlQasabSystemPrompt(undefined, "ar").includes("الفصحى"));
+});
+
+test("Najdi pronunciation: السبخة becomes الصْبخة in answers", () => {
+  assert.equal(normalizeSabkha("زرت السبخة أمس"), "زرت الصْبخة أمس");
+  assert.equal(normalizeSabkha("قريب من سبخة القصب"), "قريب من صْبخة القصب");
+  assert.equal(normalizeSabkha("بالسبخة وللسبخة"), "بالصْبخة وللصْبخة");
+  assert.equal(normalizeSabkha("الصبخة"), "الصْبخة");
+  assert.equal(normalizeSabkha("وش أسرع طريق"), "وش أسرع طريق");
+  assert.ok(applyNajdiPhoneticDiacritics("وش طقس السبخة؟").includes("الصْبخة"));
+  assert.equal(isSabkhaQuestion("وين الصبخة؟"), true);
+  assert.equal(isSabkhaQuestion("وين السبخة؟"), true);
+});
+
+test("prompts carry the pronunciation and camera rules", () => {
+  for (const mode of ["ar", "en", "auto"] as const) {
+    const prompt = buildAlQasabSystemPrompt(undefined, mode);
+    assert.ok(prompt.includes("الصْبخة"), mode);
+    assert.ok(prompt.includes("مملحة القَصَب"), mode);
+    assert.ok(/CAMERA|الكاميرا/.test(prompt), mode);
+  }
 });
