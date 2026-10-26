@@ -75,7 +75,7 @@ const fragmentShader = `
     // 3. Cover: 100% opaque mouth cavity over the whole gap
     if (gap > 0.0005) {
       // Anti-alias only outside the gap, never inside it
-      float aa = 0.0015;
+      float aa = 0.003;
       float cover = smoothstep(gapBottom - aa, gapBottom, vUv.y)
                   * (1.0 - smoothstep(gapTop, gapTop + aa, vUv.y));
 
@@ -142,6 +142,9 @@ const fragmentShader = `
 `;
 
 const SILENCE_THRESHOLD = 0.02;
+const ATTACK_TIME = 0.035; // seconds for the mouth to open towards the voice level
+const RELEASE_TIME = 0.09; // seconds for the mouth to ease closed between syllables
+const CLOSED_EPSILON = 0.015;
 
 function MemojiScene({ imageUrl, audioLevel = 0, isSpeaking = false, analyserNode = null }) {
   const meshRef = useRef();
@@ -151,7 +154,8 @@ function MemojiScene({ imageUrl, audioLevel = 0, isSpeaking = false, analyserNod
 
   const texture = useLoader(THREE.TextureLoader, imageUrl);
   texture.colorSpace = THREE.SRGBColorSpace;
-  const dataArray = useMemo(() => new Uint8Array(128), []);
+  // Read the analyser's whole window: 128 samples (~5 ms) gives a jittery level
+  const dataArray = useMemo(() => new Uint8Array(analyserNode?.fftSize || 256), [analyserNode]);
 
   // Close the mouth the instant speech ends, even before the next frame
   useEffect(() => {
@@ -202,11 +206,17 @@ function MemojiScene({ imageUrl, audioLevel = 0, isSpeaking = false, analyserNod
       }
     }
 
-    if (targetVol <= SILENCE_THRESHOLD) {
-      // Snap strictly closed: no lerp tail that leaves the mouth half open
+    if (!isSpeaking) {
+      // Speech is over: snap strictly closed, no tail that leaves the mouth half open
       smoothAudioRef.current = 0;
     } else {
-      smoothAudioRef.current = THREE.MathUtils.lerp(smoothAudioRef.current, targetVol, 0.38);
+      // During speech: quick attack, smooth release between syllables (frame-rate independent)
+      if (targetVol <= SILENCE_THRESHOLD) targetVol = 0;
+      const tau = targetVol > smoothAudioRef.current ? ATTACK_TIME : RELEASE_TIME;
+      const k = 1 - Math.exp(-Math.min(delta, 0.1) / tau);
+      smoothAudioRef.current = THREE.MathUtils.lerp(smoothAudioRef.current, targetVol, k);
+      // Finish the close exactly at 0 instead of creeping towards it forever
+      if (targetVol === 0 && smoothAudioRef.current < CLOSED_EPSILON) smoothAudioRef.current = 0;
     }
 
     const blinkCycle = t % 3.6;
