@@ -11,15 +11,15 @@ const HOST = "0.0.0.0";
 
 async function startServer() {
   const app = express();
+  // Render sits behind a proxy: trust its X-Forwarded-For so rate limits see the real visitor IP
+  app.set("trust proxy", 1);
   const server = createServer(app);
 
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  app.use(express.json({ limit: "1mb" }));
+  app.use(express.urlencoded({ limit: "1mb", extended: true }));
 
   // Static image directories
   app.use("/images", express.static(path.resolve(process.cwd(), "public/images")));
-  app.use("/images", express.static(path.resolve(process.cwd(), "images")));
-  app.use("/models", express.static(path.resolve(process.cwd(), "public/models")));
   app.use(express.static(path.resolve(process.cwd(), "public")));
 
   // API endpoints

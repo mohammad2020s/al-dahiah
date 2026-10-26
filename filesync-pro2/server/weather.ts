@@ -192,3 +192,23 @@ export async function fetchAlQasabWeather(timeoutMs: number = FETCH_TIMEOUT_MS):
 
   return Promise.race([fetchPromise, timeoutFallbackPromise]);
 }
+
+// English summary built from the data fields (summaryText and conditionText are Arabic)
+export function weatherSummaryEn(d: AlQasabWeatherData | null | undefined): string | undefined {
+  if (!d) return undefined;
+  const condition = (d.conditionType || "")
+    .toLowerCase()
+    .split("_")
+    .filter(Boolean)
+    .map((w, i) => (i === 0 ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+  const parts = [
+    `${Math.round(d.temperature)}°C (feels like ${Math.round(d.feelsLike)}°C)${condition ? `, ${condition.toLowerCase()}` : ""}`,
+  ];
+  if (d.maxTemperature !== undefined && d.minTemperature !== undefined) {
+    parts.push(`high ${Math.round(d.maxTemperature)}°C, low ${Math.round(d.minTemperature)}°C`);
+  }
+  parts.push(`humidity ${Math.round(d.humidity)}%`, `wind ${Math.round(d.windSpeed)} km/h ${d.windDirection}`);
+  if (d.uvIndex !== undefined) parts.push(`UV index ${d.uvIndex}`);
+  return parts.join("; ");
+}

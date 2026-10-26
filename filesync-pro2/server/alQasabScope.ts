@@ -665,6 +665,11 @@ export function generateLocalKnowledgeFallback(
   // Tickets keep their own short answer; everything about a known place comes from the guide knowledge
   const isTicketQuestion = ["تذكر", "تذاكر", "ticket", "حجز", "رسوم"].some(k => norm.includes(k));
   const place = isTicketQuestion ? null : matchPlaceTopic(query);
+  if (place?.id === "season" && (isLocationQuestion(query) || isDirectionsQuestion(query))) {
+    return lang === "en"
+      ? "The Al-Qasab Salt Season is held at the event grounds in Al-Qasab. The map below shows the spot; tap “Take me there” for directions."
+      : "موسم ملح القَصَب يقام في أرض الفعاليات بالقَصَب، وتلقى الموقع على الخريطة تحت. اضغط «خذني لها» وأبشر بالطريق.";
+  }
   if (place && !isCafeQuestion(query)) {
     return lang === "en" ? place.answerEn : place.answerAr;
   }

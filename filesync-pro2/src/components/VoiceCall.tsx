@@ -11,6 +11,7 @@ import {
   SwitchCamera,
 } from "lucide-react";
 import SaltBagCall from "./SaltBagCall";
+import { matchPlaceTopic } from "../../server/alQasabKnowledge.ts";
 
 // A burst of salt crystals flying out of a pressed button (pure CSS, see .vc-crystal in index.css)
 const SaltBurst = ({ color = "#ffffff", x = "50%", y = "50%" }: { color?: string; x?: string; y?: string }) => (
@@ -117,6 +118,52 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   const cameraTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cameraCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isFlippingCamera, setIsFlippingCamera] = useState(false);
+  const isCameraOnRef = useRef(false);
+  useEffect(() => {
+    isCameraOnRef.current = isCameraOn;
+  }, [isCameraOn]);
+
+  // Photos of the place being talked about, picked from the live transcription
+  type Showcase = { id: string; title: string; images: { src: string; caption: string }[] };
+  const [showcase, setShowcase] = useState<Showcase | null>(null);
+  const [showcaseIndex, setShowcaseIndex] = useState(0);
+  const showcaseIdRef = useRef<string | null>(null);
+  const transcriptRef = useRef("");
+
+  const noteTranscript = useCallback((text: string) => {
+    // Keep a short rolling window so an older topic doesn't keep matching
+    transcriptRef.current = (transcriptRef.current + " " + text).slice(-160);
+    if (isCameraOnRef.current) return;
+    const topic = matchPlaceTopic(transcriptRef.current);
+    if (!topic?.images?.length || topic.id === showcaseIdRef.current) return;
+    showcaseIdRef.current = topic.id;
+    setShowcaseIndex(0);
+    setShowcase({
+      id: topic.id,
+      title: isEn ? topic.titleEn : topic.titleAr,
+      images: topic.images.map((img) => ({ src: img.src, caption: isEn ? img.captionEn : img.captionAr })),
+    });
+  }, [isEn]);
+
+  const closeShowcase = useCallback(() => {
+    setShowcase(null);
+    transcriptRef.current = "";
+    // Allow the same place to come back later in the call
+    setTimeout(() => {
+      showcaseIdRef.current = null;
+    }, 0);
+  }, []);
+
+  // Slideshow: next photo every 3.5 s; hide after 45 s
+  useEffect(() => {
+    if (!showcase) return;
+    const tick = setInterval(() => setShowcaseIndex((i) => (i + 1) % showcase.images.length), 3500);
+    const hide = setTimeout(closeShowcase, 45_000);
+    return () => {
+      clearInterval(tick);
+      clearTimeout(hide);
+    };
+  }, [showcase, closeShowcase]);
 
   // Press animations: each counter bump remounts that button's effect so it replays
   const [fx, setFx] = useState<Record<string, number>>({});
@@ -698,6 +745,9 @@ registerProcessor('mic-processor', MicProcessor);`;
             return;
           }
 
+          const said = msg.serverContent?.outputTranscription?.text || msg.serverContent?.inputTranscription?.text;
+          if (said) noteTranscript(said);
+
           if (msg.serverContent?.interrupted || msg.interrupted) {
             await stopAllPlayback();
             setStatus("listening");
@@ -742,14 +792,14 @@ registerProcessor('mic-processor', MicProcessor);`;
         if (!isSessionActiveRef.current) return;
         console.warn("[Client] Live WebSocket error:", err);
         setStatus("error");
-        setErrorMessage(isEn ? "Live audio connection error." : "خطأ في اتصال الصوت المباشر.");
+        setErrorMessage(isEn ? "Couldn't open the live line. If you called many times, wait a few minutes and try again." : "تعذر فتح الخط المباشر. إذا اتصلت كثير، انتظر دقائق وحاول مرة ثانية.");
       };
     } catch (err: any) {
       console.warn("connectLive error:", err);
       setStatus("error");
       setErrorMessage(err.message);
     }
-  }, [language, isEn, startCapture, scheduleAudioChunk, stopAllPlayback, updateGeminiSpeaking]);
+  }, [language, isEn, startCapture, scheduleAudioChunk, stopAllPlayback, updateGeminiSpeaking, noteTranscript]);
 
   useEffect(() => {
     if (isOpen) {
@@ -831,14 +881,14 @@ registerProcessor('mic-processor', MicProcessor);`;
           {/* Stage: the salt bag alone, or the camera view with the bag as a corner bubble */}
           <div
             className={`relative flex items-center justify-center my-auto w-full max-w-md transition-[height] duration-500 ease-out ${
-              isCameraOn ? "h-[23rem] sm:h-[26rem]" : "h-72 sm:h-84"
+              isCameraOn || showcase ? "h-[23rem] sm:h-[26rem]" : "h-72 sm:h-84"
             }`}
           >
             {/* Ambient pulsating glow behind the bag */}
             <div
               style={{
                 transform: `scale(${1 + (status === "speaking" ? 0.25 : 0)})`,
-                opacity: isCameraOn ? 0 : status === "speaking" ? 0.45 : 0.2,
+                opacity: isCameraOn || showcase ? 0 : status === "speaking" ? 0.45 : 0.2,
               }}
               className="absolute size-64 sm:size-80 rounded-full bg-gradient-to-tr from-rose-700/50 via-amber-600/40 to-red-600/50 blur-3xl pointer-events-none transition-all duration-300"
             />
@@ -883,15 +933,55 @@ registerProcessor('mic-processor', MicProcessor);`;
               </div>
             )}
 
+            {/* Photos of the place he's talking about (crossfading slideshow) */}
+            {showcase && !isCameraOn && (
+              <div key={showcase.id} className="absolute inset-0 rounded-[1.75rem] overflow-hidden bg-black shadow-2xl ring-1 ring-white/15 vc-cam-open">
+                {showcase.images.map((img, i) => (
+                  <img
+                    key={img.src}
+                    src={img.src}
+                    alt={img.caption}
+                    className={`absolute inset-0 size-full object-cover transition-opacity duration-1000 ${
+                      i === showcaseIndex ? "opacity-100 vc-kenburns" : "opacity-0"
+                    }`}
+                  />
+                ))}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70 pointer-events-none" />
+                <span className="absolute top-4 inset-x-0 mx-auto w-fit flex items-center gap-1.5 rounded-full bg-black/45 backdrop-blur-md px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20">
+                  <span className="size-2 rounded-full bg-amber-300 animate-pulse" />
+                  {showcase.title}
+                </span>
+                <button
+                  type="button"
+                  onClick={closeShowcase}
+                  className="absolute top-3.5 end-4 size-9 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 backdrop-blur-md ring-1 ring-white/25 text-white flex items-center justify-center transition"
+                  title={isEn ? "Hide photos" : "إخفاء الصور"}
+                >
+                  <X className="size-4" />
+                </button>
+                <p
+                  key={`cap-${showcaseIndex}`}
+                  className={`pg-fade absolute bottom-5 ${isEn ? "left-4 right-36" : "right-4 left-36"} text-sm font-semibold text-white drop-shadow`}
+                >
+                  {showcase.images[showcaseIndex]?.caption}
+                </p>
+                <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1.5">
+                  {showcase.images.map((img, i) => (
+                    <span key={img.src} className={`h-1.5 rounded-full transition-all duration-500 ${i === showcaseIndex ? "w-5 bg-white" : "w-1.5 bg-white/45"}`} />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* White flash the moment the camera opens */}
             {isCameraOn && fx.camOn ? <span key={`flash-${fx.camOn}`} className="vc-flash" /> : null}
 
             <div
               className="vc-bag"
               style={{
-                left: isCameraOn ? (isEn ? "calc(100% - 64px)" : "64px") : "50%",
-                top: isCameraOn ? "calc(100% - 64px)" : "50%",
-                scale: isCameraOn ? "0.34" : "1",
+                left: isCameraOn || showcase ? (isEn ? "calc(100% - 64px)" : "64px") : "50%",
+                top: isCameraOn || showcase ? "calc(100% - 64px)" : "50%",
+                scale: isCameraOn || showcase ? "0.34" : "1",
               }}
             >
               <SaltBagCall
@@ -899,9 +989,9 @@ registerProcessor('mic-processor', MicProcessor);`;
                 externalAudioLevel={outputAudioLevel}
                 isSpeaking={status === "speaking" || isGeminiSpeaking}
                 analyserNode={outputAnalyserRef.current || audioAnalyser}
-                className={isCameraOn && (status === "speaking" || isGeminiSpeaking) ? "vc-talk-ring" : ""}
+                className={(isCameraOn || showcase) && (status === "speaking" || isGeminiSpeaking) ? "vc-talk-ring" : ""}
                 style={{
-                  outline: isCameraOn ? "10px solid rgba(255,255,255,0.9)" : "0px solid rgba(255,255,255,0)",
+                  outline: isCameraOn || showcase ? "10px solid rgba(255,255,255,0.9)" : "0px solid rgba(255,255,255,0)",
                   transition: "outline 500ms ease",
                 }}
               />
@@ -1012,7 +1102,10 @@ registerProcessor('mic-processor', MicProcessor);`;
             type="button"
             onClick={() => {
               fire("cam");
-              if (!isCameraOn) fire("camOn");
+              if (!isCameraOn) {
+                fire("camOn");
+                closeShowcase();
+              }
               toggleCamera();
             }}
             className={`relative size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl transition-all shadow-md flex items-center justify-center select-none active:scale-90 ${

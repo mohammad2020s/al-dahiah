@@ -1,4 +1,4 @@
-import React, { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import React, { FormEvent, KeyboardEvent, Suspense, lazy, useEffect, useRef, useState } from "react";
 import {
   CloudSun,
   Coffee,
@@ -21,11 +21,15 @@ import {
   ArrowUpLeft,
 } from "lucide-react";
 import { MalhAlQasabLogo, TanmiahLogo } from "../components/BrandLogos";
-import { VoiceCall } from "../components/VoiceCall";
+// The call screen pulls in three.js and the salt bag; load it only when someone calls
+const loadVoiceCall = () => import("../components/VoiceCall");
+const VoiceCall = lazy(() => loadVoiceCall().then((m) => ({ default: m.VoiceCall })));
 import { CallButtonAnimation } from "../components/CallButtonAnimation";
 import { LanguageModal } from "../components/LanguageModal";
-import { MapView } from "../components/Map";
+import { LeafletMap, directionsUrl } from "../components/LeafletMap";
+import { TourRoute } from "../components/TourRoute";
 import { PlaceGallery, type PlaceImage } from "../components/PlaceGallery";
+import { SeasonCountdown } from "../components/SeasonCountdown";
 import { Language, translations } from "../i18n";
 
 type WeatherData = {
@@ -113,13 +117,24 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
 
   return (
     <div className="my-4 overflow-hidden rounded-3xl border border-[#f2d4d1] bg-white shadow-lg shadow-gray-200/50 w-full">
-      <MapView
+      <LeafletMap
         className="h-64 sm:h-72"
-        initialCenter={activeCoordinates}
-        initialZoom={15}
-        locationName={locationTitle}
-        language={language}
+        points={[{ id: "here", lat: activeCoordinates.lat, lng: activeCoordinates.lng, title: locationTitle }]}
+        activeId="here"
+        zoom={15}
       />
+      <div className="flex items-center justify-between gap-2 border-t border-[#f4dedd] px-3 py-2.5">
+        <span className="min-w-0 truncate text-xs font-bold text-[#321210]">{locationTitle}</span>
+        <a
+          href={directionsUrl(activeCoordinates.lat, activeCoordinates.lng)}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#b82e24] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#992017]"
+        >
+          <ExternalLink className="size-3.5" />
+          {language === "en" ? "Take me there" : "خذني لها"}
+        </a>
+      </div>
 
       {isCafes && location.places && (
         <div className="border-t border-[#f4dedd] bg-[#fffaf9] p-3 sm:p-4">
@@ -304,6 +319,8 @@ export default function Home() {
   const t = translations[language];
 
   const handleStartCall = () => {
+    // Start fetching the call screen while the button animation plays
+    loadVoiceCall();
     if (isCallAnimating || isVoiceCallOpen) return;
     if (callButtonRef.current) {
       const rect = callButtonRef.current.getBoundingClientRect();
@@ -373,6 +390,11 @@ export default function Home() {
         signal: abortController.signal,
       });
 
+      if (res.status === 429) {
+        const body = await res.json().catch(() => ({}));
+        setMessages(prev => prev.map(m => m.id === assistantId ? { ...m, content: body.error || t.errorResponse } : m));
+        return;
+      }
       if (!res.ok || !res.body) throw new Error("Stream failed");
 
       const reader = res.body.getReader();
@@ -461,11 +483,15 @@ export default function Home() {
         originRect={callOriginRect}
       />
 
-      <VoiceCall
-        isOpen={isVoiceCallOpen}
-        onClose={() => setIsVoiceCallOpen(false)}
-        language={language}
-      />
+      {isVoiceCallOpen && (
+        <Suspense fallback={null}>
+          <VoiceCall
+            isOpen={isVoiceCallOpen}
+            onClose={() => setIsVoiceCallOpen(false)}
+            language={language}
+          />
+        </Suspense>
+      )}
 
       <div className="relative mx-auto flex min-h-screen max-w-[1480px] flex-col px-4 py-4 sm:px-6 lg:px-8">
         {/* Header Bar */}
@@ -539,6 +565,10 @@ export default function Home() {
                 {t.guideDesc}
               </p>
             </div>
+
+            <SeasonCountdown language={language} onAsk={askQuestion} />
+
+            <TourRoute language={language} onAsk={askQuestion} />
 
             {/* Weather Card */}
             {weatherData && (

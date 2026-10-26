@@ -246,3 +246,66 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .pg-enter, .pg-fade, .pg-thumb, .pg-viewer, .pg-zoom { animation: none; }
 }
+
+/* ───────── Season countdown (sc-*) ───────── */
+.sc-card { animation: pg-enter 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.sc-tick { animation: sc-tick 420ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes sc-tick { from { opacity: 0.2; transform: translateY(-6px) scale(0.92); } }
+.sc-salt {
+  opacity: 0.55;
+  background-image:
+    radial-gradient(circle at 12% 30%, rgba(184, 46, 36, 0.10) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 18%, rgba(184, 46, 36, 0.08) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 60% 80%, rgba(184, 46, 36, 0.09) 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 70%, rgba(184, 46, 36, 0.07) 0 1.5px, transparent 2.5px);
+  background-size: 90px 90px;
+  animation: sc-drift 18s linear infinite;
+}
+@keyframes sc-drift { to { background-position: 90px 90px; } }
+@media (prefers-reduced-motion: reduce) {
+  .sc-card, .sc-tick, .sc-salt { animation: none; }
+}
+
+/* ───────── Leaflet map pins (lm-*) ───────── */
+.lm-map { z-index: 0; background: #f3ebe4; }
+.lm-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: #b82e24;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 10px rgba(80, 10, 5, 0.35);
+  display: grid;
+  place-items: center;
+  transition: transform 200ms ease;
+}
+.lm-pin span {
+  transform: rotate(45deg);
+  color: #fff;
+  font: 700 12px/1 "Alexandria", system-ui, sans-serif;
+}
+.lm-pin-active {
+  background: #0f766e;
+  animation: lm-bounce 900ms cubic-bezier(0.34, 1.56, 0.64, 1) 2;
+}
+@keyframes lm-bounce {
+  0%, 100% { transform: rotate(-45deg) translate(0, 0); }
+  40% { transform: rotate(-45deg) translate(6px, -6px); }
+}
+.lm-tip { font: 600 12px/1.4 "Alexandria", system-ui, sans-serif; direction: rtl; }
+@media (prefers-reduced-motion: reduce) { .lm-pin-active { animation: none; } }
+
+/* ───────── Tour route sheet (tr-*) ───────── */
+.tr-sheet { animation: tr-sheet 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes tr-sheet { from { opacity: 0; transform: translateY(40px); } }
+.tr-stop { animation: pg-thumb 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@media (prefers-reduced-motion: reduce) { .tr-sheet, .tr-stop { animation: none; } }
+
+/* Slow pan-and-zoom on the photo being shown in the call */
+.vc-kenburns { animation: vc-kenburns 7s ease-out both; }
+@keyframes vc-kenburns {
+  from { transform: scale(1.12) translate(1.5%, 1%); }
+  to { transform: scale(1) translate(0, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .vc-kenburns { animation: none; } }

@@ -2,9 +2,14 @@ import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "http";
 import "dotenv/config";
 import { buildAlQasabSystemPrompt } from "./alQasabScope.ts";
+import { createLimiter, clientIp } from "./rateLimit.ts";
 
 export function setupLiveAudio(server: Server) {
   const wss = new WebSocketServer({ noServer: true });
+
+  // Voice calls cost the most: at most 6 new calls per 10 minutes and 2 at once per visitor
+  const callStartLimit = createLimiter({ windowMs: 10 * 60_000, max: 6 });
+  const openCalls = new Map<string, number>();
 
   server.on("upgrade", (request, socket, head) => {
     socket.on("error", (err) => {
@@ -13,7 +18,20 @@ export function setupLiveAudio(server: Server) {
 
     const pathname = new URL(request.url || "", `http://${request.headers.host || "localhost"}`).pathname;
     if (pathname === "/live") {
+      const ip = clientIp(request);
+      if ((openCalls.get(ip) || 0) >= 2 || !callStartLimit(ip).ok) {
+        console.warn(`[Live Audio] Rate limited ${ip}`);
+        socket.write("HTTP/1.1 429 Too Many Requests\r\nConnection: close\r\n\r\n");
+        socket.destroy();
+        return;
+      }
       wss.handleUpgrade(request, socket, head, (ws) => {
+        openCalls.set(ip, (openCalls.get(ip) || 0) + 1);
+        ws.on("close", () => {
+          const n = (openCalls.get(ip) || 1) - 1;
+          if (n <= 0) openCalls.delete(ip);
+          else openCalls.set(ip, n);
+        });
         wss.emit("connection", ws, request);
       });
     }
@@ -46,6 +64,9 @@ export function setupLiveAudio(server: Server) {
       const setupMessage = {
         setup: {
           model: "models/gemini-3.8-live",
+          // Text of what both sides say, so the call screen can show photos of the place being discussed
+          inputAudioTranscription: {},
+          outputAudioTranscription: {},
           generationConfig: {
             responseModalities: ["AUDIO"],
             speechConfig: {

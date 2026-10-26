@@ -34,7 +34,8 @@ import {
   FORBIDDEN_FAMILY_REPLY_AR,
   FORBIDDEN_FAMILY_REPLY_EN,
 } from "./alQasabScope.ts";
-import { fetchAlQasabWeather } from "./weather.ts";
+import { fetchAlQasabWeather, weatherSummaryEn } from "./weather.ts";
+import { rateLimitMiddleware } from "./rateLimit.ts";
 import { getPlaceImages, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
 
 export const apiRouter = Router();
@@ -76,7 +77,21 @@ apiRouter.get("/routes", (_req, res) => {
   res.json(AL_QASAB_ROUTES);
 });
 
-apiRouter.post("/chat/stream", async (req: Request, res: Response) => {
+// Per-visitor limits so a script can't drain the Gemini key
+const chatLimit = rateLimitMiddleware({
+  windowMs: 60_000,
+  max: 30,
+  messageAr: "شوي شوي علينا يا الغالي 😅 أرسلت رسايل كثير، انتظر دقيقة وكمّل سوالفك.",
+  messageEn: "You're sending messages too quickly. Please wait a minute and try again.",
+});
+const speakLimit = rateLimitMiddleware({
+  windowMs: 60_000,
+  max: 20,
+  messageAr: "طلبات الاستماع كثيرة، انتظر دقيقة.",
+  messageEn: "Too many listen requests. Please wait a minute.",
+});
+
+apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) => {
   res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
   res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");
@@ -176,7 +191,11 @@ apiRouter.post("/chat/stream", async (req: Request, res: Response) => {
     const isWeather = isWeatherQuestion(userPrompt);
     if (isWeather) {
       const weatherData = await fetchAlQasabWeather();
-      const weatherText = generateLocalKnowledgeFallback(userPrompt, lang, weatherData?.summaryText);
+      const weatherText = generateLocalKnowledgeFallback(
+        userPrompt,
+        lang,
+        lang === "en" ? weatherSummaryEn(weatherData) : weatherData?.summaryText
+      );
       let finalAnswer = lang === "ar" ? applyNajdiPhoneticDiacritics(weatherText) : weatherText;
       finalAnswer = cleanText(finalAnswer);
       const words = finalAnswer.split(" ");
@@ -305,7 +324,7 @@ apiRouter.post("/chat/stream", async (req: Request, res: Response) => {
   }
 });
 
-apiRouter.post("/speak", async (req: Request, res: Response) => {
+apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   const text = req.body?.text;
   if (!text) return res.status(400).json({ error: "Text is required" });
   const apiKey = process.env.GEMINI_API_KEY;
