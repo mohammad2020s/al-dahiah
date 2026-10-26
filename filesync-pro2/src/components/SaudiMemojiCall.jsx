@@ -42,17 +42,19 @@ const fragmentShader = `
   void main() {
     vec2 uv = vUv;
 
-    // 1. Exact Mouth Coordinates
-    vec2 mouthCenter = vec2(0.50, 0.385);
-    float mouthWidth = 0.050; // Calibrated width
+    // 1. Mouth coordinates, measured on /memoji.jpg: the lip seam (where the
+    // upper and lower lips meet) is at y=0.369 in the center and curves up
+    // to ~0.39 at dx=0.05. Slicing anywhere else drags a lip along with the jaw.
+    vec2 mouthCenter = vec2(0.50, 0.369);
+    float mouthWidth = 0.060;
 
     float dx = uv.x - mouthCenter.x;
-    float smileCurve = (dx * dx) * 1.8;
+    float smileCurve = (dx * dx) * 8.5;
     float lipLine = mouthCenter.y + smileCurve;
-    
+
     // Natural horizontal fade for the mouth corners
-    float horizMask = pow(smoothstep(mouthWidth, 0.0, abs(dx)), 1.2);
-    float gap = clamp(uAudio * 0.045, 0.0, 0.045) * horizMask;
+    float horizMask = pow(smoothstep(mouthWidth, 0.0, abs(dx)), 1.4);
+    float gap = clamp(uAudio * 0.034, 0.0, 0.034) * horizMask;
 
     // 2. Slice: the upper face never moves, only the lower jaw shifts down
     // The gap exists strictly between (lipLine - gap) and (lipLine)
@@ -82,18 +84,27 @@ const fragmentShader = `
         float normY = clamp((vUv.y - gapBottom) / gap, 0.0, 1.0);
         float normX = clamp(abs(dx) / mouthWidth, 0.0, 1.0);
 
-        // Deep dark red/black, darker towards the back of the throat
-        vec3 cavityColor = mix(vec3(0.05, 0.01, 0.015), vec3(0.14, 0.03, 0.04), normX);
-        vec3 tongueColor = vec3(0.52, 0.20, 0.22);
-        vec3 teethColor  = vec3(0.92, 0.90, 0.88);
+        // Dark red cavity, lighter towards the corners
+        vec3 cavityColor = mix(vec3(0.16, 0.035, 0.04), vec3(0.24, 0.07, 0.07), normX);
+        vec3 tongueColor = vec3(0.60, 0.27, 0.27);
+        // Warm off-white so the teeth sit in the skin palette instead of glowing
+        vec3 teethColor  = vec3(0.86, 0.80, 0.74);
 
         // Tongue at the bottom
-        float tongueShape = smoothstep(0.45, 0.0, normY) * smoothstep(0.7, 0.0, normX);
-        cavityColor = mix(cavityColor, tongueColor, tongueShape);
+        float tongueShape = smoothstep(0.55, 0.05, normY) * smoothstep(0.75, 0.1, normX);
+        cavityColor = mix(cavityColor, tongueColor, tongueShape * 0.85);
 
-        // Upper teeth, only once the mouth is open enough
-        float teethShape = smoothstep(0.68, 0.85, normY) * smoothstep(0.008, 0.016, gap);
-        cavityColor = mix(cavityColor, teethColor, teethShape);
+        // Upper teeth: a narrow band under the upper lip, fading out before the
+        // corners, shaded towards their lower edge, only once the mouth is open enough
+        float teethShape = smoothstep(0.72, 0.86, normY)
+                         * smoothstep(0.85, 0.45, normX)
+                         * smoothstep(0.010, 0.020, gap);
+        vec3 teethShaded = teethColor * mix(0.82, 1.0, smoothstep(0.72, 0.95, normY));
+        cavityColor = mix(cavityColor, teethShaded, teethShape);
+
+        // Soft shadow along both lip edges so the opening blends into the lips
+        float lipShadow = smoothstep(0.0, 0.18, normY) * smoothstep(1.0, 0.9, normY);
+        cavityColor *= mix(0.65, 1.0, lipShadow);
 
         finalColor.rgb = mix(finalColor.rgb, cavityColor, cover);
       }
