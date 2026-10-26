@@ -1,0 +1,6 @@
+{
+  "name": "الداهية - دليلك الذكي لمدينة القصب والملح",
+  "description": "المساعد التفاعلي الذكي الشامل لمدينة القصب وموسم الملح وتراث الوشم والطقس المباشر والأماكن السياحية",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,113 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  isSalamMessage,
+  isPureSalamGreeting,
+  getInstantSalamReply,
+  isAlQasabTopic,
+  isWeatherQuestion,
+  isCafeQuestion,
+  isFamilyOrTribalQuestion,
+  FORBIDDEN_FAMILY_REPLY_AR,
+  getLocationForQuery,
+  cleanText,
+  applyNajdiPhoneticDiacritics,
+  AL_QASAB_CAFES,
+  AL_QASAB_LANDMARKS,
+  AL_QASAB_ROUTES,
+  generateLocalKnowledgeFallback,
+} from "./alQasabScope.ts";
+
+test("identifies greetings and salam correctly", () => {
+  assert.equal(isSalamMessage("السلام عليكم ورحمة الله"), true);
+  assert.equal(isSalamMessage("سلام عليكم"), true);
+  assert.equal(isSalamMessage("hello"), false);
+
+  assert.equal(isPureSalamGreeting("السلام عليكم"), true);
+  assert.equal(isPureSalamGreeting("hello"), true);
+  assert.equal(isPureSalamGreeting("أين يقع موسم ملح القصب؟"), false);
+
+  const replyAr = getInstantSalamReply("ar");
+  assert.match(replyAr, /وعليكم السلام/);
+  const replyEn = getInstantSalamReply("en");
+  assert.match(replyEn, /Peace be upon you/);
+});
+
+test("identifies Al-Qasab domain topics accurately", () => {
+  assert.equal(isAlQasabTopic("حدثني عن موسم ملح القصب"), true);
+  assert.equal(isAlQasabTopic("أين تقع سبخة القصب؟"), true);
+  assert.equal(isAlQasabTopic("ما هي درجات الحرارة الآن؟"), true);
+  assert.equal(isAlQasabTopic("what is the weather in al qasab?"), true);
+  assert.equal(isAlQasabTopic("كم سعر تذكرة السفر إلى باريس وفرنسا؟"), false);
+});
+
+test("identifies weather questions and cafe questions", () => {
+  assert.equal(isWeatherQuestion("ما هو طقس القصب اليوم؟"), true);
+  assert.equal(isWeatherQuestion("درجة الحرارة كم؟"), true);
+  assert.equal(isWeatherQuestion("أين يقع قصر ابن زاحم؟"), false);
+
+  assert.equal(isCafeQuestion("ما هي أفضل المقاهي في القصب؟"), true);
+  assert.equal(isCafeQuestion("وين قهوة بدور إبراهيم؟"), true);
+  assert.equal(isCafeQuestion("أين يقع برج المرقب؟"), false);
+});
+
+test("resolves correct locations and coordinates", () => {
+  const locBdor = getLocationForQuery("قهوة بدور إبراهيم") as any;
+  assert.equal(locBdor.type, "cafes");
+  assert.equal(locBdor.places[0].id, "bdor_coffee");
+
+  const locShahi = getLocationForQuery("شاهي نقعة") as any;
+  assert.equal(locShahi.places[0].id, "shahi_nagea");
+
+  const renamedShahi = getLocationForQuery("شاهي ناقع") as any;
+  assert.equal(renamedShahi.places[0].id, "shahi_nagea");
+  assert.equal(renamedShahi.places[0].name.startsWith("شاهي ناقع"), true);
+
+  const locArt = getLocationForQuery("آرت كافيه") as any;
+  assert.equal(locArt.places[0].id, "art_coffee");
+
+  const locZahim = getLocationForQuery("قصر ابن زاحم");
+  assert.equal(locZahim.type, "ibn_zahim");
+
+  const locFestival = getLocationForQuery("موسم الملح");
+  assert.equal(locFestival.type, "festival");
+});
+
+test("answers ticket inquiries with free tickets from gate or site", () => {
+  const answerAr = generateLocalKnowledgeFallback("كم سعر التذكرة؟", "ar");
+  assert.match(answerAr, /التذاكر مجانية تماماً/);
+  assert.match(answerAr, /البوابة الرئيسية/);
+  assert.match(answerAr, /عند الموقع/);
+});
+
+test("strictly blocks questions about families, lineages, and tribes with polite Najdi refusal", () => {
+  assert.equal(isFamilyOrTribalQuestion("وش عوائل القصب؟"), true);
+  assert.equal(isFamilyOrTribalQuestion("من هم قبائل أهل القصب؟"), true);
+  assert.equal(isFamilyOrTribalQuestion("من هي عوائل الديرة والوشم؟"), true);
+  assert.equal(isFamilyOrTribalQuestion("عائلة فلان من القصب؟"), true);
+  assert.equal(isFamilyOrTribalQuestion("وش نسب أهل القصب؟"), true);
+  assert.equal(isFamilyOrTribalQuestion("أين يقع قصر ابن زاحم؟"), false);
+
+  const fallbackAnswer = generateLocalKnowledgeFallback("وش عوائل القصب؟", "ar");
+  assert.match(fallbackAnswer, /والله وألف نعم بالجميع/);
+  assert.match(fallbackAnswer, /ما أذكر أسماء عوائل أو قبائل/);
+  assert.equal(fallbackAnswer, FORBIDDEN_FAMILY_REPLY_AR);
+});
+
+test("applies text cleaning and Najdi phonetic diacritics and corrects القصيب to القَصَب", () => {
+  const cleaned = cleanText("  يا هلا  يا هلا   بالقصب  ");
+  assert.equal(cleaned, "يا هلا بالقصب");
+
+  const withDiacritics = applyNajdiPhoneticDiacritics("مدينة القصب وموسم ملح القصب");
+  assert.equal(withDiacritics, "مدينة القَصَب وموسم ملح القَصَب");
+
+  const correctedName = applyNajdiPhoneticDiacritics("أهلاً بك في القصيب عاصمة الملح");
+  assert.equal(correctedName.includes("القصيب"), false);
+  assert.equal(correctedName.includes("القَصَب"), true);
+});
+
+test("verifies core landmark, cafe, and route databases", () => {
+  assert.equal(AL_QASAB_LANDMARKS.length >= 6, true);
+  assert.equal(AL_QASAB_CAFES.length, 4);
+  assert.equal(AL_QASAB_ROUTES.length >= 4, true);
+});

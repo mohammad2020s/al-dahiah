@@ -1,0 +1,47 @@
+@import "tailwindcss" source(none);
+@source "./";
+@source "../index.html";
+
+:root {
+  --primary: #b82e24;
+  --primary-foreground: #ffffff;
+  --background: #faf4f4;
+  --foreground: #2d1716;
+  --card: #ffffff;
+  --card-foreground: #2d1716;
+  --muted: #f7eded;
+  --muted-foreground: #7d5654;
+  --border: #f2d6d3;
+}
+
+body {
+  margin: 0;
+  font-family: "Alexandria", system-ui, -apple-system, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display-ar {
+  font-family: "Noto Naskh Arabic", serif;
+}
+
+.salt-dot-pattern {
+  background-image: radial-gradient(rgba(184, 46, 36, 0.12) 1px, transparent 1px);
+  background-size: 17px 17px;
+}
+
+.soft-grid {
+  background-image: linear-gradient(rgba(184, 46, 36, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 46, 36, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
