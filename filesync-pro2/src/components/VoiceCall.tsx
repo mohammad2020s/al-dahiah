@@ -12,6 +12,31 @@ import {
 } from "lucide-react";
 import SaltBagCall from "./SaltBagCall";
 
+// A burst of salt crystals flying out of a pressed button (pure CSS, see .vc-crystal in index.css)
+const SaltBurst = ({ color = "#ffffff", x = "50%", y = "50%" }: { color?: string; x?: string; y?: string }) => (
+  <>
+    {Array.from({ length: 11 }, (_, i) => {
+      const angle = (i / 11) * Math.PI * 2 + ((i * 37) % 10) / 20;
+      const dist = 30 + ((i * 53) % 24);
+      return (
+        <span
+          key={i}
+          className="vc-crystal"
+          style={{
+            ["--x" as string]: x,
+            ["--y" as string]: y,
+            ["--c" as string]: color,
+            ["--s" as string]: `${4 + ((i * 7) % 4)}px`,
+            ["--dx" as string]: `${Math.cos(angle) * dist}px`,
+            ["--dy" as string]: `${Math.sin(angle) * dist}px`,
+            ["--rot" as string]: `${(i % 2 ? 1 : -1) * (90 + i * 20)}deg`,
+          }}
+        />
+      );
+    })}
+  </>
+);
+
 interface VoiceCallProps {
   isOpen: boolean;
   onClose: () => void;
@@ -91,6 +116,13 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   const cameraVideoRef = useRef<HTMLVideoElement | null>(null);
   const cameraTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cameraCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [isFlippingCamera, setIsFlippingCamera] = useState(false);
+
+  // Press animations: each counter bump remounts that button's effect so it replays
+  const [fx, setFx] = useState<Record<string, number>>({});
+  const fire = useCallback((name: string) => setFx((prev) => ({ ...prev, [name]: (prev[name] || 0) + 1 })), []);
+  const [ripple, setRipple] = useState({ x: "50%", y: "50%" });
+  const [closingVia, setClosingVia] = useState<"end" | "x" | null>(null);
   const workletNodeRef = useRef<AudioWorkletNode | null>(null);
 
   // Real-time audio volume analyzer for AI speech lip-sync (0.0 to 1.0)
@@ -221,6 +253,15 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
     }
   }, []);
 
+  // Callback ref: attach the live stream the moment the <video> element mounts
+  const attachCameraVideo = useCallback((video: HTMLVideoElement | null) => {
+    cameraVideoRef.current = video;
+    if (video && cameraStreamRef.current && video.srcObject !== cameraStreamRef.current) {
+      video.srcObject = cameraStreamRef.current;
+      video.play().catch(() => {});
+    }
+  }, []);
+
   const stopCamera = useCallback(() => {
     if (cameraTimerRef.current) {
       clearInterval(cameraTimerRef.current);
@@ -262,16 +303,9 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
         audio: false,
       });
       cameraStreamRef.current = stream;
+      // The <video> mounts with isCameraOn; attachCameraVideo hooks the stream up when it does
       setIsCameraOn(true);
       setErrorMessage(null);
-      // The <video> mounts with isCameraOn; attach the stream on the next frame
-      requestAnimationFrame(() => {
-        const video = cameraVideoRef.current;
-        if (video) {
-          video.srcObject = stream;
-          video.play().catch(() => {});
-        }
-      });
 
       let askedToLook = false;
       cameraTimerRef.current = setInterval(() => {
@@ -306,12 +340,50 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
     else startCamera(cameraFacing);
   }, [isCameraOn, cameraFacing, startCamera, stopCamera]);
 
-  const flipCamera = useCallback(() => {
+  const flipCamera = useCallback(async () => {
     const next = cameraFacing === "environment" ? "user" : "environment";
-    setCameraFacing(next);
-    stopCamera();
-    startCamera(next);
-  }, [cameraFacing, startCamera, stopCamera]);
+    setIsFlippingCamera(true);
+    setTimeout(() => setIsFlippingCamera(false), 560);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: next }, width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false,
+      });
+      // Swap while the card is edge-on, halfway through the flip
+      setTimeout(() => {
+        cameraStreamRef.current?.getTracks().forEach((track) => {
+          try { track.stop(); } catch {}
+        });
+        cameraStreamRef.current = stream;
+        setCameraFacing(next);
+        if (cameraVideoRef.current) {
+          cameraVideoRef.current.srcObject = stream;
+          cameraVideoRef.current.play().catch(() => {});
+        }
+      }, 230);
+    } catch (err) {
+      console.warn("Camera switch issue:", err);
+      setErrorMessage(isEn ? "Couldn't switch camera." : "ما قدرت أبدّل الكاميرا.");
+    }
+  }, [cameraFacing, isEn]);
+
+  const prefersReducedMotion = () =>
+    typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+  const closeWithAnimation = useCallback((via: "end" | "x") => {
+    if (closingVia) return;
+    fire(via);
+    setClosingVia(via);
+    setTimeout(() => {
+      setClosingVia(null);
+      onClose();
+    }, prefersReducedMotion() ? 0 : 440);
+  }, [closingVia, fire, onClose]);
+
+  const toggleMute = useCallback(() => {
+    fire("mic");
+    setIsMuted((prev) => !prev);
+  }, [fire]);
 
   const disconnectLive = useCallback(() => {
     isSessionActiveRef.current = false;
@@ -700,7 +772,9 @@ registerProcessor('mic-processor', MicProcessor);`;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-[#240b09]/95 p-3 sm:p-5 backdrop-blur-xl text-[#fef5f4] overflow-hidden"
+      className={`fixed inset-0 z-50 flex flex-col bg-[#240b09]/95 p-3 sm:p-5 backdrop-blur-xl text-[#fef5f4] overflow-hidden ${
+        closingVia ? "vc-closing" : "vc-call-enter"
+      }`}
       dir={isEn ? "ltr" : "rtl"}
     >
       <div className="flex w-full justify-between items-center pb-2.5 border-b border-white/10 shrink-0">
@@ -744,55 +818,94 @@ registerProcessor('mic-processor', MicProcessor);`;
 
         <button
           type="button"
-          onClick={onClose}
-          className="rounded-full bg-white/10 hover:bg-white/20 text-[#fef5f4] size-9 flex items-center justify-center transition"
+          onClick={() => closeWithAnimation("x")}
+          className="relative rounded-full bg-white/10 hover:bg-white/20 active:scale-90 text-[#fef5f4] size-9 flex items-center justify-center transition"
           title={isEn ? "Close" : "إغلاق"}
         >
-          <X className="w-5 h-5" />
+          <X key={`x-${fx.x || 0}`} className={`w-5 h-5 ${fx.x ? "vc-x-spin" : ""}`} />
         </button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center my-auto py-4 min-h-0 w-full max-w-xl mx-auto px-3">
         <div className="flex-1 flex flex-col items-center justify-center relative min-h-[260px] w-full">
-          {/* 2.5D Custom WebGL Shader Memoji with Lip-Sync & Depth */}
-          <div className="relative flex items-center justify-center my-auto w-full max-w-md h-72 sm:h-84">
-            {/* Ambient pulsating glow behind avatar */}
+          {/* Stage: the salt bag alone, or the camera view with the bag as a corner bubble */}
+          <div
+            className={`relative flex items-center justify-center my-auto w-full max-w-md transition-[height] duration-500 ease-out ${
+              isCameraOn ? "h-[23rem] sm:h-[26rem]" : "h-72 sm:h-84"
+            }`}
+          >
+            {/* Ambient pulsating glow behind the bag */}
             <div
               style={{
                 transform: `scale(${1 + (status === "speaking" ? 0.25 : 0)})`,
-                opacity: status === "speaking" ? 0.45 : 0.2,
+                opacity: isCameraOn ? 0 : status === "speaking" ? 0.45 : 0.2,
               }}
-              className="absolute size-64 sm:size-80 rounded-full bg-gradient-to-tr from-rose-700/50 via-amber-600/40 to-red-600/50 blur-3xl pointer-events-none transition-all duration-150"
-            />
-            <SaltBagCall
-              imageUrl="/salt-bag.png"
-              externalAudioLevel={outputAudioLevel}
-              isSpeaking={status === "speaking" || isGeminiSpeaking}
-              analyserNode={outputAnalyserRef.current || audioAnalyser}
+              className="absolute size-64 sm:size-80 rounded-full bg-gradient-to-tr from-rose-700/50 via-amber-600/40 to-red-600/50 blur-3xl pointer-events-none transition-all duration-300"
             />
 
             {isCameraOn && (
-              <div className="absolute top-0 end-0 w-24 sm:w-36 aspect-[3/4] rounded-2xl overflow-hidden border-2 border-white/25 shadow-xl bg-black">
+              <div className="absolute inset-0 rounded-[1.75rem] overflow-hidden bg-black shadow-2xl ring-1 ring-white/15 vc-cam-open">
                 <video
-                  ref={cameraVideoRef}
+                  ref={attachCameraVideo}
                   playsInline
                   muted
-                  className={`size-full object-cover ${cameraFacing === "user" ? "-scale-x-100" : ""}`}
+                  className={`size-full object-cover ${cameraFacing === "user" ? "-scale-x-100" : ""} ${
+                    isFlippingCamera ? "vc-cam-flip" : ""
+                  }`}
                 />
-                <span className="absolute top-1.5 start-1.5 flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white">
-                  <span className="size-1.5 rounded-full bg-rose-500 animate-pulse" />
-                  {isEn ? "Al-Dahiya sees" : "الداهية يشوف"}
+                {/* Soft vignette so the overlays stay readable on bright salt */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/35 pointer-events-none" />
+                <div key={`scan-${fx.camOn || 0}`} className="vc-scan" />
+                {[
+                  { pos: "top-3 start-3", border: "border-t-[3px] border-s-[3px] rounded-ss-xl", fx: "14px", fy: "14px" },
+                  { pos: "top-3 end-3", border: "border-t-[3px] border-e-[3px] rounded-se-xl", fx: "-14px", fy: "14px" },
+                  { pos: "bottom-3 start-3", border: "border-b-[3px] border-s-[3px] rounded-es-xl", fx: "14px", fy: "-14px" },
+                  { pos: "bottom-3 end-3", border: "border-b-[3px] border-e-[3px] rounded-ee-xl", fx: "-14px", fy: "-14px" },
+                ].map((c) => (
+                  <span
+                    key={c.pos}
+                    className={`vc-corner ${c.pos} ${c.border}`}
+                    style={{ ["--fx" as string]: isEn ? c.fx : c.fx.startsWith("-") ? c.fx.slice(1) : `-${c.fx}`, ["--fy" as string]: c.fy }}
+                  />
+                ))}
+                <span className="absolute top-4 inset-x-0 mx-auto w-fit flex items-center gap-1.5 rounded-full bg-black/45 backdrop-blur-md px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20">
+                  <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+                  {isEn ? "Al-Dahiya is looking" : "الداهية يشوف معك"}
                 </span>
                 <button
                   type="button"
                   onClick={flipCamera}
-                  className="absolute bottom-1.5 end-1.5 size-8 rounded-full bg-black/55 hover:bg-black/75 text-white flex items-center justify-center"
+                  className="absolute top-12 end-4 size-10 rounded-full bg-white/15 hover:bg-white/25 active:scale-90 backdrop-blur-md ring-1 ring-white/25 text-white flex items-center justify-center transition"
                   title={isEn ? "Switch camera" : "تبديل الكاميرا"}
                 >
-                  <SwitchCamera className="size-4" />
+                  <SwitchCamera className={`size-5 transition-transform duration-500 ${cameraFacing === "user" ? "rotate-180" : ""}`} />
                 </button>
               </div>
             )}
+
+            {/* White flash the moment the camera opens */}
+            {isCameraOn && fx.camOn ? <span key={`flash-${fx.camOn}`} className="vc-flash" /> : null}
+
+            <div
+              className="vc-bag"
+              style={{
+                left: isCameraOn ? (isEn ? "calc(100% - 64px)" : "64px") : "50%",
+                top: isCameraOn ? "calc(100% - 64px)" : "50%",
+                scale: isCameraOn ? "0.34" : "1",
+              }}
+            >
+              <SaltBagCall
+                imageUrl="/salt-bag.png"
+                externalAudioLevel={outputAudioLevel}
+                isSpeaking={status === "speaking" || isGeminiSpeaking}
+                analyserNode={outputAnalyserRef.current || audioAnalyser}
+                className={isCameraOn && (status === "speaking" || isGeminiSpeaking) ? "vc-talk-ring" : ""}
+                style={{
+                  outline: isCameraOn ? "10px solid rgba(255,255,255,0.9)" : "0px solid rgba(255,255,255,0)",
+                  transition: "outline 500ms ease",
+                }}
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-center gap-1.5 h-8 px-4 my-4">
@@ -867,40 +980,65 @@ registerProcessor('mic-processor', MicProcessor);`;
 
       <div className="flex flex-col items-center gap-2.5 w-full max-w-md mx-auto pt-2 shrink-0 pb-2">
         <div className="flex items-center gap-2.5 sm:gap-3 w-full justify-center">
+          {/* Mic: sound rings + pop when it comes back on, a wiggle when muted */}
           <button
             type="button"
-            onClick={() => setIsMuted(prev => !prev)}
-            className={`size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl transition-all shadow-md flex items-center justify-center select-none ${
+            onClick={toggleMute}
+            className={`relative size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl transition-all shadow-md flex items-center justify-center select-none active:scale-90 ${
               isMuted
                 ? "bg-rose-600 hover:bg-rose-700 text-white ring-4 ring-rose-500/30"
                 : "bg-white/10 hover:bg-white/20 text-[#fef5f4]"
             }`}
             title={isMuted ? (isEn ? "Unmute Mic" : "تشغيل المايك") : (isEn ? "Mute Mic" : "كتم المايك")}
           >
-            {isMuted ? (
-              <MicOff className="size-5 sm:size-6 text-white" />
-            ) : (
-              <Mic className="size-5 sm:size-6 text-rose-300" />
-            )}
+            {fx.mic && !isMuted ? (
+              <span key={`rings-${fx.mic}`}>
+                <span className="vc-ring" />
+                <span className="vc-ring vc-delay" />
+              </span>
+            ) : null}
+            <span key={`mic-${fx.mic || 0}`} className={fx.mic ? (isMuted ? "vc-wiggle" : "vc-pop") : ""}>
+              {isMuted ? (
+                <MicOff className="size-5 sm:size-6 text-white" />
+              ) : (
+                <Mic className="size-5 sm:size-6 text-rose-300" />
+              )}
+            </span>
+            {fx.mic ? <SaltBurst key={`mic-burst-${fx.mic}`} color={isMuted ? "#fda4af" : "#ffffff"} /> : null}
           </button>
 
+          {/* Camera: an aperture snaps shut and reopens, salt crystals fly */}
           <button
             type="button"
-            onClick={toggleCamera}
-            className={`size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl transition-all shadow-md flex items-center justify-center select-none ${
+            onClick={() => {
+              fire("cam");
+              if (!isCameraOn) fire("camOn");
+              toggleCamera();
+            }}
+            className={`relative size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl transition-all shadow-md flex items-center justify-center select-none active:scale-90 ${
               isCameraOn
                 ? "bg-emerald-600 hover:bg-emerald-700 text-white ring-4 ring-emerald-500/30"
                 : "bg-white/10 hover:bg-white/20 text-[#fef5f4]"
             }`}
             title={isCameraOn ? (isEn ? "Turn off camera" : "إيقاف الكاميرا") : (isEn ? "Show Al-Dahiya with your camera" : "شغّل الكاميرا وخل الداهية يشوف")}
           >
-            {isCameraOn ? <CameraOff className="size-5 sm:size-6" /> : <Camera className="size-5 sm:size-6 text-rose-300" />}
+            <span key={`cam-icon-${fx.cam || 0}`} className={fx.cam ? "vc-pop" : ""}>
+              {isCameraOn ? <CameraOff className="size-5 sm:size-6" /> : <Camera className="size-5 sm:size-6 text-rose-300" />}
+            </span>
+            {fx.cam ? <span key={`shutter-${fx.cam}`} className="vc-shutter" /> : null}
+            {fx.cam ? <SaltBurst key={`cam-burst-${fx.cam}`} color="#a7f3d0" /> : null}
           </button>
 
+          {/* Main mic: a ripple from the exact press point */}
           <button
             type="button"
-            onClick={() => setIsMuted(prev => !prev)}
-            className={`flex-1 py-3 sm:py-4 px-4 min-h-[48px] rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md select-none flex items-center justify-center ${
+            onClick={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              setRipple({ x: `${e.clientX - r.left}px`, y: `${e.clientY - r.top}px` });
+              fire("main");
+              toggleMute();
+            }}
+            className={`relative overflow-hidden flex-1 py-3 sm:py-4 px-4 min-h-[48px] rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md select-none flex items-center justify-center active:scale-[0.97] ${
               isMuted
                 ? "bg-rose-700 hover:bg-rose-800 text-white ring-4 ring-rose-500/30"
                 : status === "user_speaking"
@@ -908,28 +1046,35 @@ registerProcessor('mic-processor', MicProcessor);`;
                 : "bg-[#b82e24] hover:bg-[#992017] text-white"
             }`}
           >
-            {isMuted ? (
-              <>
-                <MicOff className={`size-4 sm:size-5 ${isEn ? "mr-1.5" : "ml-1.5"}`} />
-                {isEn ? "Unmute Live Mic" : "إلغاء كتم المايك"}
-              </>
-            ) : (
-              <>
-                <Mic className={`size-4 sm:size-5 ${isEn ? "mr-1.5" : "ml-1.5"} ${status === "user_speaking" ? "animate-pulse" : ""}`} />
-                {isEn
-                  ? status === "user_speaking" ? "Transmitting Speech..." : "Live Microphone Active"
-                  : status === "user_speaking" ? "جاري الإرسال المباشر..." : "المايك المباشر نشط"}
-              </>
-            )}
+            {fx.main ? (
+              <span key={`ripple-${fx.main}`} className="vc-ripple" style={{ ["--x" as string]: ripple.x, ["--y" as string]: ripple.y }} />
+            ) : null}
+            <span key={`main-${fx.main || 0}`} className={`relative flex items-center ${fx.main ? "vc-pop" : ""}`}>
+              {isMuted ? (
+                <>
+                  <MicOff className={`size-4 sm:size-5 ${isEn ? "mr-1.5" : "ml-1.5"}`} />
+                  {isEn ? "Unmute Live Mic" : "إلغاء كتم المايك"}
+                </>
+              ) : (
+                <>
+                  <Mic className={`size-4 sm:size-5 ${isEn ? "mr-1.5" : "ml-1.5"} ${status === "user_speaking" ? "animate-pulse" : ""}`} />
+                  {isEn
+                    ? status === "user_speaking" ? "Transmitting Speech..." : "Live Microphone Active"
+                    : status === "user_speaking" ? "جاري الإرسال المباشر..." : "المايك المباشر نشط"}
+                </>
+              )}
+            </span>
           </button>
 
+          {/* Hang up: the handset tips over and the whole call folds away */}
           <button
             type="button"
-            onClick={onClose}
-            className="size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl bg-rose-700 hover:bg-rose-800 text-white shadow-lg flex items-center justify-center transition"
+            onClick={() => closeWithAnimation("end")}
+            className="relative size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl bg-rose-700 hover:bg-rose-800 text-white shadow-lg flex items-center justify-center transition active:scale-90"
             title={isEn ? "End Call" : "إنهاء المكالمة"}
           >
-            <Phone className="size-5 sm:size-6 rotate-[135deg]" />
+            <Phone className={`size-5 sm:size-6 ${closingVia === "end" ? "vc-hangup" : "rotate-[135deg]"}`} />
+            {fx.end ? <SaltBurst key={`end-burst-${fx.end}`} color="#fb7185" /> : null}
           </button>
         </div>
       </div>

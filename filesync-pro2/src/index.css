@@ -45,3 +45,189 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ───────── Live call motion (vc-*) ───────── */
+@property --vc-iris {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 72%;
+}
+
+/* Salt crystals that burst out of a pressed button */
+.vc-crystal {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  width: var(--s, 6px);
+  height: var(--s, 6px);
+  border-radius: 1.5px;
+  background: var(--c, #fff);
+  box-shadow: 0 0 6px var(--c, #fff);
+  pointer-events: none;
+  animation: vc-crystal 680ms cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
+}
+@keyframes vc-crystal {
+  from { transform: translate(-50%, -50%) rotate(45deg) scale(1); opacity: 1; }
+  to { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(calc(45deg + var(--rot))) scale(0.15); opacity: 0; }
+}
+
+/* Mic: sound rings when it comes back on, a wiggle when muted */
+.vc-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  border: 2px solid var(--c, #fda4af);
+  pointer-events: none;
+  animation: vc-ring 760ms ease-out forwards;
+}
+.vc-ring.vc-delay { animation-delay: 160ms; opacity: 0; }
+@keyframes vc-ring {
+  from { transform: scale(0.75); opacity: 0.85; }
+  to { transform: scale(1.9); opacity: 0; }
+}
+.vc-wiggle { animation: vc-wiggle 520ms ease-in-out; }
+@keyframes vc-wiggle {
+  0%, 100% { rotate: 0deg; }
+  20% { rotate: -20deg; }
+  40% { rotate: 15deg; }
+  60% { rotate: -9deg; }
+  80% { rotate: 4deg; }
+}
+.vc-pop { animation: vc-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes vc-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.7); }
+  100% { transform: scale(1); }
+}
+
+/* Camera button: an aperture that snaps shut and reopens */
+.vc-shutter {
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(10, 30, 20, 0.92) 0deg 30deg, rgba(16, 70, 45, 0.92) 30deg 60deg);
+  -webkit-mask: radial-gradient(circle, transparent var(--vc-iris), #000 calc(var(--vc-iris) + 1%));
+  mask: radial-gradient(circle, transparent var(--vc-iris), #000 calc(var(--vc-iris) + 1%));
+  animation: vc-shutter 560ms cubic-bezier(0.5, 0, 0.3, 1) forwards;
+}
+@keyframes vc-shutter {
+  0% { --vc-iris: 72%; rotate: 0deg; opacity: 0; }
+  15% { opacity: 1; }
+  50% { --vc-iris: 0%; rotate: 60deg; opacity: 1; }
+  100% { --vc-iris: 72%; rotate: 120deg; opacity: 0; }
+}
+.vc-flash {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.75rem;
+  background: #fff;
+  pointer-events: none;
+  z-index: 30;
+  animation: vc-flash 520ms ease-out forwards;
+}
+@keyframes vc-flash {
+  0% { opacity: 0; }
+  12% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+/* Camera view: opens like an iris, viewfinder corners close in, a salt-white scan sweeps it */
+.vc-cam-open { animation: vc-cam-open 640ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes vc-cam-open {
+  from { clip-path: circle(0% at 50% 50%); transform: scale(1.06); }
+  to { clip-path: circle(80% at 50% 50%); transform: scale(1); }
+}
+.vc-cam-flip { animation: vc-cam-flip 560ms cubic-bezier(0.45, 0, 0.25, 1); }
+@keyframes vc-cam-flip {
+  0% { transform: perspective(900px) rotateY(0deg); }
+  50% { transform: perspective(900px) rotateY(90deg); filter: brightness(0.5); }
+  100% { transform: perspective(900px) rotateY(0deg); }
+}
+.vc-corner {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-color: rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+  animation: vc-corner 700ms 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes vc-corner {
+  from { opacity: 0; translate: var(--fx) var(--fy); }
+  to { opacity: 1; translate: 0 0; }
+}
+.vc-scan {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 38%;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.07) 70%, rgba(255, 255, 255, 0.55) 98%, transparent);
+  animation: vc-scan 1.9s 500ms ease-in-out 3 both;
+}
+@keyframes vc-scan {
+  from { transform: translateY(-100%); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  to { transform: translateY(270%); opacity: 0; }
+}
+
+/* The salt bag glides into a corner bubble while the camera is on */
+.vc-bag {
+  position: absolute;
+  translate: -50% -50%;
+  transition: left 620ms cubic-bezier(0.34, 1.35, 0.64, 1), top 620ms cubic-bezier(0.34, 1.35, 0.64, 1),
+    scale 620ms cubic-bezier(0.34, 1.35, 0.64, 1);
+  z-index: 20;
+}
+.vc-talk-ring { animation: vc-talk-ring 1.1s ease-out infinite; }
+@keyframes vc-talk-ring {
+  from { box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.75), 0 25px 60px rgba(0, 0, 0, 0.55); }
+  to { box-shadow: 0 0 0 60px rgba(251, 113, 133, 0), 0 25px 60px rgba(0, 0, 0, 0.55); }
+}
+
+/* Main mic button: a ripple from the exact press point */
+.vc-ripple {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 260%;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 60%);
+  pointer-events: none;
+  animation: vc-ripple 700ms ease-out forwards;
+}
+@keyframes vc-ripple {
+  from { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* Hang up: the handset tips over, then the whole call folds away */
+.vc-hangup { animation: vc-hangup 460ms cubic-bezier(0.5, 0, 0.3, 1) forwards; }
+@keyframes vc-hangup {
+  0% { rotate: 135deg; }
+  25% { rotate: 160deg; }
+  45% { rotate: 120deg; }
+  100% { rotate: 225deg; translate: 0 4px; }
+}
+.vc-closing { animation: vc-closing 440ms cubic-bezier(0.6, 0, 0.8, 0.4) forwards; }
+@keyframes vc-closing {
+  to { opacity: 0; transform: scale(0.94) translateY(24px); filter: blur(8px); }
+}
+.vc-call-enter { animation: vc-call-enter 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes vc-call-enter {
+  from { opacity: 0; transform: scale(1.04); filter: blur(6px); }
+}
+.vc-x-spin { animation: vc-x-spin 420ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes vc-x-spin {
+  from { rotate: 0deg; scale: 1; }
+  50% { scale: 0.7; }
+  to { rotate: 180deg; scale: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vc-crystal, .vc-ring, .vc-shutter, .vc-flash, .vc-scan, .vc-corner, .vc-ripple, .vc-talk-ring { display: none; }
+  .vc-wiggle, .vc-pop, .vc-cam-open, .vc-cam-flip, .vc-hangup, .vc-closing, .vc-call-enter, .vc-x-spin { animation: none; }
+  .vc-bag { transition: none; }
+}
