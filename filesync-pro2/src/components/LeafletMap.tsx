@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-export type MapPoint = { id: string; lat: number; lng: number; title: string; label?: string };
+export type MapPoint = { id: string; lat: number; lng: number; title: string; label?: string; kind?: "cafe" | "nature" };
 
 // Free OpenStreetMap map (no API key, no billing). Pins are drawn with CSS
 // (L.divIcon) so no marker images have to be bundled.
@@ -13,6 +13,7 @@ export function LeafletMap({
   className = "h-64",
   zoom = 15,
   onSelect,
+  fitIds,
 }: {
   points: MapPoint[];
   activeId?: string;
@@ -20,6 +21,8 @@ export function LeafletMap({
   className?: string;
   zoom?: number;
   onSelect?: (id: string) => void;
+  /** Frame these pins (instead of the active one / all pins) */
+  fitIds?: string[];
 }) {
   const elRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -61,7 +64,7 @@ export function LeafletMap({
       const active = p.id === activeId;
       const icon = L.divIcon({
         className: "",
-        html: `<div class="lm-pin${active ? " lm-pin-active" : ""}"><span>${p.label ?? ""}</span></div>`,
+        html: `<div class="lm-pin${p.kind ? ` lm-pin-${p.kind}` : ""}${active ? " lm-pin-active" : ""}"><span>${p.label ?? ""}</span></div>`,
         iconSize: [30, 38],
         iconAnchor: [15, 36],
         tooltipAnchor: [0, -34],
@@ -73,7 +76,10 @@ export function LeafletMap({
     });
 
     const active = points.find((p) => p.id === activeId);
-    if (active && !route) {
+    const fitPoints = fitIds ? points.filter((p) => fitIds.includes(p.id)) : [];
+    if (fitPoints.length > 1) {
+      map.fitBounds(L.latLngBounds(fitPoints.map((p) => [p.lat, p.lng] as [number, number])), { padding: [30, 30], maxZoom: 17 });
+    } else if (active && !route) {
       map.setView([active.lat, active.lng], zoom);
     } else if (points.length === 1) {
       map.setView([points[0].lat, points[0].lng], zoom);
@@ -81,7 +87,7 @@ export function LeafletMap({
       map.fitBounds(L.latLngBounds(points.map((p) => [p.lat, p.lng] as [number, number])), { padding: [30, 30], maxZoom: 17 });
       if (active) map.panTo([active.lat, active.lng]);
     }
-  }, [points, activeId, route, zoom, onSelect]);
+  }, [points, activeId, route, zoom, onSelect, fitIds]);
 
   return <div ref={elRef} dir="ltr" className={`lm-map w-full ${className}`} />;
 }

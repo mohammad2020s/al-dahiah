@@ -26,7 +26,9 @@ const loadVoiceCall = () => import("../components/VoiceCall");
 const VoiceCall = lazy(() => loadVoiceCall().then((m) => ({ default: m.VoiceCall })));
 import { CallButtonAnimation } from "../components/CallButtonAnimation";
 import { LanguageModal } from "../components/LanguageModal";
-import { LeafletMap, directionsUrl } from "../components/LeafletMap";
+import { LeafletMap, directionsUrl, type MapPoint } from "../components/LeafletMap";
+import { AL_QASAB_CAFES, AL_QASAB_LANDMARKS } from "../../server/alQasabScope.ts";
+import { PLACE_TOPICS } from "../../server/alQasabKnowledge.ts";
 import { TourRoute } from "../components/TourRoute";
 import { PlaceGallery, type PlaceImage } from "../components/PlaceGallery";
 import { SeasonCountdown } from "../components/SeasonCountdown";
@@ -111,27 +113,57 @@ function WeatherCard({ weather, language = "ar" }: { weather: WeatherData; langu
   );
 }
 
+// Every Al-Qasab place gets a pin on the location map; tap a pin to see its name
+const ALL_MAP_POINTS: MapPoint[] = [
+  ...AL_QASAB_LANDMARKS.filter((l) => l.id !== "cafes").map((l) => ({
+    id: l.id,
+    lat: l.coordinates.lat,
+    lng: l.coordinates.lng,
+    title: l.name,
+    kind: l.id === "salt_flat" || l.id === "sabkha" ? ("nature" as const) : undefined,
+  })),
+  ...PLACE_TOPICS.filter((t) => t.coordinates).map((t) => ({
+    id: t.id,
+    lat: t.coordinates!.lat,
+    lng: t.coordinates!.lng,
+    title: t.titleAr,
+    kind: "nature" as const,
+  })),
+  ...AL_QASAB_CAFES.map((c, i) => ({
+    id: c.id,
+    lat: c.coordinates.lat,
+    lng: c.coordinates.lng,
+    title: c.name,
+    label: String(i + 1),
+    kind: "cafe" as const,
+  })),
+];
+const CAFE_PIN_IDS = AL_QASAB_CAFES.map((c) => c.id);
+
 function LocationMapCard({ location, language = "ar" }: { location: any; language?: Language }) {
   const isCafes = location.type === "cafes" || Boolean(location.places && location.places.length > 0);
   const activeCoordinates = location.coordinates || { lat: 25.2984, lng: 45.5073 };
   const locationTitle = location.name || (language === "en" ? "Al-Qasab Salt Season - Event Grounds" : "موسم ملح القصب - أرض الفعاليات");
-  // Several cafes → one numbered pin per cafe (same order as the list below)
+  // Several cafes → frame the 4 cafes; otherwise focus the place being asked about
   const multiPin = isCafes && Array.isArray(location.places) && location.places.length > 1;
-  const mapPoints = useMemo(
-    () =>
-      multiPin
-        ? location.places.map((p: any, i: number) => ({ id: p.id, lat: p.coordinates.lat, lng: p.coordinates.lng, title: p.name, label: String(i + 1) }))
-        : [{ id: "here", lat: activeCoordinates.lat, lng: activeCoordinates.lng, title: locationTitle }],
-    [multiPin, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]
-  );
+  const { mapPoints, activeId } = useMemo(() => {
+    const points: MapPoint[] = [...ALL_MAP_POINTS];
+    if (multiPin) return { mapPoints: points, activeId: undefined };
+    const byId = location.id && points.find((p) => p.id === location.id);
+    const near = byId || points.find((p) => Math.abs(p.lat - activeCoordinates.lat) < 0.0004 && Math.abs(p.lng - activeCoordinates.lng) < 0.0004);
+    if (near) return { mapPoints: points, activeId: near.id };
+    points.push({ id: "here", lat: activeCoordinates.lat, lng: activeCoordinates.lng, title: locationTitle });
+    return { mapPoints: points, activeId: "here" };
+  }, [multiPin, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]);
 
   return (
     <div className="my-4 overflow-hidden rounded-3xl border border-[#f2d4d1] bg-white shadow-lg shadow-gray-200/50 w-full">
       <LeafletMap
         className="h-64 sm:h-72"
         points={mapPoints}
-        activeId={multiPin ? undefined : "here"}
-        zoom={15}
+        activeId={activeId}
+        fitIds={multiPin ? CAFE_PIN_IDS : undefined}
+        zoom={17}
       />
       <div className="flex items-center justify-between gap-2 border-t border-[#f4dedd] px-3 py-2.5">
         <span className="min-w-0 truncate text-xs font-bold text-[#321210]">{locationTitle}</span>
