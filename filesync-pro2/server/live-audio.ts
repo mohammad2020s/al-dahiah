@@ -56,6 +56,13 @@ export function setupLiveAudio(server: Server) {
     const placeList = PLACE_TOPICS.map((t) => `${t.id} = ${t.titleAr} / ${t.titleEn}`).join("\n");
     const systemInstruction = `${buildAlQasabSystemPrompt(undefined, "auto")}
 
+VOICE CALL — PRONUNCIATION (critical — enforce on every word you say):
+- «القَصَب»: القاف مفتوحة وزن فَعَل (fatha on ق then fatha on ص then sukoon on ب). Say "al-QA-sab" — never "al-qasab" with a neutral schwa or a kasra.
+- «الجِفار»: الجيم مكسورة (kasra on ج). Say "al-JI-far" — never "al-ja-far" or "al-ju-far".
+- «الصْبَخَة»: الصاد ساكنة (sukoon), الباء مفتوحة, الخاء مفتوحة. Say "aṣ-ṣab-KHA".
+- «الوَشْم»: الواو مفتوحة, الشين ساكنة. Say "al-WASM" — short 'a' on the waaw, no kasra.
+- «المَمْلحة»: الميم مفتوحة, الميم الثانية ساكنة. Say "al-MAM-la-ḥa".
+
 VOICE CALL — SHOWING PLACES ON THE CALLER'S SCREEN:
 Whenever the caller asks about one of these Al-Qasab places, or you start explaining one, FIRST call the tool show_place with its id (their screen then shows its real photos, or an info card), THEN explain it like a tour guide in 2–4 short sentences from the guide knowledge, and offer to tell more. Call it once per place, not again while you keep talking about the same place.
 Places:
