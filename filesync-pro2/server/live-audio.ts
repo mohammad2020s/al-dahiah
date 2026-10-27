@@ -2,6 +2,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "http";
 import "dotenv/config";
 import { buildAlQasabSystemPrompt } from "./alQasabScope.ts";
+import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { createLimiter, clientIp } from "./rateLimit.ts";
 
 export function setupLiveAudio(server: Server) {
@@ -51,7 +52,14 @@ export function setupLiveAudio(server: Server) {
     }
 
     // Bilingual prompt: the caller may switch language mid-call (English → English, Arabic → Najdi only)
-    const systemInstruction = buildAlQasabSystemPrompt(undefined, "auto");
+    // In a call he can put a place on the caller's screen: show it first, then explain
+    const placeList = PLACE_TOPICS.map((t) => `${t.id} = ${t.titleAr} / ${t.titleEn}`).join("\n");
+    const systemInstruction = `${buildAlQasabSystemPrompt(undefined, "auto")}
+
+VOICE CALL — SHOWING PLACES ON THE CALLER'S SCREEN:
+Whenever the caller asks about one of these Al-Qasab places, or you start explaining one, FIRST call the tool show_place with its id (their screen then shows its real photos, or an info card), THEN explain it like a tour guide in 2–4 short sentences from the guide knowledge, and offer to tell more. Call it once per place, not again while you keep talking about the same place.
+Places:
+${placeList}`;
 
     // Official Gemini Live WebSocket endpoint
     const geminiWsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
@@ -67,6 +75,27 @@ export function setupLiveAudio(server: Server) {
           // Text of what both sides say, so the call screen can show photos of the place being discussed
           inputAudioTranscription: {},
           outputAudioTranscription: {},
+          tools: [
+            {
+              functionDeclarations: [
+                {
+                  name: "show_place",
+                  description: "Show the caller photos or an info card of an Al-Qasab place on their call screen. Call it right before explaining that place.",
+                  parameters: {
+                    type: "OBJECT",
+                    properties: {
+                      place_id: {
+                        type: "STRING",
+                        enum: PLACE_TOPICS.map((t) => t.id),
+                        description: "Id of the place being discussed",
+                      },
+                    },
+                    required: ["place_id"],
+                  },
+                },
+              ],
+            },
+          ],
           generationConfig: {
             responseModalities: ["AUDIO"],
             speechConfig: {

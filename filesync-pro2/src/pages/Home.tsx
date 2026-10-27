@@ -56,6 +56,7 @@ type ChatMessage = {
   locationData?: any;
   weather?: WeatherData | null;
   images?: PlaceImage[];
+  mapsUrl?: string;
   audio?: string;
 };
 
@@ -432,6 +433,7 @@ export default function Home() {
                         locationData: data.locationData,
                         weather: data.weather,
                         images: Array.isArray(data.images) ? data.images : undefined,
+                        mapsUrl: typeof data.mapsUrl === "string" ? data.mapsUrl : undefined,
                       }
                     : m
                 )
@@ -658,6 +660,17 @@ export default function Home() {
                       )}
                       {m.role === "assistant" && m.images && m.images.length > 0 && (
                         <PlaceGallery images={m.images} language={language} />
+                      )}
+                      {m.role === "assistant" && m.mapsUrl && (
+                        <a
+                          href={m.mapsUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="pg-enter mt-2 inline-flex items-center gap-1.5 rounded-xl border border-[#f2d6d3] bg-white px-3 py-2 text-xs font-bold text-[#8e1b12] shadow-sm hover:bg-[#fff5f4]"
+                        >
+                          <ExternalLink className="size-3.5" />
+                          {language === "en" ? "More photos on Google Maps" : "صور أكثر على Google Maps"}
+                        </a>
                       )}
                       {m.role === "assistant" && m.showMap && m.locationData && (
                         <LocationMapCard location={m.locationData} language={language} />

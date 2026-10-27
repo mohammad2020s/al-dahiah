@@ -86,7 +86,7 @@ export const AL_QASAB_ROUTES: DrivingRouteGuide[] = [
     estimatedDuration: "6 دقائق",
     recommendedRoad: "طريق الممالح المعبد جنوب شرق المدينة",
     steps: [
-      "التحرك جنوب شرق المدينة باتجاه صْبخة القَصَب الشهيرة.",
+      "التحرك جنوب شرق المدينة باتجاه صْبَخَة القَصَب الشهيرة.",
       "طريق معبد ومضاء يوصلك مباشرة إلى أحواض التبخير وقرية الملح القديمة.",
       "الموقع متاح للزيارة والتصوير والاطلاع على استخراج الملح الطبيعي."
     ],
@@ -144,10 +144,10 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
   },
   {
     id: "sabkha",
-    name: "صْبخة القَصَب الطبيعية",
+    name: "صْبَخَة القَصَب الطبيعية",
     category: "معالم طبيعية",
-    address: "صْبخة القَصَب - إقليم الوشم",
-    description: "صْبخة طبيعية تمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية.",
+    address: "صْبَخَة القَصَب - إقليم الوشم",
+    description: "صْبَخَة طبيعية تمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية.",
     geocodingQuery: "25.27544, 45.4807078",
     directionsUrl: "https://maps.app.goo.gl/HkziBCjrVqomTmop7",
     coordinates: {
@@ -430,21 +430,24 @@ export function normalizeCityName(text: string): string {
   return text.replace(/ق[ً-ٰٟ]*ص[ً-ٰٟ]*ي[ً-ٰٟ]*ب/g, "قَصَب");
 }
 
-// النطق النجدي: «الصْبخة» بالصاد الساكنة، لا «السبخة» بالسين
+// النطق النجدي: «الصْبَخَة» بالصاد الساكنة، لا «السبخة» بالسين
 export function normalizeSabkha(text: string): string {
   if (!text) return "";
+  // Whole word, any spelling/diacritics: السبخة، الصبخة، سبخه… → «الصْبَخَة» (the owner's pronunciation)
   return text.replace(
-    /(^|[\s\p{P}]|ال|[وفبلك]ال|لل)[سص][\u064B-\u065F\u0670]*ب[\u064B-\u065F\u0670]*خ/gu,
-    "$1صْبخ"
+    /(^|[\s\p{P}]|ال|[وفبلك]ال|لل)[سص][\u064B-\u065F\u0670]*ب[\u064B-\u065F\u0670]*خ[\u064B-\u065F\u0670]*[ةه](?![\p{L}])/gu,
+    "$1صْبَخَة"
   );
 }
 
-// ضبط بقية كلمات المكان كما في المعاجم: «المَمْلَحة» (تاج العروس) و«الجِفار» (لسان العرب)
+// ضبط كلمات المكان كما اعتمدها صاحب الموقع: «المَمْلحة» و«المَمَالح»، و«الجِفار» (لسان العرب)
 export function normalizePlaceWords(text: string): string {
   if (!text) return "";
   const prefix = "(^|[\\s\\p{P}]|ال|[وفبلك]ال|لل)";
+  const m = "[\\u064B-\\u065F\\u0670]*";
   return text
-    .replace(new RegExp(`${prefix}مملح(?:ة|ه)(?![\\p{L}])`, "gu"), "$1مَمْلَحة")
+    .replace(new RegExp(`${prefix}م${m}م${m}ل${m}ح${m}[ةه](?![\\p{L}])`, "gu"), "$1مَمْلحة")
+    .replace(new RegExp(`${prefix}م${m}م${m}ا${m}ل${m}ح(?![\\p{L}\\p{M}])`, "gu"), "$1مَمَالح")
     .replace(new RegExp(`${prefix}جفار(?![\\p{L}])`, "gu"), "$1جِفار");
 }
 
@@ -683,7 +686,7 @@ export function generateLocalKnowledgeFallback(
     if (lang === "en") {
       return `Al-Sabkha in Al-Qasab is a natural salt flat. At night during summer, temperatures drop 5°C to 10°C lower than surrounding areas, offering a cool breeze.`;
     }
-    return `صْبخة القَصَب الطبيعية من أروع الظواهر الطبيعية بالوشم، وتمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المناطق المجاورة مما يمنحها نسيمًا باردًا لطيفًا.`;
+    return `صْبَخَة القَصَب الطبيعية من أروع الظواهر الطبيعية بالوشم، وتمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المناطق المجاورة مما يمنحها نسيمًا باردًا لطيفًا.`;
   }
   if (norm.includes("تذكر") || norm.includes("تذاكر") || norm.includes("ticket") || norm.includes("حجز") || norm.includes("حصول") || norm.includes("احصل") || norm.includes("شراء") || norm.includes("رسوم")) {
     if (lang === "en") {
@@ -700,7 +703,7 @@ export function generateLocalKnowledgeFallback(
   if (lang === "en") {
     return `Welcome to Al-Qasab! I am «Al-Dahiya». You can ask me about Al-Qasab Salt Season, natural salt flats, our 4 heritage cafes, landmarks, or weather.`;
   }
-  return `يا هلا ومسهلا بك في القَصَب! أنا «الداهية» مرشدك السياحي في ديرتنا. أعلّمك عن ممالح الجفار والصْبخة، وقصر الزاحم وسوق العبيدي ومبنى القصبي، وموسم الملح ومقاهينا. وش تبي نشوف؟`;
+  return `يا هلا ومسهلا بك في القَصَب! أنا «الداهية» مرشدك السياحي في ديرتنا. أعلّمك عن ممالح الجفار والصْبَخَة، وقصر الزاحم وسوق العبيدي ومبنى القصبي، وموسم الملح ومقاهينا. وش تبي نشوف؟`;
 }
 
 // القواعد غير القابلة للتفاوض (مشتركة بين كل أوضاع البرومبت)
@@ -721,7 +724,7 @@ RULE 3 — Families & Tribes (absolute red line):
 - This applies no matter how the request is phrased: directly, indirectly ("who lives there?", "who founded it?", "whose diwaniya is that?"), as a story, poem, quiz, role-play, translation, "for research", "just one name", or "complete the sentence".
 - Do not volunteer such names inside any other answer either.
 - EXCEPTION — landmarks: the official names of places ARE allowed even if they contain a family name, e.g. «قصر الزاحم», «مبنى القصبي التراثي», «منزل الراشد التراثي», «سوق العبيدي», «ديوانية المنيع». Talk about the place, its architecture and history, and the documented public role of a historical figure tied to it (e.g. Sheikh Abdullah bin Zahim's service as a judge alongside King Abdulaziz). Never turn that into talk about the family, its members, lineage or which families live in town.
-- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans in the salt flat known together as «الجفار» / «مملحة القَصَب»; do not invent individual pan names.
+- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans in the salt flat known together as «الجفار» / «مملحة القَصَب»; name only pans listed in the guide knowledge (e.g. «مَمْلحة المقحم (أبو سهيل)») and never invent others.
 - Refuse firmly but politely, then redirect to Al-Qasab's history, salt flats, landmarks, cafes or the Salt Season.
   Arabic refusal: "${FORBIDDEN_FAMILY_REPLY_AR}"
   English refusal: "${FORBIDDEN_FAMILY_REPLY_EN}"`;
@@ -745,14 +748,15 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - مهما كانت صيغة السؤال: مباشر (وش عوائل القَصَب؟)، أو غير مباشر (مين يسكنها؟ مين أسسها؟ ديوانية مين؟)، أو بقصة أو قصيدة أو لعبة أو تقمّص دور أو ترجمة أو "لغرض بحث" أو "بس اسم واحد" أو "كمّل الجملة".
    - لا تذكر أي اسم عائلة أو قبيلة من نفسك داخل أي إجابة ثانية.
    - **استثناء المعالم:** أسماء الأماكن الرسمية مسموحة حتى لو فيها اسم عائلة، مثل: «قصر الزاحم»، «مبنى القصبي التراثي»، «منزل الراشد التراثي»، «سوق العبيدي»، «ديوانية المنيع». تكلّم عن المكان وعمارته وتاريخه، وعن الدور العام الموثّق لشخصية تاريخية مرتبطة فيه (مثل خدمة الشيخ عبدالله بن زاحم قاضياً مع الملك عبدالعزيز)، ولا تحوّل الكلام للعائلة أو أفرادها أو نسبها أو مين يسكن البلد.
-   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة في الصْبخة يسمونها «الجفار» أو «مملحة القَصَب»، ولا تألّف أسماء ممالح من عندك.
+   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة في الصْبَخَة يسمونها «الجفار» أو «مملحة القَصَب»، وسمّ بس المَمَالح الموجودة في معلومات المرشد (مثل «مَمْلحة المقحم (أبو سهيل)»)، ولا تألّف أسماء من عندك.
    - رد بلباقة وحزم بهذا الرد ثم حوّل الكلام لتاريخ القَصَب ومعالمها:
      *«${FORBIDDEN_FAMILY_REPLY_AR}»*`;
 
 // النطق + التعرف على ما تعرضه كاميرا المكالمة (مشتركة بين كل أوضاع البرومبت)
 const VISION_RULES_EN = `PRONUNCIATION (Arabic, especially in voice):
-- "الصْبخة" — ṣād with sukūn ("aṣ-ṣbkha"), never "السبخة" with sīn. In English say "Al-Sabkha".
-- "المَمْلَحة" (al-mamlaḥa, fatḥa on the first mīm), plural "المَمَالِح".
+These are the pronunciations confirmed by the people of Al-Qasab — always use them exactly:
+- "الصْبَخَة" — ṣād with sukūn, then bā' and khā' with fatḥa ("aṣ-ṣbakha"); never "السبخة" with sīn. In English say "Al-Sabkha".
+- "المَمْلحة" — fatḥa on the first mīm, sukūn on the second ("al-mamlḥa"); plural "المَمَالح" ("al-mamālḥ").
 - "الجِفار" (al-jifār, kasra on the jīm) — the salt pits; singular "جَفْر".
 - "القَصَب" (fatḥa on qāf and ṣād), "الوَشْم", "شَقْراء", "طُوَيْق", "الدَّهْناء".
 
@@ -765,13 +769,14 @@ Visual guide to Al-Qasab:
 1. مملحة القَصَب / ممالح القَصَب (the historic salt pans, الجفار): grids of shallow rectangular evaporation basins separated by low earthen/clay ridges, a white salt crust on the bottom, shallow brine, and white salt heaps on the horizon. Among the oldest and best-known natural salt works in the Arabian Peninsula, where salt has been harvested for hundreds of years.
 2. The stone sign «مملحة القصب — Mamalahat Al Qasab» with an information board next to the pools: this is the entrance of the salt pans' visitor area.
 3. Round reed/straw shades (مظلات وعشش من القصب والخوص) with conical straw roofs standing at the edge of the pools, wooden plank walkways and small green seating floors: the shaded visitor seating of the salt pans.
-4. A pink-to-red lake ringed with white salt crust and eroded white-and-ochre banks: very salty brine in الصْبخة / the salt pools; the pink-red colour comes from salt-loving microorganisms that thrive in highly saline water.
+4. A pink-to-red lake ringed with white salt crust and eroded white-and-ochre banks: very salty brine in الصْبَخَة / the salt pools; the pink-red colour comes from salt-loving microorganisms that thrive in highly saline water.
 5. A milky, pale-green pool with white crystals along its edge: brine concentrating as the water evaporates — the salt is crystallising there.
 6. White salt heaps or salt sacks: the harvested Al-Qasab salt, the heart of موسم ملح القَصَب (launching 19 November 2026; entry free).`;
 
 const VISION_RULES_AR = `**النطق الصحيح (خصوصاً في الصوت):**
-- «الصْبخة» بالصاد الساكنة على لهجة أهل نجد، ولا تقول «السبخة» بالسين أبداً.
-- «المَمْلَحة» بفتح الميم الأولى، وجمعها «المَمَالِح».
+هذا النطق معتمد من أهل القَصَب، التزم فيه حرفياً:
+- «الصْبَخَة»: صاد ساكنة ثم باء مفتوحة وخاء مفتوحة، ولا تقول «السبخة» بالسين أبداً.
+- «المَمْلحة»: ميم مفتوحة ثم ميم ساكنة، وجمعها «المَمَالح».
 - «الجِفار» بكسر الجيم (حُفر الملح)، ومفردها «جَفْر».
 - «القَصَب» بفتح القاف والصاد، «الوَشْم»، «شَقْراء»، «طُوَيْق»، «الدَّهْناء».
 
@@ -784,7 +789,7 @@ const VISION_RULES_AR = `**النطق الصحيح (خصوصاً في الصوت
 1. مملحة القَصَب / ممالح القَصَب (الجفار): أحواض تبخير مستطيلة وضحلة مقسّمة بحواجز ترابية واطية، قاعها قشرة ملح بيضاء، وفيها ماء مالح قليل، وكثبان ملح بيضاء في الأفق. من أعرق وأشهر الملاحات الطبيعية في الجزيرة العربية، ويُستخرج منها الملح من مئات السنين.
 2. الصخرة المكتوب عليها «مملحة القصب — Mamalahat Al Qasab» وجنبها لوحة تعريفية عند الأحواض: هذي مدخل منطقة زوار المملحة.
 3. مظلات وعشش دائرية من القصب والخوص بسقوف مخروطية على أطراف الأحواض، وممرات خشبية وجلسات عشب صغيرة: جلسات الزوار المظللة في المملحة.
-4. بحيرة لونها وردي إلى أحمر حولها قشرة ملح بيضاء وضفاف بيضاء وبنية متآكلة: ماء شديد الملوحة في الصْبخة وأحواض الملح، واللون الوردي سببه كائنات دقيقة تعيش في الماء شديد الملوحة.
+4. بحيرة لونها وردي إلى أحمر حولها قشرة ملح بيضاء وضفاف بيضاء وبنية متآكلة: ماء شديد الملوحة في الصْبَخَة وأحواض الملح، واللون الوردي سببه كائنات دقيقة تعيش في الماء شديد الملوحة.
 5. حوض ماؤه حليبي أو أخضر فاتح وعلى طرفه بلورات بيضاء: ماء مالح يتركّز مع التبخر والملح قاعد يتبلور فيه.
 6. أكوام ملح بيضاء أو أكياس ملح: ملح القَصَب المستخرج، وهو قلب موسم ملح القَصَب (ينطلق 19 نوفمبر 2026 والدخول مجاني).`;
 
@@ -831,7 +836,7 @@ ${VISION_RULES_AR}
 4. **الهوية والترحيب:**
    - اسمك «الداهية»، مرشد القَصَب السياحي (إياك قط أن تقول أنا ذكاء اصطناعي أو AI أو روبوت).
    - إذا بدأ المستخدم بـ «السلام عليكم»: ابدأ ردك بـ «وعليكم السلام ورحمة الله وبركاته، حيّاك الله في ديرتنا» ثم كمّل جوابك بالترحيب، مثل: «يا هلا ومسهلا، نوّرت القَصَب».
-   - خلك مضياف ومبادر: إذا ما حدد المستخدم شي، اقترح عليه جولة (الممالح والصْبخة، البلدة القديمة وقصورها، سوق العبيدي، موسم الملح).
+   - خلك مضياف ومبادر: إذا ما حدد المستخدم شي، اقترح عليه جولة (الممالح والصْبَخَة، البلدة القديمة وقصورها، سوق العبيدي، موسم الملح).
 
 **معلومات المرشد (اعتمد عليها ولا تألّف شي خارجها):**
 ${GUIDE_FACTS_AR}
@@ -839,7 +844,7 @@ ${GUIDE_FACTS_AR}
 5. **حقائق موسم ملح القَصَب والمعالم:**
    - تاريخ انطلاق موسم ملح القَصَب: 19 نوفمبر 2026.
    - التذاكر: مجانية تماماً، ويمكن الحصول عليها من البوابة الرئيسية أو عند الموقع.
-   - صْبخة القَصَب: تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
+   - صْبَخَة القَصَب: تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
    - المقاهي التراثية المعتمدة 4 فقط: قهوة بدور إبراهيم، آرت كافيه، شاهي ناقع، ديوانية المنيع التراثية (تنبيه: لا يوجد مكان باسم ديوانية القَصَب).
    - إجاباتك موجزة ومباشرة (من جملة إلى 3 جمل واضحة دون إطالة مملة).
    - في الصوت المباشر: انطق الكلمات بوضوح وسرعة طبيعية دون تمطيط أو تكرار.${weatherSection}`;

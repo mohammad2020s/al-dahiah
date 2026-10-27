@@ -153,12 +153,13 @@ test("system prompts enforce dialect, city name and family red line", () => {
 });
 
 test("Najdi pronunciation: السبخة becomes الصْبخة in answers", () => {
-  assert.equal(normalizeSabkha("زرت السبخة أمس"), "زرت الصْبخة أمس");
-  assert.equal(normalizeSabkha("قريب من سبخة القصب"), "قريب من صْبخة القصب");
-  assert.equal(normalizeSabkha("بالسبخة وللسبخة"), "بالصْبخة وللصْبخة");
-  assert.equal(normalizeSabkha("الصبخة"), "الصْبخة");
+  assert.equal(normalizeSabkha("زرت السبخة أمس"), "زرت الصْبَخَة أمس");
+  assert.equal(normalizeSabkha("قريب من سبخة القصب"), "قريب من صْبَخَة القصب");
+  assert.equal(normalizeSabkha("بالسبخة وللسبخة"), "بالصْبَخَة وللصْبَخَة");
+  assert.equal(normalizeSabkha("الصبخة"), "الصْبَخَة");
+  assert.equal(normalizeSabkha("الصْبخة"), "الصْبَخَة");
   assert.equal(normalizeSabkha("وش أسرع طريق"), "وش أسرع طريق");
-  assert.ok(applyNajdiPhoneticDiacritics("وش طقس السبخة؟").includes("الصْبخة"));
+  assert.ok(applyNajdiPhoneticDiacritics("وش طقس السبخة؟").includes("الصْبَخَة"));
   assert.equal(isSabkhaQuestion("وين الصبخة؟"), true);
   assert.equal(isSabkhaQuestion("وين السبخة؟"), true);
 });
@@ -166,7 +167,7 @@ test("Najdi pronunciation: السبخة becomes الصْبخة in answers", () =
 test("prompts carry the pronunciation and camera rules", () => {
   for (const mode of ["ar", "en", "auto"] as const) {
     const prompt = buildAlQasabSystemPrompt(undefined, mode);
-    assert.ok(prompt.includes("الصْبخة"), mode);
+    assert.ok(prompt.includes("الصْبَخَة") && prompt.includes("المَمْلحة") && prompt.includes("المَمَالح"), mode);
     assert.ok(prompt.includes("مملحة القَصَب"), mode);
     assert.ok(/CAMERA|الكاميرا/.test(prompt), mode);
   }
@@ -181,7 +182,7 @@ test("tour guide knowledge: salt pans, palaces and the weather false positive", 
   for (const q of ["وش اسامي المملحه؟", "اعطني أسماء الممالح", "وش أسماء الممالح الموجودة في القصب"]) {
     assert.equal(isFamilyOrTribalQuestion(q), false, q);
     const a = generateLocalKnowledgeFallback(q, "ar");
-    assert.ok(a.includes("الجفار"), q);
+    assert.ok(a.includes("الجِفار"), q);
     assert.ok(!a.includes("ما أذكر أسماء عوائل"), q);
     assert.equal(getPlaceImages(q, "ar").length, 5, q);
   }
@@ -206,10 +207,12 @@ test("salam is answered like a host", () => {
 });
 
 test("place words get their dictionary vowels", () => {
-  assert.equal(normalizePlaceWords("زرت المملحة"), "زرت المَمْلَحة");
-  assert.equal(normalizePlaceWords("عشرين مملحه"), "عشرين مَمْلَحة");
-  assert.equal(normalizePlaceWords("بالمملحة والجفار"), "بالمَمْلَحة والجِفار");
+  assert.equal(normalizePlaceWords("زرت المملحة"), "زرت المَمْلحة");
+  assert.equal(normalizePlaceWords("عشرين مملحه"), "عشرين مَمْلحة");
+  assert.equal(normalizePlaceWords("بالمملحة والجفار"), "بالمَمْلحة والجِفار");
+  assert.equal(normalizePlaceWords("المَمْلَحة"), "المَمْلحة");
+  assert.equal(normalizePlaceWords("زرت الممالح"), "زرت المَمَالح");
   assert.equal(normalizePlaceWords("مملحتها"), "مملحتها");
   const out = applyNajdiPhoneticDiacritics("السبخة جنب المملحة والجفار في القصيب");
-  assert.ok(out.includes("الصْبخة") && out.includes("المَمْلَحة") && out.includes("الجِفار") && out.includes("القَصَب"), out);
+  assert.ok(out.includes("الصْبَخَة") && out.includes("المَمْلحة") && out.includes("الجِفار") && out.includes("القَصَب"), out);
 });

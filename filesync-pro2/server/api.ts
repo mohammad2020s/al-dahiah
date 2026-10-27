@@ -36,7 +36,7 @@ import {
 } from "./alQasabScope.ts";
 import { fetchAlQasabWeather, weatherSummaryEn } from "./weather.ts";
 import { rateLimitMiddleware } from "./rateLimit.ts";
-import { getPlaceImages, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
+import { getPlaceImages, getPlaceMapsUrl, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
 
 export const apiRouter = Router();
 
@@ -291,6 +291,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
 
     // Real photos of the place being asked about (e.g. the salt pans), shown as a gallery under the answer
     const images = getPlaceImages(userPrompt, lang);
+    const mapsUrl = getPlaceMapsUrl(userPrompt);
 
     const showMap =
       isLocationQuestion(userPrompt) ||
@@ -311,6 +312,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         locationData,
         weather: null,
         images,
+        mapsUrl,
         responseTimeMs: totalResponseTimeMs,
       });
       res.end();
@@ -342,7 +344,7 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
 
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-tts-preview",
-      // Same Najdi corrections as the chat («القَصَب», «الصْبخة») so the voice says them right
+      // Same Najdi corrections as the chat («القَصَب», «الصْبَخَة», «المَمْلحة») so the voice says them right
       contents: [{ parts: [{ text: applyNajdiPhoneticDiacritics(String(text)).slice(0, 400) }] }],
       config: {
         responseModalities: [Modality.AUDIO],

@@ -18,17 +18,21 @@ export interface PlaceTopic {
   answerAr: string;
   answerEn: string;
   images?: PlaceImage[];
+  /** Google Maps page of the place (opens its photos and directions in Google Maps) */
+  mapsUrl?: string;
 }
+
+const MUQHIM_PAN_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=25.260929%2C45.548462";
 
 const SALT_PAN_IMAGES: PlaceImage[] = [
   {
     src: "/images/places/mamlaha-sign.jpg",
-    captionAr: "مدخل مملحة القَصَب واللوحة التعريفية",
+    captionAr: "مدخل مَمْلحة القَصَب واللوحة التعريفية",
     captionEn: "Entrance sign of the Al-Qasab salt pans",
   },
   {
     src: "/images/places/mamlaha-basins.jpg",
-    captionAr: "أحواض تبخير الملح في المملحة",
+    captionAr: "أحواض تبخير الملح في المَمْلحة",
     captionEn: "Salt evaporation basins",
   },
   {
@@ -43,30 +47,43 @@ const SALT_PAN_IMAGES: PlaceImage[] = [
   },
   {
     src: "/images/places/sabkha-pink-lake.jpg",
-    captionAr: "ماء شديد الملوحة بلون وردي في الصْبخة",
+    captionAr: "ماء شديد الملوحة بلون وردي في الصْبَخَة",
     captionEn: "Pink, highly saline brine in Al-Sabkha",
   },
 ];
 
 export const PLACE_TOPICS: PlaceTopic[] = [
   {
+    id: "muqhim_pan",
+    titleAr: "مَمْلحة المقحم (أبو سهيل)",
+    titleEn: "Al-Muqhim salt pan (Abu Suhail)",
+    keywords: ["المقحم", "مقحم", "ابوسهيل", "ابو سهيل"],
+    answerAr:
+      "مَمْلحة المقحم (أبو سهيل) من مَمَالح القَصَب في الجِفار جنوب شرق البلد، فيها أحواض الملح المستطيلة اللي يتبخر فيها الماء ويبقى الملح الأبيض. تقدر تشوف صورها وموقعها على خرائط Google، وإذا جيتها تعال الصبح بدري والشمس هادية.",
+    answerEn:
+      "Al-Muqhim salt pan (Abu Suhail) is one of the Al-Qasab salt pans in Al-Jifar, southeast of town, with rectangular basins where the water evaporates and leaves white salt. Its photos and location are on Google Maps; come early in the morning for the best light.",
+    // No photos of this specific pan yet: its own photos are on Google Maps
+    mapsUrl: MUQHIM_PAN_MAPS_URL,
+  },
+  {
     id: "salt_pans",
-    titleAr: "ممالح القَصَب (الجفار)",
+    titleAr: "مَمَالح القَصَب (الجِفار)",
     titleEn: "Al-Qasab salt pans (Al-Jifar)",
     keywords: ["مملحه", "ممالح", "المملحه", "الممالح", "جفار", "الجفاره", "ملاحات", "salt pan", "saltworks", "salt flat"],
     answerAr:
-      "ممالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مملحة متجاورة في أرض الصْبخة، تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت صْبخة ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من القصب، تعال شوفها بعينك!",
+      "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلحة متجاورة في أرض الصْبَخَة، تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت صْبَخَة ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. ومن مَمَالحها المعروفة مَمْلحة المقحم (أبو سهيل). وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من القصب، تعال شوفها بعينك!",
     answerEn:
       "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans in the salt flat, about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into a salt flat, and salt has been harvested here for around three centuries, first by hand, today with modern purification and packing. The site now welcomes visitors with wooden walkways and reed shades.",
     images: SALT_PAN_IMAGES,
+    mapsUrl: MUQHIM_PAN_MAPS_URL,
   },
   {
     id: "sabkha",
-    titleAr: "صْبخة القَصَب",
+    titleAr: "صْبَخَة القَصَب",
     titleEn: "Al-Sabkha",
     keywords: ["سبخه", "صبخه", "السبخه", "الصبخه", "sabkha"],
     answerAr:
-      "الصْبخة أرض ملحية واسعة جنوب القَصَب، وفيها الممالح. ماؤها شديد الملوحة، وأحياناً يصير لونه وردي من كائنات دقيقة تعيش في الماء المالح، وحولها قشرة ملح بيضاء تلمع. وفي ليالي الصيف تكون أبرد من اللي حولها بخمس إلى عشر درجات، جوها يونّس!",
+      "الصْبَخَة أرض ملحية واسعة جنوب القَصَب، وفيها المَمَالح. ماؤها شديد الملوحة، وأحياناً يصير لونه وردي من كائنات دقيقة تعيش في الماء المالح، وحولها قشرة ملح بيضاء تلمع. وفي ليالي الصيف تكون أبرد من اللي حولها بخمس إلى عشر درجات، جوها يونّس!",
     answerEn:
       "Al-Sabkha is the wide salt flat south of Al-Qasab where the salt pans lie. Its brine is very salty, sometimes pink from salt-loving microorganisms, edged with sparkling white crust, and on summer nights it is 5–10°C cooler than its surroundings.",
     images: [SALT_PAN_IMAGES[4], SALT_PAN_IMAGES[3], SALT_PAN_IMAGES[1]],
@@ -137,7 +154,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Al-Qasab Salt Season",
     keywords: ["موسم", "مهرجان", "فعاليات", "festival", "season"],
     answerAr:
-      "موسم ملح القَصَب تنظمه أمانة منطقة الرياض عن طريق بلدية القَصَب، يحتفي بالذهب الأبيض وطرق استخراجه. النسخة الأولى كانت في مارس ٢٠٢٣، والثانية في فبراير ٢٠٢٤، والثالثة من ٢٠ إلى ٢٧ فبراير ٢٠٢٥ بأكثر من ٦٠ عارض. وفيه مملحة نموذجية تشرح مراحل الاستخراج، ومسارات للملح، ومسرح ثقافي وكتاتيب، وركن للأطفال، والأسر المنتجة، وعروض خيل وإبل وسيارات كلاسيكية. وموعد الموسم الجاي ١٩ نوفمبر ٢٠٢٦ بإذن الله، والدخول مجاني.",
+      "موسم ملح القَصَب تنظمه أمانة منطقة الرياض عن طريق بلدية القَصَب، يحتفي بالذهب الأبيض وطرق استخراجه. النسخة الأولى كانت في مارس ٢٠٢٣، والثانية في فبراير ٢٠٢٤، والثالثة من ٢٠ إلى ٢٧ فبراير ٢٠٢٥ بأكثر من ٦٠ عارض. وفيه مَمْلحة نموذجية تشرح مراحل الاستخراج، ومسارات للملح، ومسرح ثقافي وكتاتيب، وركن للأطفال، والأسر المنتجة، وعروض خيل وإبل وسيارات كلاسيكية. وموعد الموسم الجاي ١٩ نوفمبر ٢٠٢٦ بإذن الله، والدخول مجاني.",
     answerEn:
       "The Al-Qasab Salt Season is organised by the Riyadh Region Municipality through Al-Qasab Municipality to celebrate the town's 'white gold'. Editions ran in March 2023, February 2024 and 20–27 February 2025 (60+ exhibitors), with a model salt pan, salt trails, a cultural theatre, traditional kuttab schools, a kids' zone, family producers, and horse, camel and classic-car shows. The next season launches on 19 November 2026, with free entry.",
   },
@@ -147,7 +164,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Al-Qasab town",
     keywords: ["تاريخ القصب", "عن القصب", "مدينه القصب", "بلده القصب", "تعريف", "نبذه"],
     answerAr:
-      "القَصَب من أقدم بلدات الوشم في نجد، تتبع محافظة شقراء بمنطقة الرياض، على بعد حوالي ١٥٠ كيلو شمال غرب الرياض. بلدة قديمة من العصر الجاهلي ذكرها ياقوت الحموي، واشتهرت قديم بالبر والملح، وتسمى «مدينة الذهب الأبيض» و«بلدة الملح والشعراء». فيها ممالح الجفار والصْبخة، والبلدة القديمة بسوق العبيدي وقصورها التراثية، ومرقبها.",
+      "القَصَب من أقدم بلدات الوشم في نجد، تتبع محافظة شقراء بمنطقة الرياض، على بعد حوالي ١٥٠ كيلو شمال غرب الرياض. بلدة قديمة من العصر الجاهلي ذكرها ياقوت الحموي، واشتهرت قديم بالبر والملح، وتسمى «مدينة الذهب الأبيض» و«بلدة الملح والشعراء». فيها مَمَالح الجِفار والصْبَخَة، والبلدة القديمة بسوق العبيدي وقصورها التراثية، ومرقبها.",
     answerEn:
       "Al-Qasab is one of the oldest towns of Al-Washm in Najd, part of Shaqra Governorate in the Riyadh Region, roughly 150 km northwest of Riyadh. Mentioned by Yaqut al-Hamawi and dating back to pre-Islamic times, it was known for wheat and salt and is called the 'City of White Gold' and the 'town of salt and poets'.",
   },
@@ -178,11 +195,18 @@ export function getPlaceImages(message: string, lang: "ar" | "en" = "ar"): { src
   return (topic?.images || []).map(img => ({ src: img.src, caption: lang === "en" ? img.captionEn : img.captionAr }));
 }
 
+/** Google Maps link for the place a message is about, when we have one. */
+export function getPlaceMapsUrl(message: string): string | undefined {
+  return matchPlaceTopic(message)?.mapsUrl;
+}
+
+export const placeById = (id: string) => PLACE_TOPICS.find(t => t.id === id) || null;
+
 // Greetings in the voice of a hospitable Najdi tour guide
 const SALAM_REPLIES_AR = [
-  "وعليكم السلام ورحمة الله وبركاته، حيّاك الله في ديرتنا القَصَب، يا هلا ومسهلا! أنا «الداهية» مرشدك السياحي هنا. وش ودك نبدأ فيه: الممالح والصْبخة، ولا البلدة القديمة وقصورها، ولا موسم الملح؟",
+  "وعليكم السلام ورحمة الله وبركاته، حيّاك الله في ديرتنا القَصَب، يا هلا ومسهلا! أنا «الداهية» مرشدك السياحي هنا. وش ودك نبدأ فيه: المَمَالح والصْبَخَة، ولا البلدة القديمة وقصورها، ولا موسم الملح؟",
   "وعليكم السلام ورحمة الله وبركاته، يا مرحبا وألف هلا! نوّرت ديرتنا القَصَب، ديرة الملح والطين. أنا «الداهية» مرشدك، آمرني وين تبي أوديك اليوم؟",
-  "وعليكم السلام ورحمة الله، حيّاك الله وبيّاك في القَصَب! أنا «الداهية» مرشدك السياحي، اسألني عن الجفار والصْبخة وقصر الزاحم وسوق العبيدي وموسم الملح، وأبشر بعزك.",
+  "وعليكم السلام ورحمة الله، حيّاك الله وبيّاك في القَصَب! أنا «الداهية» مرشدك السياحي، اسألني عن الجِفار والصْبَخَة وقصر الزاحم وسوق العبيدي وموسم الملح، وأبشر بعزك.",
 ];
 const WELCOME_REPLIES_EN = [
   "Welcome to our hometown, Al-Qasab! I'm «Al-Dahiya», your local tour guide. Shall we start with the salt pans and Al-Sabkha, the old town and its palaces, or the Salt Season?",

@@ -9,9 +9,10 @@ import {
   Camera,
   CameraOff,
   SwitchCamera,
+  MapPin,
 } from "lucide-react";
 import SaltBagCall from "./SaltBagCall";
-import { matchPlaceTopic } from "../../server/alQasabKnowledge.ts";
+import { matchPlaceTopic, placeById, type PlaceTopic } from "../../server/alQasabKnowledge.ts";
 
 // A burst of salt crystals flying out of a pressed button (pure CSS, see .vc-crystal in index.css)
 const SaltBurst = ({ color = "#ffffff", x = "50%", y = "50%" }: { color?: string; x?: string; y?: string }) => (
@@ -124,26 +125,33 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   }, [isCameraOn]);
 
   // Photos of the place being talked about, picked from the live transcription
-  type Showcase = { id: string; title: string; images: { src: string; caption: string }[] };
+  type Showcase = { id: string; title: string; images: { src: string; caption: string }[]; text: string; mapsUrl?: string };
   const [showcase, setShowcase] = useState<Showcase | null>(null);
   const [showcaseIndex, setShowcaseIndex] = useState(0);
   const showcaseIdRef = useRef<string | null>(null);
   const transcriptRef = useRef("");
 
-  const noteTranscript = useCallback((text: string) => {
-    // Keep a short rolling window so an older topic doesn't keep matching
-    transcriptRef.current = (transcriptRef.current + " " + text).slice(-160);
-    if (isCameraOnRef.current) return;
-    const topic = matchPlaceTopic(transcriptRef.current);
-    if (!topic?.images?.length || topic.id === showcaseIdRef.current) return;
+  const showPlace = useCallback((topic: PlaceTopic) => {
+    if (isCameraOnRef.current || topic.id === showcaseIdRef.current) return;
     showcaseIdRef.current = topic.id;
     setShowcaseIndex(0);
+    const answer = isEn ? topic.answerEn : topic.answerAr;
     setShowcase({
       id: topic.id,
       title: isEn ? topic.titleEn : topic.titleAr,
-      images: topic.images.map((img) => ({ src: img.src, caption: isEn ? img.captionEn : img.captionAr })),
+      images: (topic.images || []).map((img) => ({ src: img.src, caption: isEn ? img.captionEn : img.captionAr })),
+      // First sentence or two of the guide text for the info card
+      text: answer.split(/(?<=[.!؟?،])\s/).slice(0, 2).join(" ").slice(0, 190),
+      mapsUrl: topic.mapsUrl,
     });
   }, [isEn]);
+
+  const noteTranscript = useCallback((text: string) => {
+    // Backup for when the model doesn't call show_place: match the rolling transcript
+    transcriptRef.current = (transcriptRef.current + " " + text).slice(-160);
+    const topic = matchPlaceTopic(transcriptRef.current);
+    if (topic?.images?.length) showPlace(topic);
+  }, [showPlace]);
 
   const closeShowcase = useCallback(() => {
     setShowcase(null);
@@ -157,7 +165,7 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   // Slideshow: next photo every 3.5 s; hide after 45 s
   useEffect(() => {
     if (!showcase) return;
-    const tick = setInterval(() => setShowcaseIndex((i) => (i + 1) % showcase.images.length), 3500);
+    const tick = setInterval(() => setShowcaseIndex((i) => (i + 1) % Math.max(1, showcase.images.length)), 3500);
     const hide = setTimeout(closeShowcase, 45_000);
     return () => {
       clearInterval(tick);
@@ -748,6 +756,26 @@ registerProcessor('mic-processor', MicProcessor);`;
           const said = msg.serverContent?.outputTranscription?.text || msg.serverContent?.inputTranscription?.text;
           if (said) noteTranscript(said);
 
+          // The model asks to put a place on screen; answer right away so it carries on talking
+          const calls = msg.toolCall?.functionCalls;
+          if (Array.isArray(calls) && calls.length) {
+            const functionResponses = calls.map((call: { id?: string; name?: string; args?: { place_id?: string } }) => {
+              const topic = call.name === "show_place" && call.args?.place_id ? placeById(call.args.place_id) : null;
+              if (topic) showPlace(topic);
+              return {
+                id: call.id,
+                name: call.name,
+                response: topic
+                  ? { result: "shown", photos: topic.images?.length || 0 }
+                  : { result: "unknown place" },
+              };
+            });
+            if (wsRef.current?.readyState === WebSocket.OPEN) {
+              wsRef.current.send(JSON.stringify({ toolResponse: { functionResponses } }));
+            }
+            return;
+          }
+
           if (msg.serverContent?.interrupted || msg.interrupted) {
             await stopAllPlayback();
             setStatus("listening");
@@ -799,7 +827,7 @@ registerProcessor('mic-processor', MicProcessor);`;
       setStatus("error");
       setErrorMessage(err.message);
     }
-  }, [language, isEn, startCapture, scheduleAudioChunk, stopAllPlayback, updateGeminiSpeaking, noteTranscript]);
+  }, [language, isEn, startCapture, scheduleAudioChunk, stopAllPlayback, updateGeminiSpeaking, noteTranscript, showPlace]);
 
   useEffect(() => {
     if (isOpen) {
@@ -946,6 +974,26 @@ registerProcessor('mic-processor', MicProcessor);`;
                     }`}
                   />
                 ))}
+                {showcase.images.length === 0 && (
+                  // No photos yet: an info card in the salt-season colours
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#7a1a12] via-[#9e2319] to-[#c0582c] px-6 pt-24 pb-36 flex flex-col justify-start">
+                    <div className="sc-salt absolute inset-0 opacity-40" aria-hidden="true" />
+                    <MapPin className="relative size-9 text-amber-200 vc-pop" />
+                    <h3 className="relative mt-3 text-xl font-bold text-white text-balance">{showcase.title}</h3>
+                    <p className="relative mt-2 text-sm leading-7 text-white/90 pg-fade">{showcase.text}</p>
+                  </div>
+                )}
+                {showcase.mapsUrl && (
+                  <a
+                    href={showcase.mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="absolute top-14 end-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[11px] font-bold text-[#7a1a12] shadow hover:bg-white active:scale-95 transition"
+                  >
+                    <MapPin className="size-3.5" />
+                    {isEn ? "Photos on Google Maps" : "صورها على Google Maps"}
+                  </a>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70 pointer-events-none" />
                 <span className="absolute top-4 inset-x-0 mx-auto w-fit flex items-center gap-1.5 rounded-full bg-black/45 backdrop-blur-md px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20">
                   <span className="size-2 rounded-full bg-amber-300 animate-pulse" />
