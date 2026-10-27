@@ -661,7 +661,7 @@ export function generateLocalKnowledgeFallback(
     if (lang === "en") {
       return `Here is the current live weather in Al-Qasab: ${weatherSummary || "Clear and pleasant over Al-Qasab"}.`;
     }
-    return `الطقس المباشر في مدينة القَصَب:\n${weatherSummary || "أجواء معتدلة وصافية فوق مدينة القَصَب وتوابعها"}.`;
+    return weatherSummary || "أجواء معتدلة وصافية فوق مدينة القَصَب وتوابعها.";
   }
   const isTicketQuestion = ["تذكر", "تذاكر", "ticket", "حجز", "رسوم", "سعر الدخول"].some(k => norm.includes(k));
   const nq = normalizeArabic(query);
