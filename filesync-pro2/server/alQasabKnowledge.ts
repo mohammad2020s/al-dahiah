@@ -7,7 +7,23 @@ export interface PlaceImage {
   src: string;
   captionAr: string;
   captionEn: string;
+  /** Set when the photo was taken by someone else (e.g. visitors on Google Maps) */
+  credit?: "google_maps_visitors";
 }
+
+const GM = "google_maps_visitors" as const;
+// Photos of مَمْلحة المقحم (أبو سهيل), cropped from visitors' photos on its Google Maps page
+const MUQHIM_IMAGES: PlaceImage[] = [
+  { src: "/images/places/muqhim-sign.jpg", captionAr: "لوحة مَمْلحة المقحم عند المدخل", captionEn: "Al-Muqhim salt pan sign at the entrance", credit: GM },
+  { src: "/images/places/muqhim-night-green.jpg", captionAr: "الأحواض في الليل بالإنارة الخضراء", captionEn: "The basins at night under green lights", credit: GM },
+  { src: "/images/places/muqhim-reed-shades.jpg", captionAr: "مظلات الخوص فوق ماء الأحواض", captionEn: "Reed shades over the brine pools", credit: GM },
+  { src: "/images/places/muqhim-night-pools.jpg", captionAr: "انعكاس الأنوار على الماء ليلاً", captionEn: "Lights reflected on the water at night", credit: GM },
+  { src: "/images/places/muqhim-entrance.jpg", captionAr: "صخرة المدخل والأحواض والمظلات", captionEn: "Entrance stone, basins and shades", credit: GM },
+  { src: "/images/places/muqhim-sunset-pool.jpg", captionAr: "حوض ملح واسع وقت الغروب", captionEn: "A wide salt pool at sunset", credit: GM },
+  { src: "/images/places/muqhim-prayer-room.jpg", captionAr: "مصلى بطابع طيني من الداخل", captionEn: "A mud-style prayer room inside", credit: GM },
+  { src: "/images/places/muqhim-building.jpg", captionAr: "مبنى خدمات الزوار بباب خشبي نجدي", captionEn: "Visitor building with a Najdi wooden door", credit: GM },
+  { src: "/images/places/muqhim-blue-seats.jpg", captionAr: "جلسات انتظار مظللة للزوار", captionEn: "Shaded seating for visitors", credit: GM },
+];
 
 export interface PlaceTopic {
   id: string;
@@ -20,6 +36,8 @@ export interface PlaceTopic {
   images?: PlaceImage[];
   /** Google Maps page of the place (opens its photos and directions in Google Maps) */
   mapsUrl?: string;
+  /** Exact spot, for the map under chat answers */
+  coordinates?: { lat: number; lng: number };
 }
 
 const MUQHIM_PAN_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=25.260929%2C45.548462";
@@ -62,8 +80,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
       "مَمْلحة المقحم (أبو سهيل) من مَمَالح القَصَب في الجِفار جنوب شرق البلد، فيها أحواض الملح المستطيلة اللي يتبخر فيها الماء ويبقى الملح الأبيض. تقدر تشوف صورها وموقعها على خرائط Google، وإذا جيتها تعال الصبح بدري والشمس هادية.",
     answerEn:
       "Al-Muqhim salt pan (Abu Suhail) is one of the Al-Qasab salt pans in Al-Jifar, southeast of town, with rectangular basins where the water evaporates and leaves white salt. Its photos and location are on Google Maps; come early in the morning for the best light.",
-    // No photos of this specific pan yet: its own photos are on Google Maps
+    images: MUQHIM_IMAGES,
     mapsUrl: MUQHIM_PAN_MAPS_URL,
+    coordinates: { lat: 25.260929, lng: 45.548462 },
   },
   {
     id: "salt_pans",
@@ -74,7 +93,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
       "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلحة متجاورة في أرض الصْبَخَة، تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت صْبَخَة ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. ومن مَمَالحها المعروفة مَمْلحة المقحم (أبو سهيل). وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من القصب، تعال شوفها بعينك!",
     answerEn:
       "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans in the salt flat, about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into a salt flat, and salt has been harvested here for around three centuries, first by hand, today with modern purification and packing. The site now welcomes visitors with wooden walkways and reed shades.",
-    images: SALT_PAN_IMAGES,
+    images: [...SALT_PAN_IMAGES, MUQHIM_IMAGES[1], MUQHIM_IMAGES[2], MUQHIM_IMAGES[5]],
     mapsUrl: MUQHIM_PAN_MAPS_URL,
   },
   {
@@ -190,9 +209,13 @@ export function matchPlaceTopic(message: string): PlaceTopic | null {
 }
 
 /** Real photos to show under an answer about a place (empty when the place has none). */
-export function getPlaceImages(message: string, lang: "ar" | "en" = "ar"): { src: string; caption: string }[] {
+export function getPlaceImages(message: string, lang: "ar" | "en" = "ar"): { src: string; caption: string; credit?: string }[] {
   const topic = matchPlaceTopic(message);
-  return (topic?.images || []).map(img => ({ src: img.src, caption: lang === "en" ? img.captionEn : img.captionAr }));
+  return (topic?.images || []).map(img => ({
+    src: img.src,
+    caption: lang === "en" ? img.captionEn : img.captionAr,
+    ...(img.credit ? { credit: lang === "en" ? "Photo: visitors on Google Maps" : "الصورة من زوار المكان على Google Maps" } : {}),
+  }));
 }
 
 /** Google Maps link for the place a message is about, when we have one. */
@@ -201,6 +224,13 @@ export function getPlaceMapsUrl(message: string): string | undefined {
 }
 
 export const placeById = (id: string) => PLACE_TOPICS.find(t => t.id === id) || null;
+
+/** Map pin for a place that has its own coordinates (beats the generic landmark lookup). */
+export function getPlaceLocation(message: string, lang: "ar" | "en" = "ar") {
+  const topic = matchPlaceTopic(message);
+  if (!topic?.coordinates) return null;
+  return { name: lang === "en" ? topic.titleEn : topic.titleAr, coordinates: topic.coordinates, type: "place" as const };
+}
 
 // Greetings in the voice of a hospitable Najdi tour guide
 const SALAM_REPLIES_AR = [

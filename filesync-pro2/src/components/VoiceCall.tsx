@@ -125,7 +125,7 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   }, [isCameraOn]);
 
   // Photos of the place being talked about, picked from the live transcription
-  type Showcase = { id: string; title: string; images: { src: string; caption: string }[]; text: string; mapsUrl?: string };
+  type Showcase = { id: string; title: string; images: { src: string; caption: string; credit?: string }[]; text: string; mapsUrl?: string };
   const [showcase, setShowcase] = useState<Showcase | null>(null);
   const [showcaseIndex, setShowcaseIndex] = useState(0);
   const showcaseIdRef = useRef<string | null>(null);
@@ -139,7 +139,11 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
     setShowcase({
       id: topic.id,
       title: isEn ? topic.titleEn : topic.titleAr,
-      images: (topic.images || []).map((img) => ({ src: img.src, caption: isEn ? img.captionEn : img.captionAr })),
+      images: (topic.images || []).map((img) => ({
+        src: img.src,
+        caption: isEn ? img.captionEn : img.captionAr,
+        credit: img.credit ? (isEn ? "Photo: visitors on Google Maps" : "الصورة من زوار المكان على Google Maps") : undefined,
+      })),
       // First sentence or two of the guide text for the info card
       text: answer.split(/(?<=[.!؟?،])\s/).slice(0, 2).join(" ").slice(0, 190),
       mapsUrl: topic.mapsUrl,
@@ -1012,6 +1016,9 @@ registerProcessor('mic-processor', MicProcessor);`;
                   className={`pg-fade absolute bottom-5 ${isEn ? "left-4 right-36" : "right-4 left-36"} text-sm font-semibold text-white drop-shadow`}
                 >
                   {showcase.images[showcaseIndex]?.caption}
+                  {showcase.images[showcaseIndex]?.credit && (
+                    <span className="mt-0.5 block text-[10px] font-normal text-white/70">{showcase.images[showcaseIndex].credit}</span>
+                  )}
                 </p>
                 <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1.5">
                   {showcase.images.map((img, i) => (

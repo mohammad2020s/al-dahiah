@@ -36,7 +36,7 @@ import {
 } from "./alQasabScope.ts";
 import { fetchAlQasabWeather, weatherSummaryEn } from "./weather.ts";
 import { rateLimitMiddleware } from "./rateLimit.ts";
-import { getPlaceImages, getPlaceMapsUrl, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
+import { getPlaceImages, getPlaceLocation, getPlaceMapsUrl, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
 
 export const apiRouter = Router();
 
@@ -300,7 +300,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       isLocationQuestion(finalAnswer) ||
       isCafeQuestion(finalAnswer);
 
-    const locationData = showMap ? getLocationForQuery(userPrompt, finalAnswer) : null;
+    const locationData = showMap ? getPlaceLocation(userPrompt, lang) || getLocationForQuery(userPrompt, finalAnswer) : null;
     const totalResponseTimeMs = Date.now() - requestStartTime;
 
     if (!res.writableEnded && !res.destroyed) {

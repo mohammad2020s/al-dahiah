@@ -184,7 +184,7 @@ test("tour guide knowledge: salt pans, palaces and the weather false positive", 
     const a = generateLocalKnowledgeFallback(q, "ar");
     assert.ok(a.includes("الجِفار"), q);
     assert.ok(!a.includes("ما أذكر أسماء عوائل"), q);
-    assert.equal(getPlaceImages(q, "ar").length, 5, q);
+    assert.equal(getPlaceImages(q, "ar").length, 8, q);
   }
   assert.equal(isAlQasabTopic("علمني عن قصر الزاحم"), true);
   assert.ok(generateLocalKnowledgeFallback("علمني عن قصر الزاحم", "ar").includes("١٤٣٦"));
@@ -215,4 +215,10 @@ test("place words get their dictionary vowels", () => {
   assert.equal(normalizePlaceWords("مملحتها"), "مملحتها");
   const out = applyNajdiPhoneticDiacritics("السبخة جنب المملحة والجفار في القصيب");
   assert.ok(out.includes("الصْبَخَة") && out.includes("المَمْلحة") && out.includes("الجِفار") && out.includes("القَصَب"), out);
+});
+
+test("Al-Muqhim salt pan has its own photos with a credit", () => {
+  const imgs = getPlaceImages("وش مملحة المقحم؟", "ar");
+  assert.equal(imgs.length, 9);
+  assert.ok(imgs.every(i => i.credit && i.caption));
 });

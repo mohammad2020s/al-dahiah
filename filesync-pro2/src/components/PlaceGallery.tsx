@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, Expand, Images, X } from "lucide-react";
 import type { Language } from "../i18n";
 
-export type PlaceImage = { src: string; caption: string };
+export type PlaceImage = { src: string; caption: string; credit?: string };
 
 // Real photos of the place an answer talks about: a large main photo with its caption,
 // thumbnails to switch, and a full-screen viewer (swipe / arrows / Esc).
@@ -71,6 +71,7 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
         />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-3 pt-10 text-start">
           <p className="text-sm font-semibold text-white drop-shadow">{current.caption}</p>
+          {current.credit && <p className="mt-0.5 text-[10px] text-white/70">{current.credit}</p>}
         </div>
         <span className="absolute top-2.5 end-2.5 flex size-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm opacity-80 group-hover:opacity-100 transition">
           <Expand className="size-4" />
@@ -119,6 +120,7 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
             className="pg-zoom max-h-[78vh] max-w-full rounded-2xl object-contain shadow-2xl"
           />
           <p className="mt-4 text-center text-sm font-semibold text-white">{current.caption}</p>
+          {current.credit && <p className="mt-0.5 text-center text-[11px] text-white/60">{current.credit}</p>}
           <p dir="ltr" className="mt-1 text-xs text-white/60 tabular-nums">
             {active + 1} / {count}
           </p>
