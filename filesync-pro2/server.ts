@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import { setupLiveAudio } from "./server/live-audio.ts";
 import { apiRouter } from "./server/api.ts";
+import { STATS_PAGE_HTML } from "./server/statsPage.ts";
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
@@ -24,6 +25,11 @@ async function startServer() {
 
   // API endpoints
   app.use("/api", apiRouter);
+
+  // Owner page: what visitors ask (data needs STATS_KEY)
+  app.get("/stats", (_req, res) => {
+    res.set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" }).send(STATS_PAGE_HTML);
+  });
 
   // Setup Gemini Live WebSocket
   setupLiveAudio(server);

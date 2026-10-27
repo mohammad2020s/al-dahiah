@@ -36,7 +36,9 @@ import {
 } from "./alQasabScope.ts";
 import { fetchAlQasabWeather, weatherSummaryEn } from "./weather.ts";
 import { rateLimitMiddleware } from "./rateLimit.ts";
-import { getPlaceImages, getPlaceLocation, getPlaceMapsUrl, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
+import { getPlaceImages, getPlaceLocation, getPlaceMapsUrl, matchPlaceTopic, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
+import { recordQuestion, getQuestionStats } from "./questionStats.ts";
+import { timingSafeEqual } from "node:crypto";
 
 export const apiRouter = Router();
 
@@ -67,6 +69,19 @@ apiRouter.get("/location", (req, res) => {
   if (type === "ibn_zahim") return res.json(IBN_ZAHIM_LOCATION);
   if (type === "al_marqab") return res.json(AL_MARQAB_LOCATION);
   return res.json(FESTIVAL_LOCATION);
+});
+
+// Owner-only question stats. Disabled unless STATS_KEY is set on the server.
+apiRouter.get("/stats", async (req, res) => {
+  const expected = process.env.STATS_KEY || "";
+  const given = String(req.query.key || req.headers["x-stats-key"] || "");
+  const ok =
+    expected.length > 0 &&
+    given.length === expected.length &&
+    timingSafeEqual(Buffer.from(given), Buffer.from(expected));
+  if (!ok) return res.status(expected ? 401 : 404).json({ error: expected ? "Wrong key" : "Stats are disabled" });
+  res.setHeader("Cache-Control", "no-store");
+  res.json(await getQuestionStats(Math.min(Number(req.query.limit) || 50, 200)));
 });
 
 apiRouter.get("/landmarks", (_req, res) => {
@@ -140,6 +155,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     // Fast-path: Instant Salam greeting
     if (isPureSalamGreeting(userPrompt, lang)) {
       const instantAnswer = getInstantSalamReply(lang, userPrompt);
+      recordQuestion(userPrompt, "greeting", null, lang);
       sendEvent({ type: "chunk", content: instantAnswer });
       sendEvent({
         type: "done",
@@ -156,6 +172,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     // Strict Red Line: حظر ذكر العوائل والقبائل نهائياً
     if (isFamilyOrTribalQuestion(userPrompt)) {
       const familyAnswer = lang === "en" ? FORBIDDEN_FAMILY_REPLY_EN : FORBIDDEN_FAMILY_REPLY_AR;
+      recordQuestion(userPrompt, "family", null, lang);
       sendEvent({ type: "chunk", content: familyAnswer });
       sendEvent({
         type: "done",
@@ -177,6 +194,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
 
     if (!isSmallTalk(userPrompt) && !isAlQasabTopic(userPrompt, recentMessages)) {
       const outOfScopeAnswer = getOutOfScopeMessage(lang);
+      recordQuestion(userPrompt, "out_of_scope", null, lang);
       sendEvent({ type: "chunk", content: outOfScopeAnswer });
       sendEvent({
         type: "done",
@@ -193,6 +211,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     // Fast-path: Weather question
     const isWeather = isWeatherQuestion(userPrompt);
     if (isWeather) {
+      recordQuestion(userPrompt, "weather", "weather", lang);
       const weatherData = await fetchAlQasabWeather();
       const weatherText = generateLocalKnowledgeFallback(
         userPrompt,
@@ -314,6 +333,16 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     if (isSalamMessage(userPrompt) && !/^\s*(وعليكم السلام|wa alaykum|wa alaikum)/i.test(finalAnswer)) {
       finalAnswer = `${lang === "en" ? SALAM_PREFIX_EN : SALAM_PREFIX_AR} ${finalAnswer}`;
     }
+
+    // Stats: a local answer that fell through to the generic welcome means we had no answer
+    const isGenericWelcome =
+      usedFallback && /مرشدك السياحي في ديرتنا|^Welcome to Al-Qasab! I am/.test(rawAnswer);
+    recordQuestion(
+      userPrompt,
+      isGenericWelcome ? "unanswered" : usedFallback ? "local" : "gemini",
+      matchPlaceTopic(userPrompt)?.id || (isCafeQuestion(userPrompt) ? "cafes" : null),
+      lang
+    );
 
     // Real photos of the place being asked about (e.g. the salt pans), shown as a gallery under the answer
     const images = getPlaceImages(userPrompt, lang);
