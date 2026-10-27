@@ -14,15 +14,11 @@ export interface PlaceImage {
 const GM = "google_maps_visitors" as const;
 // Photos of مَمْلحة المقحم النموذجية (أبو سهيل), cropped from visitors' photos on its Google Maps page
 const MUQHIM_IMAGES: PlaceImage[] = [
-  { src: "/images/places/muqhim-sign.jpg", captionAr: "لوحة مَمْلحة المقحم النموذجية عند المدخل", captionEn: "Al-Muqhim Model Salt Pan sign at the entrance", credit: GM },
-  { src: "/images/places/muqhim-night-green.jpg", captionAr: "الأحواض في الليل بالإنارة الخضراء", captionEn: "The basins at night under green lights", credit: GM },
-  { src: "/images/places/muqhim-reed-shades.jpg", captionAr: "مظلات الخوص فوق ماء الأحواض", captionEn: "Reed shades over the brine pools", credit: GM },
-  { src: "/images/places/muqhim-night-pools.jpg", captionAr: "انعكاس الأنوار على الماء ليلاً", captionEn: "Lights reflected on the water at night", credit: GM },
-  { src: "/images/places/muqhim-entrance.jpg", captionAr: "صخرة المدخل والأحواض والمظلات", captionEn: "Entrance stone, basins and shades", credit: GM },
-  { src: "/images/places/muqhim-sunset-pool.jpg", captionAr: "حوض ملح واسع وقت الغروب", captionEn: "A wide salt pool at sunset", credit: GM },
-  { src: "/images/places/muqhim-prayer-room.jpg", captionAr: "مصلى بطابع طيني من الداخل", captionEn: "A mud-style prayer room inside", credit: GM },
-  { src: "/images/places/muqhim-building.jpg", captionAr: "مبنى خدمات الزوار بباب خشبي نجدي", captionEn: "Visitor building with a Najdi wooden door", credit: GM },
-  { src: "/images/places/muqhim-blue-seats.jpg", captionAr: "جلسات انتظار مظللة للزوار", captionEn: "Shaded seating for visitors", credit: GM },
+  { src: "/images/places/muqhim-visitors-walkway.jpg", captionAr: "زوار على الممشى الخشبي بين أكواخ الخوص", captionEn: "Visitors on the wooden walkway between reed huts", credit: GM },
+  { src: "/images/places/muqhim-entrance-stone.jpg", captionAr: "صخرة مملحة القصب عند المدخل مع الأحواض", captionEn: "Mamalahat Al Qasab entrance stone with the basins", credit: GM },
+  { src: "/images/places/muqhim-wooden-bridge.jpg", captionAr: "الجسر الخشبي وأحواض الملح في الفجر", captionEn: "Wooden bridge over the salt basins at dawn", credit: GM },
+  { src: "/images/places/muqhim-salt-booth.jpg", captionAr: "كشك الملح الطبيعي داخل المملحة", captionEn: "Natural salt kiosk inside the salt pan", credit: GM },
+  { src: "/images/places/muqhim-sign-new.jpg", captionAr: "لوحة مملحة المقحم والأكواخ في الخلف", captionEn: "Al-Muqhim Salt Shop sign with reed huts in background", credit: GM },
 ];
 
 export interface PlaceTopic {
