@@ -119,7 +119,9 @@ export async function fetchAlQasabWeather(timeoutMs: number = FETCH_TIMEOUT_MS):
       const conditionType = json.weatherCondition?.type || "CLEAR";
       const humidity = json.relativeHumidity ?? 0;
       const windSpeed = Math.round(json.wind?.speed?.value ?? 0);
-      const windDir = json.wind?.direction?.cardinal || "";
+      const cardinal: string = json.wind?.direction?.cardinal || "";
+      const AR_DIR: Record<string, string> = { NORTH: "شمالية", NORTH_NORTHEAST: "شمالية شرقية", NORTHEAST: "شمالية شرقية", EAST_NORTHEAST: "شرقية", EAST: "شرقية", EAST_SOUTHEAST: "شرقية", SOUTHEAST: "جنوبية شرقية", SOUTH_SOUTHEAST: "جنوبية شرقية", SOUTH: "جنوبية", SOUTH_SOUTHWEST: "جنوبية غربية", SOUTHWEST: "جنوبية غربية", WEST_SOUTHWEST: "غربية", WEST: "غربية", WEST_NORTHWEST: "غربية", NORTHWEST: "شمالية غربية", NORTH_NORTHWEST: "شمالية غربية" };
+      const windDir = AR_DIR[cardinal] || "";
       const maxTemp = json.currentConditionsHistory?.maxTemperature?.degrees != null
         ? Math.round(json.currentConditionsHistory.maxTemperature.degrees)
         : undefined;
@@ -140,7 +142,7 @@ export async function fetchAlQasabWeather(timeoutMs: number = FETCH_TIMEOUT_MS):
           ? `- العظمى ${maxTemp}° والصغرى ${minTemp}° مئوية.`
           : null,
         `- الرطوبة: ${humidity}%.`,
-        `- الرياح: ${windSpeed} كم/س ${windDir}.`,
+        `- الرياح: ${windSpeed} كم/س${windDir ? ` ${windDir}` : ""}.`,
         precip !== undefined ? `- فرصة هطول الأمطار: ${precip}%.` : null,
         uv !== undefined ? `- مؤشر الأشعة (UV): ${uv}.` : null,
       ].filter(Boolean);
@@ -208,7 +210,7 @@ export function weatherSummaryEn(d: AlQasabWeatherData | null | undefined): stri
   if (d.maxTemperature !== undefined && d.minTemperature !== undefined) {
     parts.push(`high ${Math.round(d.maxTemperature)}°C, low ${Math.round(d.minTemperature)}°C`);
   }
-  parts.push(`humidity ${Math.round(d.humidity)}%`, `wind ${Math.round(d.windSpeed)} km/h ${d.windDirection}`);
+  parts.push(`humidity ${Math.round(d.humidity)}%`, `wind ${Math.round(d.windSpeed)} km/h`);
   if (d.uvIndex !== undefined) parts.push(`UV index ${d.uvIndex}`);
   return parts.join("; ");
 }

@@ -436,13 +436,13 @@ export function normalizeSabkha(text: string): string {
   );
 }
 
-// ضبط كلمات المكان كما اعتمدها صاحب الموقع: «المَمْلحة» و«المَمَالح»، و«الجِفار» (لسان العرب)
+// ضبط كلمات المكان كما اعتمدها صاحب الموقع: «المَمْلَحَة» و«المَمَالح»، و«الجِفار» (لسان العرب)
 export function normalizePlaceWords(text: string): string {
   if (!text) return "";
   const prefix = "(^|[\\s\\p{P}]|ال|[وفبلك]ال|لل)";
   const m = "[\\u064B-\\u065F\\u0670]*";
   return text
-    .replace(new RegExp(`${prefix}م${m}م${m}ل${m}ح${m}[ةه](?![\\p{L}])`, "gu"), "$1مَمْلحة")
+    .replace(new RegExp(`${prefix}م${m}م${m}ل${m}ح${m}[ةه](?![\\p{L}])`, "gu"), "$1مَمْلَحَة")
     .replace(new RegExp(`${prefix}م${m}م${m}ا${m}ل${m}ح(?![\\p{L}\\p{M}])`, "gu"), "$1مَمَالح")
     .replace(new RegExp(`${prefix}جفار(?![\\p{L}])`, "gu"), "$1جِفار");
 }
@@ -537,6 +537,7 @@ export function isAlQasabTopic(message: string, recentContext: string[] = []): b
     "كيف اوصل", "وين اروح", "المقاهي", "الكافيهات", "الديوانية",
     "قهوة", "شاهي", "art coffee", "مطاعم", "فنادق", "سكن",
     "مواعيد", "اوقات", "الافتتاح", "موسم الملح", "تذاكر الموسم", "تذكرة الموسم",
+    "تذاكر", "التذاكر", "تذكره", "سعر الدخول", "رسوم الدخول", "الدخول", "احسن وقت", "افضل وقت",
   ];
   const saltSignals = [
     "ملح", "الملح", "ملح خشن", "ملح ناعم", "استخراج",
@@ -546,6 +547,7 @@ export function isAlQasabTopic(message: string, recentContext: string[] = []): b
   const englishSignals = [
     "al qasab", "al-qasab", "qasab", "salt", "salt flat", "sabkha", "jifar", "washm", "season",
     "heritage village", "ibn zahim", "marqab", "bdor", "shahi nagea", "art coffee", "diwaniyat al-manie",
+    "ticket", "tickets", "entry fee",
   ];
   if (englishSignals.some(sig => lowerMessage.includes(sig))) return true;
   if ([...citySignals, ...saltSignals, ...localContextSignals].some(s => normalized.includes(normalizeArabic(s)))) return true;
@@ -622,7 +624,9 @@ export function getLocationForQuery(userPrompt: string, answerText: string = "")
   if (userNorm.includes("زاحم")) return IBN_ZAHIM_LOCATION;
   if (userNorm.includes("مرقب")) return AL_MARQAB_LOCATION;
   if (userNorm.includes("قرية") || userNorm.includes("تراثية")) return HERITAGE_VILLAGE_LOCATION;
-  if (userNorm.includes("ممالح") || userNorm.includes("جفار")) return SALT_FLAT_LOCATION;
+  if (userNorm.includes("ممالح") || userNorm.includes("جفار") || userNorm.includes("مملحه")) return SALT_FLAT_LOCATION;
+  const oldTownTopic = matchPlaceTopic(userPrompt);
+  if (oldTownTopic && ["obaidi_souq", "qusaibi_building", "rashid_house", "old_town"].includes(oldTownTopic.id)) return HERITAGE_VILLAGE_LOCATION;
   if (combinedNorm.includes("بدور")) return BDOR_COFFEE_LOCATION;
   if (combinedNorm.includes("ناقع") || combinedNorm.includes("نقعه")) return SHAHI_NAGEA_LOCATION;
   if (combinedNorm.includes("ارت") || combinedNorm.includes("art")) return ART_COFFEE_LOCATION;
@@ -659,12 +663,40 @@ export function generateLocalKnowledgeFallback(
     }
     return `الطقس المباشر في مدينة القَصَب:\n${weatherSummary || "أجواء معتدلة وصافية فوق مدينة القَصَب وتوابعها"}.`;
   }
-  const isTicketQuestion = ["تذكر", "تذاكر", "ticket", "حجز", "رسوم"].some(k => norm.includes(k));
+  const isTicketQuestion = ["تذكر", "تذاكر", "ticket", "حجز", "رسوم", "سعر الدخول"].some(k => norm.includes(k));
+  const nq = normalizeArabic(query);
+  // One named cafe → answer about that cafe only (not the whole list)
+  const namedCafe = AL_QASAB_CAFES.find(c =>
+    (c.id === "bdor_coffee" && nq.includes("بدور")) ||
+    (c.id === "art_coffee" && (nq.includes("ارت") || norm.includes("art"))) ||
+    (c.id === "shahi_nagea" && (nq.includes("ناقع") || nq.includes("نقعه"))) ||
+    (c.id === "diwaniyat_al_manie" && nq.includes("المنيع"))
+  );
+  if (namedCafe && !isTicketQuestion) {
+    return lang === "en"
+      ? `${namedCafe.name} (${namedCafe.rating}★): ${namedCafe.category}. The map below shows its exact spot; tap "Take me there" for directions.`
+      : `${namedCafe.name} (${namedCafe.rating} نجوم) ${namedCafe.locationDescription}: ${namedCafe.description} تلقى موقعه على الخريطة تحت، اضغط «خذني لها» وأبشر.`;
+  }
+  if (["احسن وقت", "افضل وقت", "متى ازور", "متى اروح", "best time", "when to visit"].some(k => nq.includes(normalizeArabic(k)) || norm.includes(k))) {
+    return lang === "en"
+      ? "Visit the salt pans early in the morning while the light is soft, the old town in the afternoon, the watchtower at sunset, and Al-Sabkha at night when it is cooler. The Salt Season starts on 19 November 2026."
+      : "الممالح تعال لها الصبح بدري والشمس هادية، والبلدة القديمة العصر، والمرقب وقت الغروب، والصْبَخَة في الليل لأن جوها أبرد. وموسم الملح يبدأ ١٩ نوفمبر ٢٠٢٦ بإذن الله.";
+  }
+  if (["مطعم", "مطاعم", "غداء", "عشاء", "restaurant"].some(k => nq.includes(k) || norm.includes(k))) {
+    return lang === "en"
+      ? "I don't have verified restaurant listings for Al-Qasab yet. For coffee and traditional hospitality there are 4 verified heritage cafes: Bdor Ibrahim, Art Coffee, Shahi Nagea and Diwaniyat Al-Manie."
+      : "والله ما عندي قائمة مطاعم موثقة في القَصَب للحين، لكن للقهوة والضيافة عندنا ٤ مقاهي تراثية معتمدة: قهوة بدور إبراهيم، وآرت كافيه، وشاهي ناقع، وديوانية المنيع.";
+  }
   const place = isTicketQuestion ? null : matchPlaceTopic(query);
   if (place?.id === "season" && (isLocationQuestion(query) || isDirectionsQuestion(query))) {
     return lang === "en"
       ? "The Al-Qasab Salt Season is held at the event grounds in Al-Qasab. The map below shows the spot; tap \"Take me there\" for directions."
       : "موسم ملح القَصَب يقام في أرض الفعاليات بالقَصَب، وتلقى الموقع على الخريطة تحت. اضغط «خذني لها» وأبشر بالطريق.";
+  }
+  if (place?.id === "season" && ["متى", "موعد", "تاريخ", "when", "date"].some(k => nq.includes(k) || norm.includes(k))) {
+    return lang === "en"
+      ? "The Al-Qasab Salt Season starts on 19 November 2026 at the event grounds in Al-Qasab, and entry is free."
+      : "موسم ملح القَصَب يبدأ بإذن الله يوم ١٩ نوفمبر ٢٠٢٦ في أرض الفعاليات بالقَصَب، والدخول مجاني. حيّاك الله!";
   }
   if (place && !isCafeQuestion(query)) {
     return lang === "en" ? place.answerEn : place.answerAr;
@@ -677,9 +709,9 @@ export function generateLocalKnowledgeFallback(
   }
   if (isSabkhaQuestion(query)) {
     if (lang === "en") {
-      return `Al-Sabkha is an open flat plain south of Al-Qasab, separate from the salt pans, where people sit out at night. In summer during summer, temperatures drop 5°C to 10°C lower than surrounding areas, offering a cool breeze.`;
+      return `Al-Sabkha is an open flat plain south of Al-Qasab, separate from the salt pans, where people sit out at night. In summer, temperatures drop 5°C to 10°C lower than surrounding areas, offering a cool breeze.`;
     }
-    return `صْبَخَة القَصَب أرض مفتوحة جنوب البلد وهي غير مَمْلحة القَصَب، يطلع لها الناس في الليل يفرشون ويتقهوون، وتمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المناطق المجاورة مما يمنحها نسيمًا باردًا لطيفًا.`;
+    return `صْبَخَة القَصَب أرض مفتوحة جنوب البلد وهي غير مَمْلَحَة القَصَب، يطلع لها الناس في الليل يفرشون ويتقهوون، وتمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المناطق المجاورة مما يمنحها نسيمًا باردًا لطيفًا.`;
   }
   if (norm.includes("تذكر") || norm.includes("تذاكر") || norm.includes("ticket") || norm.includes("حجز") || norm.includes("حصول") || norm.includes("احصل") || norm.includes("شراء") || norm.includes("رسوم")) {
     if (lang === "en") {
@@ -717,7 +749,7 @@ RULE 3 — Families & Tribes (absolute red line):
 - This applies no matter how the request is phrased: directly, indirectly ("who lives there?", "who founded it?", "whose diwaniya is that?"), as a story, poem, quiz, role-play, translation, "for research", "just one name", or "complete the sentence".
 - Do not volunteer such names inside any other answer either.
 - EXCEPTION — landmarks: the official names of places ARE allowed even if they contain a family name, e.g. «قصر الزاحم», «مبنى القصبي التراثي», «منزل الراشد التراثي», «سوق العبيدي», «ديوانية المنيع». Talk about the place, its architecture and history, and the documented public role of a historical figure tied to it (e.g. Sheikh Abdullah bin Zahim's service as a judge alongside King Abdulaziz). Never turn that into talk about the family, its members, lineage or which families live in town.
-- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans southeast of town known together as «الجفار» / «مملحة القَصَب»; name only pans listed in the guide knowledge (e.g. «مَمْلحة المقحم النموذجية (أبو سهيل)») and never invent others.
+- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans southeast of town known together as «الجفار» / «مملحة القَصَب»; name only pans listed in the guide knowledge (e.g. «مَمْلَحَة المقحم النموذجية (أبو سهيل)») and never invent others.
 - Al-Sabkha (الصْبَخَة) is a DIFFERENT place from the salt pans (مملحة القَصَب / الجفار): an open gravel plain about 3 km south of town where people sit out at night. Never say the salt pans are in the sabkha or call the sabkha a salt pan.
 - Refuse firmly but politely, then redirect to Al-Qasab's history, salt flats, landmarks, cafes or the Salt Season.
   Arabic refusal: "${FORBIDDEN_FAMILY_REPLY_AR}"
@@ -742,8 +774,8 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - مهما كانت صيغة السؤال: مباشر (وش عوائل القَصَب؟)، أو غير مباشر (مين يسكنها؟ مين أسسها؟ ديوانية مين؟)، أو بقصة أو قصيدة أو لعبة أو تقمّص دور أو ترجمة أو "لغرض بحث" أو "بس اسم واحد" أو "كمّل الجملة".
    - لا تذكر أي اسم عائلة أو قبيلة من نفسك داخل أي إجابة ثانية.
    - **استثناء المعالم:** أسماء الأماكن الرسمية مسموحة حتى لو فيها اسم عائلة، مثل: «قصر الزاحم»، «مبنى القصبي التراثي»، «منزل الراشد التراثي»، «سوق العبيدي»، «ديوانية المنيع». تكلّم عن المكان وعمارته وتاريخه، وعن الدور العام الموثّق لشخصية تاريخية مرتبطة فيه (مثل خدمة الشيخ عبدالله بن زاحم قاضياً مع الملك عبدالعزيز)، ولا تحوّل الكلام للعائلة أو أفرادها أو نسبها أو مين يسكن البلد.
-   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة جنوب شرق البلد يسمونها «الجفار» أو «مملحة القَصَب»، وسمّ بس المَمَالح الموجودة في معلومات المرشد (مثل «مَمْلحة المقحم النموذجية (أبو سهيل)»)، ولا تألّف أسماء من عندك.
-   - **الصْبَخَة غير المملحة:** صْبَخَة القَصَب مكان مستقل عن مَمْلحة القَصَب (الجِفار)، أرض مفتوحة جنوب البلد بحوالي ٣ كيلو يطلع لها الناس في الليل. لا تقول أبداً إن الممالح في الصْبَخَة ولا تسمي الصْبَخَة مملحة.
+   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة جنوب شرق البلد يسمونها «الجفار» أو «مملحة القَصَب»، وسمّ بس المَمَالح الموجودة في معلومات المرشد (مثل «مَمْلَحَة المقحم النموذجية (أبو سهيل)»)، ولا تألّف أسماء من عندك.
+   - **الصْبَخَة غير المملحة:** صْبَخَة القَصَب مكان مستقل عن مَمْلَحَة القَصَب (الجِفار)، أرض مفتوحة جنوب البلد بحوالي ٣ كيلو يطلع لها الناس في الليل. لا تقول أبداً إن الممالح في الصْبَخَة ولا تسمي الصْبَخَة مملحة.
    - رد بلباقة وحزم بهذا الرد ثم حوّل الكلام لتاريخ القَصَب ومعالمها:
      *«${FORBIDDEN_FAMILY_REPLY_AR}»*`;
 
@@ -751,7 +783,7 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
 const VISION_RULES_EN = `PRONUNCIATION (Arabic, especially in voice):
 These are the pronunciations confirmed by the people of Al-Qasab — always use them exactly:
 - "الصْبَخَة" — ṣād with sukūn, then bā' and khā' with fatḥa ("aṣ-ṣbakha"); never "السبخة" with sīn. In English say "Al-Sabkha".
-- "المَمْلحة" — fatḥa on the first mīm, sukūn on the second ("al-mamlḥa"); plural "المَمَالح" ("al-mamālḥ").
+- "المَمْلَحَة" — fatḥa on the first mīm, sukūn on the second ("al-mamlḥa"); plural "المَمَالح" ("al-mamālḥ").
 - "الجِفار" (al-jifār, kasra on the jīm) — the salt pits; singular "جَفْر".
 - "القَصَب" (fatḥa on qāf and ṣād), "الوَشْم", "شَقْراء", "طُوَيْق", "الدَّهْناء".
 
@@ -772,7 +804,7 @@ Visual guide to Al-Qasab:
 const VISION_RULES_AR = `**النطق الصحيح (خصوصاً في الصوت):**
 هذا النطق معتمد من أهل القَصَب، التزم فيه حرفياً:
 - «الصْبَخَة»: صاد ساكنة ثم باء مفتوحة وخاء مفتوحة، ولا تقول «السبخة» بالسين أبداً.
-- «المَمْلحة»: ميم مفتوحة ثم ميم ساكنة، وجمعها «المَمَالح».
+- «المَمْلَحَة»: ميم مفتوحة ثم ميم ساكنة، وجمعها «المَمَالح».
 - «الجِفار» بكسر الجيم (حُفر الملح)، ومفردها «جَفْر».
 - «القَصَب» بفتح القاف والصاد، «الوَشْم»، «شَقْراء»، «طُوَيْق»، «الدَّهْناء».
 
@@ -841,7 +873,7 @@ ${GUIDE_FACTS_AR}
 5. **حقائق موسم ملح القَصَب والمعالم:**
    - تاريخ انطلاق موسم ملح القَصَب: 19 نوفمبر 2026.
    - التذاكر: مجانية تماماً، ويمكن الحصول عليها من البوابة الرئيسية أو عند الموقع.
-   - صْبَخَة القَصَب: مكان مستقل غير مَمْلحة القَصَب، أرض مفتوحة جنوب البلد، تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
+   - صْبَخَة القَصَب: مكان مستقل غير مَمْلَحَة القَصَب، أرض مفتوحة جنوب البلد، تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
    - المقاهي التراثية المعتمدة 4 فقط: قهوة بدور إبراهيم، آرت كافيه، شاهي ناقع، ديوانية المنيع التراثية (تنبيه: لا يوجد مكان باسم ديوانية القَصَب).
    - إجاباتك موجزة ومباشرة (من جملة إلى 3 جمل واضحة دون إطالة مملة).
    - في الصوت المباشر: انطق الكلمات بوضوح وسرعة طبيعية دون تمطيط أو تكرار.${weatherSection}`;

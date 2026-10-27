@@ -167,7 +167,7 @@ test("Najdi pronunciation: السبخة becomes الصْبخة in answers", () =
 test("prompts carry the pronunciation and camera rules", () => {
   for (const mode of ["ar", "en", "auto"] as const) {
     const prompt = buildAlQasabSystemPrompt(undefined, mode);
-    assert.ok(prompt.includes("الصْبَخَة") && prompt.includes("المَمْلحة") && prompt.includes("المَمَالح"), mode);
+    assert.ok(prompt.includes("الصْبَخَة") && prompt.includes("المَمْلَحَة") && prompt.includes("المَمَالح"), mode);
     assert.ok(prompt.includes("مملحة القَصَب"), mode);
     assert.ok(/CAMERA|الكاميرا/.test(prompt), mode);
   }
@@ -207,18 +207,18 @@ test("salam is answered like a host", () => {
 });
 
 test("place words get their dictionary vowels", () => {
-  assert.equal(normalizePlaceWords("زرت المملحة"), "زرت المَمْلحة");
-  assert.equal(normalizePlaceWords("عشرين مملحه"), "عشرين مَمْلحة");
-  assert.equal(normalizePlaceWords("بالمملحة والجفار"), "بالمَمْلحة والجِفار");
-  assert.equal(normalizePlaceWords("المَمْلَحة"), "المَمْلحة");
+  assert.equal(normalizePlaceWords("زرت المملحة"), "زرت المَمْلَحَة");
+  assert.equal(normalizePlaceWords("عشرين مملحه"), "عشرين مَمْلَحَة");
+  assert.equal(normalizePlaceWords("بالمملحة والجفار"), "بالمَمْلَحَة والجِفار");
+  assert.equal(normalizePlaceWords("المَمْلَحة"), "المَمْلَحَة");
   assert.equal(normalizePlaceWords("زرت الممالح"), "زرت المَمَالح");
   assert.equal(normalizePlaceWords("مملحتها"), "مملحتها");
   const out = applyNajdiPhoneticDiacritics("السبخة جنب المملحة والجفار في القصيب");
-  assert.ok(out.includes("الصْبَخَة") && out.includes("المَمْلحة") && out.includes("الجِفار") && out.includes("القَصَب"), out);
+  assert.ok(out.includes("الصْبَخَة") && out.includes("المَمْلَحَة") && out.includes("الجِفار") && out.includes("القَصَب"), out);
 });
 
 test("Al-Muqhim salt pan has its own photos with a credit", () => {
   const imgs = getPlaceImages("وش مملحة المقحم؟", "ar");
-  assert.equal(imgs.length, 9);
+  assert.equal(imgs.length, 5);
   assert.ok(imgs.every(i => i.credit && i.caption));
 });

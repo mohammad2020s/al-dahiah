@@ -77,6 +77,9 @@ apiRouter.get("/routes", (_req, res) => {
   res.json(AL_QASAB_ROUTES);
 });
 
+// When Gemini reports its quota is used up, answer locally until this time
+let geminiPausedUntil = 0;
+
 // Per-visitor limits so a script can't drain the Gemini key
 const chatLimit = rateLimitMiddleware({
   windowMs: 60_000,
@@ -219,10 +222,11 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       return;
     }
 
-    // Stream from Gemini
+    // Stream from Gemini (skipped while the key's quota is exhausted, so answers stay instant)
     const apiKey = process.env.GEMINI_API_KEY;
     let rawAnswer = "";
-    if (apiKey) {
+    let usedFallback = false;
+    if (apiKey && Date.now() >= geminiPausedUntil) {
       const ai = new GoogleGenAI({
         apiKey,
         httpOptions: {
@@ -246,30 +250,52 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         parts: [{ text: userPrompt }],
       });
 
+      // Never leave the visitor waiting: give Gemini 12 s, then answer from local knowledge
+      const geminiAbort = new AbortController();
+      const geminiTimer = setTimeout(() => geminiAbort.abort(), 12_000);
+      const timedOut = new Promise<void>((resolve) => geminiAbort.signal.addEventListener("abort", () => resolve()));
       try {
+        await Promise.race([timedOut, (async () => {
         const stream = await ai.models.generateContentStream({
           model: "gemini-3.8-flash",
           contents,
           config: {
             systemInstruction: systemPrompt,
             maxOutputTokens: 400,
+            abortSignal: geminiAbort.signal,
           },
         });
 
         for await (const chunk of stream) {
-          if (clientDisconnected) break;
+          if (clientDisconnected || geminiAbort.signal.aborted) break;
           const chunkText = chunk.text;
-          if (chunkText) {
+          if (chunkText && !geminiAbort.signal.aborted) {
             rawAnswer += chunkText;
             sendEvent({ type: "chunk", content: chunkText });
           }
         }
+        })()]);
+        if (geminiAbort.signal.aborted) {
+          console.warn("[Chat Stream] Gemini took longer than 12 s, using local answer");
+          rawAnswer = "";
+        }
       } catch (err: any) {
-        console.warn("[Chat Stream] Gemini call failed, using fallback:", err?.message || err);
+        const msg = String(err?.message || err);
+        console.warn("[Chat Stream] Gemini call failed, using fallback:", msg.slice(0, 300));
+        // Quota used up (429): stop calling Gemini for a while instead of failing on every message
+        if (/\b429\b|RESOURCE_EXHAUSTED|quota/i.test(msg)) {
+          geminiPausedUntil = Date.now() + 15 * 60_000;
+          console.warn("[Chat Stream] Gemini quota exhausted, using local answers for 15 minutes");
+        }
+        // A half-streamed answer that was cut off is replaced by the local one
+        if (geminiAbort.signal.aborted) rawAnswer = "";
+      } finally {
+        clearTimeout(geminiTimer);
       }
     }
 
     if (!rawAnswer || rawAnswer.trim().length === 0) {
+      usedFallback = true;
       const fallbackText = generateLocalKnowledgeFallback(userPrompt, lang);
       rawAnswer = fallbackText;
       const words = fallbackText.split(" ");
@@ -297,8 +323,8 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       isLocationQuestion(userPrompt) ||
       isCafeQuestion(userPrompt) ||
       isDirectionsQuestion(userPrompt) ||
-      isLocationQuestion(finalAnswer) ||
-      isCafeQuestion(finalAnswer);
+      // Look at the answer text only for real Gemini answers (the canned welcome mentions cafes)
+      (!usedFallback && (isLocationQuestion(finalAnswer) || isCafeQuestion(finalAnswer)));
 
     const locationData = showMap ? getPlaceLocation(userPrompt, lang) || getLocationForQuery(userPrompt, finalAnswer) : null;
     const totalResponseTimeMs = Date.now() - requestStartTime;
@@ -344,7 +370,7 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
 
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-tts-preview",
-      // Same Najdi corrections as the chat («القَصَب», «الصْبَخَة», «المَمْلحة») so the voice says them right
+      // Same Najdi corrections as the chat («القَصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
       contents: [{ parts: [{ text: applyNajdiPhoneticDiacritics(String(text)).slice(0, 400) }] }],
       config: {
         responseModalities: [Modality.AUDIO],

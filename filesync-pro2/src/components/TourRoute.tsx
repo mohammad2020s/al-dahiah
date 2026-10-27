@@ -25,7 +25,7 @@ const STOPS: Stop[] = [
     landmarkId: "salt_flat",
     timeAr: "الصبح بدري",
     timeEn: "Early morning",
-    titleAr: "مَمْلحة القَصَب والجِفار",
+    titleAr: "مَمْلَحَة القَصَب والجِفار",
     titleEn: "Al-Qasab salt pans",
     tipAr: "امشِ على الممرات الخشبية بين أحواض الملح، والشمس الهادية تخلي الصور تجنن.",
     tipEn: "Walk the wooden paths between the salt basins while the light is soft.",
