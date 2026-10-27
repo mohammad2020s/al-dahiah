@@ -38,6 +38,7 @@ import { fetchAlQasabWeather, weatherSummaryEn } from "./weather.ts";
 import { rateLimitMiddleware } from "./rateLimit.ts";
 import { getPlaceImages, getPlaceLocation, getPlaceMapsUrl, matchPlaceTopic, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
 import { recordQuestion, getQuestionStats } from "./questionStats.ts";
+import { availableChatEngines, streamChatWithFallback, voiceKeys, pauseVoice, type Engine } from "./geminiFallback.ts";
 import { timingSafeEqual } from "node:crypto";
 
 export const apiRouter = Router();
@@ -91,9 +92,6 @@ apiRouter.get("/landmarks", (_req, res) => {
 apiRouter.get("/routes", (_req, res) => {
   res.json(AL_QASAB_ROUTES);
 });
-
-// When Gemini reports its quota is used up, answer locally until this time
-let geminiPausedUntil = 0;
 
 // Per-visitor limits so a script can't drain the Gemini key
 const chatLimit = rateLimitMiddleware({
@@ -241,20 +239,11 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       return;
     }
 
-    // Stream from Gemini (skipped while the key's quota is exhausted, so answers stay instant)
-    const apiKey = process.env.GEMINI_API_KEY;
+    // Stream from Gemini: free models first, then the paid key (see geminiFallback.ts)
     let rawAnswer = "";
     let usedFallback = false;
-    if (apiKey && Date.now() >= geminiPausedUntil) {
-      const ai = new GoogleGenAI({
-        apiKey,
-        httpOptions: {
-          headers: {
-            "User-Agent": "aistudio-build",
-          },
-        },
-      });
-      const systemPrompt = buildAlQasabSystemPrompt(undefined, lang);
+    let answeredBy: Engine | null = null;
+    if (availableChatEngines().length > 0) {
       const contents: any[] = [];
       for (const turn of rawHistory.slice(-4)) {
         if (turn?.content) {
@@ -264,53 +253,18 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
           });
         }
       }
-      contents.push({
-        role: "user",
-        parts: [{ text: userPrompt }],
+      contents.push({ role: "user", parts: [{ text: userPrompt }] });
+
+      const result = await streamChatWithFallback({
+        contents,
+        systemInstruction: buildAlQasabSystemPrompt(undefined, lang),
+        maxOutputTokens: 400,
+        budgetMs: 15_000, // never leave the visitor waiting longer than this
+        onChunk: (t) => sendEvent({ type: "chunk", content: t }),
+        isCancelled: () => clientDisconnected,
       });
-
-      // Never leave the visitor waiting: give Gemini 12 s, then answer from local knowledge
-      const geminiAbort = new AbortController();
-      const geminiTimer = setTimeout(() => geminiAbort.abort(), 12_000);
-      const timedOut = new Promise<void>((resolve) => geminiAbort.signal.addEventListener("abort", () => resolve()));
-      try {
-        await Promise.race([timedOut, (async () => {
-        const stream = await ai.models.generateContentStream({
-          model: "gemini-3.8-flash",
-          contents,
-          config: {
-            systemInstruction: systemPrompt,
-            maxOutputTokens: 400,
-            abortSignal: geminiAbort.signal,
-          },
-        });
-
-        for await (const chunk of stream) {
-          if (clientDisconnected || geminiAbort.signal.aborted) break;
-          const chunkText = chunk.text;
-          if (chunkText && !geminiAbort.signal.aborted) {
-            rawAnswer += chunkText;
-            sendEvent({ type: "chunk", content: chunkText });
-          }
-        }
-        })()]);
-        if (geminiAbort.signal.aborted) {
-          console.warn("[Chat Stream] Gemini took longer than 12 s, using local answer");
-          rawAnswer = "";
-        }
-      } catch (err: any) {
-        const msg = String(err?.message || err);
-        console.warn("[Chat Stream] Gemini call failed, using fallback:", msg.slice(0, 300));
-        // Quota used up (429): stop calling Gemini for a while instead of failing on every message
-        if (/\b429\b|RESOURCE_EXHAUSTED|quota/i.test(msg)) {
-          geminiPausedUntil = Date.now() + 15 * 60_000;
-          console.warn("[Chat Stream] Gemini quota exhausted, using local answers for 15 minutes");
-        }
-        // A half-streamed answer that was cut off is replaced by the local one
-        if (geminiAbort.signal.aborted) rawAnswer = "";
-      } finally {
-        clearTimeout(geminiTimer);
-      }
+      rawAnswer = result.text;
+      answeredBy = result.engine;
     }
 
     if (!rawAnswer || rawAnswer.trim().length === 0) {
@@ -341,7 +295,8 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       userPrompt,
       isGenericWelcome ? "unanswered" : usedFallback ? "local" : "gemini",
       matchPlaceTopic(userPrompt)?.id || (isCafeQuestion(userPrompt) ? "cafes" : null),
-      lang
+      lang,
+      answeredBy ? `${answeredBy.tier}:${answeredBy.model}` : usedFallback ? "local" : null
     );
 
     // Real photos of the place being asked about (e.g. the salt pans), shown as a gallery under the answer
@@ -384,46 +339,34 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
 apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   const text = req.body?.text;
   if (!text) return res.status(400).json({ error: "Text is required" });
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY is missing" });
+  const keys = voiceKeys("tts");
+  if (keys.length === 0) return res.status(503).json({ error: "Speech is unavailable right now" });
 
-  try {
-    const ai = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          "User-Agent": "aistudio-build",
+  let lastError = "TTS error";
+  // Free key first; if its speech quota is used up, the paid key (when set)
+  for (const { tier, key } of keys) {
+    try {
+      const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
+      const response = await ai.models.generateContent({
+        model: "gemini-3.1-flash-tts-preview",
+        // Same Najdi corrections as the chat («القَصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
+        contents: [{ parts: [{ text: applyNajdiPhoneticDiacritics(String(text)).slice(0, 400) }] }],
+        config: {
+          responseModalities: [Modality.AUDIO],
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } },
         },
-      },
-    });
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-tts-preview",
-      // Same Najdi corrections as the chat («القَصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
-      contents: [{ parts: [{ text: applyNajdiPhoneticDiacritics(String(text)).slice(0, 400) }] }],
-      config: {
-        responseModalities: [Modality.AUDIO],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: "Charon" },
-          },
-        },
-      },
-    });
-
-    const audioPart = response.candidates?.[0]?.content?.parts?.find(
-      (p: any) => p.inlineData?.mimeType?.startsWith("audio/")
-    );
-
-    if (audioPart?.inlineData?.data) {
-      return res.json({
-        audio: audioPart.inlineData.data,
-        mimeType: audioPart.inlineData.mimeType,
       });
+      const audioPart = response.candidates?.[0]?.content?.parts?.find(
+        (p: any) => p.inlineData?.mimeType?.startsWith("audio/")
+      );
+      if (audioPart?.inlineData?.data) {
+        return res.json({ audio: audioPart.inlineData.data, mimeType: audioPart.inlineData.mimeType });
+      }
+      lastError = "Failed to generate audio";
+    } catch (err: any) {
+      lastError = String(err?.message || err);
+      pauseVoice("tts", tier, lastError);
     }
-
-    return res.status(500).json({ error: "Failed to generate audio" });
-  } catch (err: any) {
-    return res.status(500).json({ error: err?.message || "TTS error" });
   }
+  return res.status(500).json({ error: lastError.slice(0, 200) });
 });

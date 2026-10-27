@@ -43,6 +43,7 @@ export const STATS_PAGE_HTML = `<!doctype html>
   button:hover { background:var(--brand-dark); }
   button.ghost { background:transparent; color:var(--brand); border:1px solid var(--line); }
   .err { color:var(--brand); font-size:13px; margin-top:8px; }
+  .h3 { font-size:13px; margin:6px 0 2px; color:var(--muted); font-weight:600; }
   .note { font-size:12px; color:var(--muted); }
   .hidden { display:none; }
 </style>
@@ -78,6 +79,8 @@ export const STATS_PAGE_HTML = `<!doctype html>
         <div class="card"><h2>الأسئلة حسب اليوم</h2><ol id="days"></ol></div>
       </div>
     </div>
+    <div class="card"><h2>مين جاوب الأسئلة</h2><p class="hint">النماذج المجانية أول، والمدفوع بس لما يخلص المجاني. اليوم يبدأ ١٠ الصبح بتوقيت الرياض عند Google، والأرقام هنا بيوم الرياض.</p>
+      <div class="grid"><div><h3 class="h3">اليوم</h3><ol id="engToday"></ol></div><div><h3 class="h3">من البداية</h3><ol id="engAll"></ol></div></div></div>
     <div class="card"><h2>أسئلة خارج التخصص</h2><p class="hint">رفضها لأنها مو عن القصب. لو تكرر شي منها وله علاقة بالقصب، أضفه.</p><ol id="oos"></ol></div>
     <p class="note" id="storage"></p>
   </div>
@@ -86,6 +89,11 @@ export const STATS_PAGE_HTML = `<!doctype html>
 (function () {
   var TOPIC = { muqhim_pan:"مملحة المقحم", salt_pans:"ممالح القصب (الجفار)", sabkha:"الصبخة", zahim_palace:"قصر الزاحم", qusaibi_building:"مبنى القصبي", obaidi_souq:"سوق العبيدي", rashid_house:"منزل الراشد", old_town:"البلدة القديمة", marqab:"المرقب", season:"موسم الملح", town:"مدينة القصب", cafes:"المقاهي", weather:"الطقس", other:"أخرى / عام" };
   var KIND = { gemini:"جاوب بالذكاء الاصطناعي", local:"جاوب من المعلومات المحفوظة", unanswered:"ما لقى جواب", out_of_scope:"خارج التخصص", family:"سؤال عن العوائل", weather:"الطقس", greeting:"سلام وترحيب" };
+  var engLabel = function (k) {
+    if (k === "local") return "المعلومات المحفوظة (بدون ذكاء اصطناعي)";
+    var p = k.split(":"); var tier = p[0] === "paid" ? "مدفوع" : "مجاني";
+    return tier + " · " + (p[1] || "");
+  };
   var $ = function (id) { return document.getElementById(id); };
   var store = { get: function () { try { return sessionStorage.getItem("statsKey") || ""; } catch (e) { return ""; } },
                 set: function (v) { try { sessionStorage.setItem("statsKey", v); } catch (e) {} } };
@@ -154,6 +162,9 @@ export const STATS_PAGE_HTML = `<!doctype html>
         list($("topics"), d.topics, function (t) { return TOPIC[t] || t; });
         list($("days"), d.days.map(function (x) { return { text: x.day, count: x.count }; }));
         list($("oos"), d.outOfScope);
+        var engRows = function (o) { return Object.keys(o || {}).map(function (k) { return { text: k, count: o[k] }; }).sort(function (a, b) { return b.count - a.count; }); };
+        list($("engToday"), engRows(d.enginesToday), engLabel);
+        list($("engAll"), engRows(d.engines), engLabel);
         $("storage").textContent = d.storage === "keyvalue"
           ? "الأرقام محفوظة في Render Key Value."
           : "تنبيه: الأرقام محفوظة في الذاكرة فقط، وتنمسح لما ينام السيرفر أو ينزل تحديث. اربط Render Key Value عشان تنحفظ.";

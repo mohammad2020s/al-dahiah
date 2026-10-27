@@ -183,7 +183,8 @@ async function hgetall(hash: string): Promise<Record<string, number>> {
 }
 
 /** Record one visitor question. Never throws and never delays the answer. */
-export function recordQuestion(question: string, kind: AnswerKind, topic?: string | null, lang: "ar" | "en" = "ar") {
+/** engine: which model answered, e.g. "free:gemini-3.5-flash-lite", "paid:gemini-3.8-flash" or "local". */
+export function recordQuestion(question: string, kind: AnswerKind, topic?: string | null, lang: "ar" | "en" = "ar", engine?: string | null) {
   const q = cleanQuestion(question); // the real question, or "" for greetings / small talk
   if (!q && !normalizeQuestion(question)) return;
   void Promise.all([
@@ -196,6 +197,8 @@ export function recordQuestion(question: string, kind: AnswerKind, topic?: strin
       : Promise.resolve(),
     hincr("days", today()),
     hincr("langs", lang),
+    engine ? hincr("engines", engine) : Promise.resolve(),
+    engine ? hincr("engines_day:" + today(), engine) : Promise.resolve(),
     q && (kind === "unanswered" || kind === "out_of_scope") ? hincr(kind, q) : Promise.resolve(),
   ]).catch(() => {});
 }
@@ -207,8 +210,8 @@ const top = (rec: Record<string, number>, n: number) =>
     .map(([text, count]) => ({ text, count }));
 
 export async function getQuestionStats(limit = 50) {
-  const [questions, kinds, topics, days, langs, unanswered, outOfScope] = await Promise.all(
-    ["questions", "kinds", "topics", "days", "langs", "unanswered", "out_of_scope"].map(hgetall)
+  const [questions, kinds, topics, days, langs, unanswered, outOfScope, engines, enginesToday] = await Promise.all(
+    ["questions", "kinds", "topics", "days", "langs", "unanswered", "out_of_scope", "engines", "engines_day:" + today()].map(hgetall)
   );
   const total = Object.values(kinds).reduce((a, b) => a + b, 0);
   const display = await hgetallText("display");
@@ -219,6 +222,8 @@ export async function getQuestionStats(limit = 50) {
     total,
     kinds,
     langs,
+    engines,
+    enginesToday,
     // Cleaned again on read, so greetings counted before the smart filter disappear too
     groups: insights.groups,
     topQuestions: insights.questions,

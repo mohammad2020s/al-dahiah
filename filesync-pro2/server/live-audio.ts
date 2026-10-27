@@ -4,6 +4,7 @@ import "dotenv/config";
 import { buildAlQasabSystemPrompt } from "./alQasabScope.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { createLimiter, clientIp } from "./rateLimit.ts";
+import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
 
 export function setupLiveAudio(server: Server) {
   const wss = new WebSocketServer({ noServer: true });
@@ -43,10 +44,11 @@ export function setupLiveAudio(server: Server) {
     const lang = reqUrl.searchParams.get("lang") === "en" ? "en" : "ar";
     console.log(`[Live Audio] Client connected (language: ${lang})`);
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      console.error("[Live Audio] GEMINI_API_KEY is missing");
-      clientWs.send(JSON.stringify({ error: lang === "en" ? "API key not available." : "مفتاح API غير متوفر." }));
+    // Free key first; the paid key (GEMINI_PAID_API_KEY) only if the free one is refused
+    const keys = voiceKeys("live");
+    if (keys.length === 0) {
+      console.error("[Live Audio] No usable Gemini key (missing or quota used up)");
+      clientWs.send(JSON.stringify({ error: lang === "en" ? "Voice calls are busy right now, please try again later or type your question." : "المكالمات الصوتية مشغولة الحين، جرّب بعد شوي أو اكتب سؤالك بالدردشة." }));
       clientWs.close();
       return;
     }
@@ -68,88 +70,103 @@ Whenever the caller asks about one of these Al-Qasab places, or you start explai
 Places:
 ${placeList}`;
 
-    // Official Gemini Live WebSocket endpoint
-    const geminiWsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
-    const geminiWs = new WebSocket(geminiWsUrl);
-
-
-    geminiWs.on("open", () => {
-      console.log("[Gemini Live] Connected to Gemini Live WebSocket API endpoint");
-
-      const setupMessage = {
-        setup: {
-          model: "models/gemini-3.8-live",
-          // Text of what both sides say, so the call screen can show photos of the place being discussed
-          inputAudioTranscription: {},
-          outputAudioTranscription: {},
-          tools: [
-            {
-              functionDeclarations: [
-                {
-                  name: "show_place",
-                  description: "Show the caller photos or an info card of an Al-Qasab place on their call screen. Call it right before explaining that place.",
-                  parameters: {
-                    type: "OBJECT",
-                    properties: {
-                      place_id: {
-                        type: "STRING",
-                        enum: PLACE_TOPICS.map((t) => t.id),
-                        description: "Id of the place being discussed",
-                      },
+    // Built once; sent on every connection attempt
+    const setupMessage = {
+      setup: {
+        model: "models/gemini-3.8-live",
+        // Text of what both sides say, so the call screen can show photos of the place being discussed
+        inputAudioTranscription: {},
+        outputAudioTranscription: {},
+        tools: [
+          {
+            functionDeclarations: [
+              {
+                name: "show_place",
+                description: "Show the caller photos or an info card of an Al-Qasab place on their call screen. Call it right before explaining that place.",
+                parameters: {
+                  type: "OBJECT",
+                  properties: {
+                    place_id: {
+                      type: "STRING",
+                      enum: PLACE_TOPICS.map((t) => t.id),
+                      description: "Id of the place being discussed",
                     },
-                    required: ["place_id"],
                   },
+                  required: ["place_id"],
                 },
-              ],
-            },
-          ],
-          generationConfig: {
-            responseModalities: ["AUDIO"],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: {
-                  voiceName: "Puck"
-                }
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseModalities: ["AUDIO"],
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: {
+                voiceName: "Puck"
               }
             }
-          },
-          systemInstruction: {
-            parts: [{ text: systemInstruction }]
-          },
-          realtimeInputConfig: {
-            automaticActivityDetection: {
-              startOfSpeechSensitivity: "START_SENSITIVITY_LOW",
-              endOfSpeechSensitivity: "END_SENSITIVITY_HIGH",
-              silenceDurationMs: 500
-            }
+          }
+        },
+        systemInstruction: {
+          parts: [{ text: systemInstruction }]
+        },
+        realtimeInputConfig: {
+          automaticActivityDetection: {
+            startOfSpeechSensitivity: "START_SENSITIVITY_LOW",
+            endOfSpeechSensitivity: "END_SENSITIVITY_HIGH",
+            silenceDurationMs: 500
           }
         }
-      };
-
-      console.log("[Gemini Live] Sending low-latency audio setup");
-      geminiWs.send(JSON.stringify(setupMessage));
-    });
-
-    geminiWs.on("message", (data) => {
-      const text = data.toString();
-      if (clientWs.readyState === WebSocket.OPEN) {
-        clientWs.send(text);
       }
-    });
+    };
 
-    geminiWs.on("close", (code, reason) => {
-      console.log(`[Gemini Live] Gemini connection closed (${code}):`, reason.toString());
-      if (clientWs.readyState === WebSocket.OPEN) {
-        clientWs.close();
-      }
-    });
 
-    geminiWs.on("error", (err) => {
-      console.error("[Gemini Live] Gemini connection error:", err.message);
-      if (clientWs.readyState === WebSocket.OPEN) {
-        clientWs.send(JSON.stringify({ error: "Gemini connection error: " + err.message }));
-      }
-    });
+    let geminiWs: WebSocket;
+    let keyIndex = 0;
+    let setupDone = false;
+    let clientGone = false;
+
+    const connect = () => {
+      const { tier, key } = keys[keyIndex];
+      // Official Gemini Live WebSocket endpoint
+      const ws = new WebSocket(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${key}`);
+      geminiWs = ws;
+
+      ws.on("open", () => {
+        console.log(`[Gemini Live] Connected (${tier} key), sending low-latency audio setup`);
+        ws.send(JSON.stringify(setupMessage));
+      });
+
+      ws.on("message", (data) => {
+        const text = data.toString();
+        if (!setupDone && text.includes("setupComplete")) setupDone = true;
+        if (clientWs.readyState === WebSocket.OPEN) clientWs.send(text);
+      });
+
+      ws.on("close", (code, reason) => {
+        const why = reason.toString();
+        console.log(`[Gemini Live] Gemini connection closed (${code}, ${tier} key):`, why);
+        if (clientGone || ws !== geminiWs) return;
+        // Refused before the call started (quota / key): pause this key and try the next one
+        if (!setupDone && code !== 1000) {
+          pauseVoice("live", tier, `${code} ${why}`);
+          if (keyIndex + 1 < keys.length) {
+            keyIndex++;
+            console.warn(`[Gemini Live] Retrying the call with the ${keys[keyIndex].tier} key`);
+            connect();
+            return;
+          }
+        }
+        if (clientWs.readyState === WebSocket.OPEN) clientWs.close();
+      });
+
+      ws.on("error", (err) => {
+        console.error(`[Gemini Live] Gemini connection error (${tier} key):`, err.message);
+        // A failed handshake is followed by "close", which handles the retry
+      });
+    };
+    connect();
 
     // Forward client audio to Gemini in the exact realtimeInput format
     clientWs.on("message", (data) => {
@@ -164,6 +181,7 @@ ${placeList}`;
     });
 
     clientWs.on("close", () => {
+      clientGone = true;
       console.log("[Live Audio] Client disconnected");
       if (geminiWs.readyState === WebSocket.OPEN || geminiWs.readyState === WebSocket.CONNECTING) {
         geminiWs.close();
