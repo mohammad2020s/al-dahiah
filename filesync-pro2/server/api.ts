@@ -259,7 +259,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         contents,
         systemInstruction: buildAlQasabSystemPrompt(undefined, lang),
         maxOutputTokens: 400,
-        budgetMs: 15_000, // never leave the visitor waiting longer than this
+        budgetMs: 20_000, // never leave the visitor waiting longer than this (each model gets 7 s to start)
         onChunk: (t) => sendEvent({ type: "chunk", content: t }),
         isCancelled: () => clientDisconnected,
       });

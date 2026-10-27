@@ -23,6 +23,10 @@ const CHAT_CHAIN: Engine[] = [
   { tier: "paid", model: process.env.GEMINI_PAID_MODEL || "gemini-3.8-flash" },
 ];
 
+/** A model that hasn't said its first word by then is skipped for the next one. */
+const FIRST_WORD_MS = Number(process.env.GEMINI_FIRST_WORD_MS || 7000);
+const slowStrikes = new Map<string, number>();
+
 /** Safety net on top of the AI Studio spend cap: paid chat requests per day (Riyadh day). */
 const PAID_DAILY_LIMIT = Number(process.env.GEMINI_PAID_DAILY_LIMIT || 500);
 
@@ -132,8 +136,11 @@ export async function streamChatWithFallback(opts: {
       continue;
     }
 
+    // A model gets FIRST_WORD_MS to start answering; once it streams, it may use the rest
     const abort = new AbortController();
-    const timer = setTimeout(() => abort.abort(), left);
+    const startedAt = Date.now();
+    let firstWordAt = 0;
+    const timer = setTimeout(() => abort.abort(), Math.min(left, FIRST_WORD_MS));
     const timedOut = new Promise<"timeout">((resolve) => abort.signal.addEventListener("abort", () => resolve("timeout")));
     let text = "";
     try {
@@ -147,6 +154,11 @@ export async function streamChatWithFallback(opts: {
           if (opts.isCancelled() || abort.signal.aborted) break;
           const t = chunk.text;
           if (t && !abort.signal.aborted) {
+            if (!firstWordAt) {
+              firstWordAt = Date.now();
+              clearTimeout(timer);
+              setTimeout(() => abort.abort(), Math.max(0, deadline - Date.now())).unref?.();
+            }
             text += t;
             opts.onChunk(t);
           }
@@ -155,10 +167,20 @@ export async function streamChatWithFallback(opts: {
       })();
       const outcome = await Promise.race([run, timedOut]);
       if (outcome === "timeout") {
-        console.warn(`[Gemini] ${id(engine)} took too long, answering locally`);
-        return { text: "", engine: null, timedOut: true };
+        if (text.trim()) return { text, engine, timedOut: false }; // ran out of time mid-answer: keep it
+        console.warn(`[Gemini] ${id(engine)} gave no answer in ${Math.round((Date.now() - startedAt) / 1000)} s, trying the next model`);
+        slowStrikes.set(id(engine), (slowStrikes.get(id(engine)) || 0) + 1);
+        if ((slowStrikes.get(id(engine)) || 0) >= 2) {
+          pausedUntil.set(id(engine), Date.now() + 10 * 60_000); // slow twice in a row: skip it for 10 min
+          slowStrikes.delete(id(engine));
+        }
+        continue;
       }
-      if (text.trim()) return { text, engine, timedOut: false };
+      slowStrikes.delete(id(engine));
+      if (text.trim()) {
+        console.log(`[Gemini] answered by ${id(engine)}: first word ${Math.round((firstWordAt - startedAt) / 100) / 10} s, total ${Math.round((Date.now() - startedAt) / 100) / 10} s`);
+        return { text, engine, timedOut: false };
+      }
       // Empty answer (e.g. safety block): try the next engine
     } catch (err: any) {
       const msg = String(err?.message || err);
