@@ -6,27 +6,14 @@
 // counts live in memory only. No IPs or personal data are stored: only the question
 // text (trimmed, capped), its topic and how it was answered.
 import net from "node:net";
+import { normalizeQuestion, cleanQuestion, groupQuestions, cleanList } from "./questionInsights.ts";
+
+export { normalizeQuestion };
 
 export type AnswerKind = "gemini" | "local" | "unanswered" | "out_of_scope" | "family" | "weather" | "greeting";
 
 const PREFIX = "qstats:";
-const MAX_QUESTION_CHARS = 140;
 const MAX_MEMORY_QUESTIONS = 3000;
-
-/** One form per question so «وين المملحة؟» and «وين المملحه» count together. */
-export function normalizeQuestion(text: string): string {
-  return (text || "")
-    .normalize("NFKC")
-    .replace(/[ً-ٰٟـ]/g, "") // tashkeel, tatweel
-    .replace(/[أإآ]/g, "ا")
-    .replace(/ة/g, "ه")
-    .replace(/ى/g, "ي")
-    .replace(/[؟?!.,،؛:"'«»()\[\]]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase()
-    .slice(0, MAX_QUESTION_CHARS);
-}
 
 const today = () => new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 10); // Riyadh date
 
@@ -153,6 +140,34 @@ async function hincr(hash: string, field: string) {
   m.set(field, (m.get(field) || 0) + 1);
 }
 
+const memoryDisplay = new Map<string, string>();
+/** Keep the first plain spelling of a question for display («متى موسم الملح»). */
+async function setDisplay(q: string, original: string) {
+  if (redis) {
+    try {
+      await redis.command(["HSETNX", PREFIX + "display", q, original]);
+      return;
+    } catch {
+      /* memory below */
+    }
+  }
+  if (!memoryDisplay.has(q) && memoryDisplay.size < MAX_MEMORY_QUESTIONS) memoryDisplay.set(q, original);
+}
+
+async function hgetallText(hash: string): Promise<Record<string, string>> {
+  if (redis) {
+    try {
+      const flat = (await redis.command(["HGETALL", PREFIX + hash])) as string[] | null;
+      const out: Record<string, string> = {};
+      for (let i = 0; flat && i < flat.length; i += 2) out[flat[i]] = flat[i + 1];
+      return out;
+    } catch {
+      /* memory below */
+    }
+  }
+  return Object.fromEntries(memoryDisplay);
+}
+
 async function hgetall(hash: string): Promise<Record<string, number>> {
   if (redis) {
     try {
@@ -169,15 +184,19 @@ async function hgetall(hash: string): Promise<Record<string, number>> {
 
 /** Record one visitor question. Never throws and never delays the answer. */
 export function recordQuestion(question: string, kind: AnswerKind, topic?: string | null, lang: "ar" | "en" = "ar") {
-  const q = normalizeQuestion(question);
-  if (!q) return;
+  const q = cleanQuestion(question); // the real question, or "" for greetings / small talk
+  if (!q && !normalizeQuestion(question)) return;
   void Promise.all([
-    hincr("questions", q),
+    q ? hincr("questions", q) : Promise.resolve(),
     hincr("kinds", kind),
-    hincr("topics", topic || "other"),
+    q ? hincr("topics", topic || "other") : Promise.resolve(),
+    // Plain question (no greeting around it): remember how the visitor spelled it
+    q && normalizeQuestion(question) === q
+      ? setDisplay(q, question.trim().replace(/[؟?!.,،]+$/u, "").slice(0, 140))
+      : Promise.resolve(),
     hincr("days", today()),
     hincr("langs", lang),
-    kind === "unanswered" || kind === "out_of_scope" ? hincr(kind, q) : Promise.resolve(),
+    q && (kind === "unanswered" || kind === "out_of_scope") ? hincr(kind, q) : Promise.resolve(),
   ]).catch(() => {});
 }
 
@@ -192,15 +211,22 @@ export async function getQuestionStats(limit = 50) {
     ["questions", "kinds", "topics", "days", "langs", "unanswered", "out_of_scope"].map(hgetall)
   );
   const total = Object.values(kinds).reduce((a, b) => a + b, 0);
+  const display = await hgetallText("display");
+  const insights = groupQuestions(questions, limit, display, outOfScope);
+  const outOfScopeTotal = Object.values(outOfScope).reduce((a, b) => a + b, 0);
   return {
     storage: redis && !warnedRedis ? "keyvalue" : "memory",
     total,
     kinds,
     langs,
-    topQuestions: top(questions, limit),
-    unanswered: top(unanswered, limit),
-    outOfScope: top(outOfScope, limit),
-    topics: top(topics, 30),
+    // Cleaned again on read, so greetings counted before the smart filter disappear too
+    groups: insights.groups,
+    topQuestions: insights.questions,
+    realQuestions: insights.realTotal,
+    chatter: Math.max(0, total - insights.realTotal - outOfScopeTotal),
+    unanswered: cleanList(unanswered, limit, display),
+    outOfScope: cleanList(outOfScope, limit, display),
+    topics: insights.topics.slice(0, 30),
     days: Object.entries(days)
       .sort((a, b) => b[0].localeCompare(a[0]))
       .slice(0, 30)

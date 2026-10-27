@@ -29,6 +29,10 @@ export const STATS_PAGE_HTML = `<!doctype html>
   li { display:flex; align-items:center; gap:10px; padding:7px 0; border-top:1px solid #f6e6e4; }
   li:first-child { border-top:0; }
   li .q { flex:1; min-width:0; overflow-wrap:anywhere; }
+  li.group { display:block; }
+  li.group .row { display:flex; align-items:center; gap:10px; }
+  li.group .ex { margin:4px 0 2px; padding:0; list-style:none; color:var(--muted); font-size:13px; }
+  li.group .ex span { display:inline-block; background:var(--soft); border:1px solid #f6e6e4; border-radius:999px; padding:1px 9px; margin:3px 0 0 4px; }
   li .n { font-variant-numeric:tabular-nums; font-weight:700; color:var(--brand); min-width:2.5em; text-align:left; }
   .bar { height:6px; border-radius:3px; background:var(--brand); opacity:.75; }
   .barwrap { flex:0 0 90px; background:#f6e6e4; border-radius:3px; }
@@ -68,7 +72,7 @@ export const STATS_PAGE_HTML = `<!doctype html>
       <ol id="unanswered"></ol>
     </div>
     <div class="grid">
-      <div class="card"><h2>أكثر الأسئلة</h2><p class="hint">كل الأسئلة مجمّعة بعد توحيد الكتابة</p><ol id="top"></ol></div>
+      <div class="card"><h2>الأسئلة الشائعة</h2><p class="hint">الأسئلة اللي معناها واحد مجمّعة تحت عنوان واحد، وتحتها كيف سألها الناس. السلام والسوالف مستبعدة.</p><ol id="top"></ol></div>
       <div>
         <div class="card"><h2>أكثر المواضيع</h2><ol id="topics"></ol></div>
         <div class="card"><h2>الأسئلة حسب اليوم</h2><ol id="days"></ol></div>
@@ -101,6 +105,27 @@ export const STATS_PAGE_HTML = `<!doctype html>
     });
   }
 
+  function groups(el, rows) {
+    el.innerHTML = "";
+    if (!rows || !rows.length) { el.innerHTML = '<div class="empty">ما فيه شي للحين</div>'; return; }
+    var max = rows[0].count || 1;
+    rows.forEach(function (g) {
+      var li = document.createElement("li"); li.className = "group";
+      var row = document.createElement("div"); row.className = "row";
+      var q = document.createElement("span"); q.className = "q"; q.style.fontWeight = "600"; q.textContent = g.label;
+      var bw = document.createElement("span"); bw.className = "barwrap";
+      var b = document.createElement("div"); b.className = "bar"; b.style.width = Math.max(4, Math.round(100 * g.count / max)) + "%"; bw.appendChild(b);
+      var n = document.createElement("span"); n.className = "n"; n.textContent = fmt(g.count);
+      row.appendChild(q); row.appendChild(bw); row.appendChild(n); li.appendChild(row);
+      if (g.examples && (g.examples.length > 1 || g.examples[0].text !== g.label)) {
+        var ex = document.createElement("div"); ex.className = "ex";
+        g.examples.forEach(function (e) { var s = document.createElement("span"); s.textContent = e.text + " (" + fmt(e.count) + ")"; ex.appendChild(s); });
+        li.appendChild(ex);
+      }
+      el.appendChild(li);
+    });
+  }
+
   function kpi(label, value, cls) { return '<div class="kpi ' + (cls || "") + '"><b>' + fmt(value) + '</b><span>' + label + '</span></div>'; }
 
   function load(key) {
@@ -115,16 +140,17 @@ export const STATS_PAGE_HTML = `<!doctype html>
         }
         store.set(key);
         var d = res.j, k = d.kinds || {};
-        var answered = (k.gemini || 0) + (k.local || 0) + (k.weather || 0);
+        var real = d.realQuestions != null ? d.realQuestions : d.total;
+        var answered = Math.max(0, real - (k.unanswered || 0));
         $("kpis").innerHTML =
-          kpi("كل الأسئلة", d.total) +
+          kpi("أسئلة فعلية", real) +
+          kpi("سلام وسوالف (مستبعدة)", d.chatter || 0) +
           kpi("جاوبها", answered, "ok") +
           kpi("ما لقى لها جواب", k.unanswered || 0, "warn") +
           kpi("خارج التخصص", k.out_of_scope || 0) +
-          kpi("بالذكاء الاصطناعي", k.gemini || 0) +
-          kpi("بالإنجليزي", (d.langs || {}).en || 0);
+          kpi("جاوبها بالذكاء الاصطناعي", k.gemini || 0);
         list($("unanswered"), d.unanswered);
-        list($("top"), d.topQuestions);
+        groups($("top"), d.groups || []);
         list($("topics"), d.topics, function (t) { return TOPIC[t] || t; });
         list($("days"), d.days.map(function (x) { return { text: x.day, count: x.count }; }));
         list($("oos"), d.outOfScope);
