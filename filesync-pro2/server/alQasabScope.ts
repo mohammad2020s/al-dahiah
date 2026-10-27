@@ -148,7 +148,7 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     address: "صْبَخَة القَصَب - إقليم الوشم",
     description: "صْبَخَة طبيعية تمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية.",
     geocodingQuery: "25.27544, 45.4807078",
-    directionsUrl: "https://maps.app.goo.gl/HkziBCjrVqomTmop7",
+    directionsUrl: "https://maps.app.goo.gl/BYu4pZc2gGV15dEG8",
     coordinates: {
       lat: 25.27544,
       lng: 45.4807078,

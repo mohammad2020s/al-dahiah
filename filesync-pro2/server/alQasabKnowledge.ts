@@ -36,7 +36,7 @@ export interface PlaceTopic {
   coordinates?: { lat: number; lng: number };
 }
 
-const MUQHIM_PAN_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=25.260929%2C45.548462";
+const MUQHIM_PAN_MAPS_URL = "https://maps.app.goo.gl/DsMP4ruDfFH2wwZh9";
 
 const SALT_PAN_IMAGES: PlaceImage[] = [
   {
