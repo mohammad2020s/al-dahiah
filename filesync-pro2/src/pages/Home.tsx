@@ -1,4 +1,4 @@
-import React, { FormEvent, KeyboardEvent, Suspense, lazy, useEffect, useRef, useState } from "react";
+import React, { FormEvent, KeyboardEvent, Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import {
   CloudSun,
   Coffee,
@@ -115,13 +115,22 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
   const isCafes = location.type === "cafes" || Boolean(location.places && location.places.length > 0);
   const activeCoordinates = location.coordinates || { lat: 25.2984, lng: 45.5073 };
   const locationTitle = location.name || (language === "en" ? "Al-Qasab Salt Season - Event Grounds" : "موسم ملح القصب - أرض الفعاليات");
+  // Several cafes → one numbered pin per cafe (same order as the list below)
+  const multiPin = isCafes && Array.isArray(location.places) && location.places.length > 1;
+  const mapPoints = useMemo(
+    () =>
+      multiPin
+        ? location.places.map((p: any, i: number) => ({ id: p.id, lat: p.coordinates.lat, lng: p.coordinates.lng, title: p.name, label: String(i + 1) }))
+        : [{ id: "here", lat: activeCoordinates.lat, lng: activeCoordinates.lng, title: locationTitle }],
+    [multiPin, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]
+  );
 
   return (
     <div className="my-4 overflow-hidden rounded-3xl border border-[#f2d4d1] bg-white shadow-lg shadow-gray-200/50 w-full">
       <LeafletMap
         className="h-64 sm:h-72"
-        points={[{ id: "here", lat: activeCoordinates.lat, lng: activeCoordinates.lng, title: locationTitle }]}
-        activeId="here"
+        points={mapPoints}
+        activeId={multiPin ? undefined : "here"}
         zoom={15}
       />
       <div className="flex items-center justify-between gap-2 border-t border-[#f4dedd] px-3 py-2.5">

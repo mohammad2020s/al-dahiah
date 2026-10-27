@@ -78,7 +78,7 @@ export function LeafletMap({
     } else if (points.length === 1) {
       map.setView([points[0].lat, points[0].lng], zoom);
     } else {
-      map.fitBounds(L.latLngBounds(points.map((p) => [p.lat, p.lng] as [number, number])), { padding: [30, 30] });
+      map.fitBounds(L.latLngBounds(points.map((p) => [p.lat, p.lng] as [number, number])), { padding: [30, 30], maxZoom: 17 });
       if (active) map.panTo([active.lat, active.lng]);
     }
   }, [points, activeId, route, zoom, onSelect]);

@@ -111,20 +111,20 @@ export const AL_QASAB_ROUTES: DrivingRouteGuide[] = [
 ];
 
 export const GOOGLE_MAPS_COFFEE_URL =
-  "https://www.google.com/maps/search/coffee/@25.2994467,45.5111576,2237m/data=!3m1!1e3?entry=ttu&g_ep=EgoyMDI2MDkwMS4wIKXMDSoASAFQAw%3D%3D";
+  "https://www.google.com/maps/search/coffee/@25.2994,45.506,800m/data=!3m1!1e3?entry=ttu&g_ep=EgoyMDI2MDkwMS4wIKXMDSoASAFQAw%3D%3D";
 
 export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
   {
     id: "festival",
     name: "مقر موسم ملح القصب (أرض الفعاليات)",
     category: "فعاليات ومواسم",
-    address: "مدينة القصب - أرض الفعاليات التراثية (إحداثيات: 25.298446, 45.507268)",
+    address: "مدينة القصب - أرض الفعاليات التراثية (إحداثيات: 25.298351, 45.507257)",
     description: "مقر احتفالات وفعاليات موسم ملح القصب السنوي والمعارض التراثية والأسواق الشعبية.",
-    geocodingQuery: "25.298445880677342, 45.507267904132114",
+    geocodingQuery: "25.2983509, 45.5072574",
     directionsUrl: "https://maps.app.goo.gl/ANX6a26KTspG5we88",
     coordinates: {
-      lat: 25.298445880677342,
-      lng: 45.507267904132114,
+      lat: 25.2983509,
+      lng: 45.5072574,
     },
   },
   {
@@ -160,11 +160,11 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     category: "تراث وعمارة طينية",
     address: "وسط القصب القديمة",
     description: "مبانٍ طينية نجدية أصيلة، أزقة تاريخية ومجالس تراثية تعكس تاريخ أهل القصب العريق.",
-    geocodingQuery: "25.29880, 45.50650",
+    geocodingQuery: "25.2987325, 45.5050328",
     directionsUrl: "https://maps.app.goo.gl/uadCKcKUxtJ74JwB7",
     coordinates: {
-      lat: 25.2988,
-      lng: 45.5065,
+      lat: 25.2987325,
+      lng: 45.5050328,
     },
   },
   {
@@ -173,11 +173,11 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     category: "قصور وقلاع تاريخية",
     address: "القصب القديمة",
     description: "أحد أبرز القصور التاريخية والمعالم الشامخة في القصب الدالة على كرم وريادة أهلها.",
-    geocodingQuery: "25.29870, 45.50790",
+    geocodingQuery: "25.298999, 45.5072916",
     directionsUrl: "https://maps.app.goo.gl/LG8vwuh1cFSnZYAC7",
     coordinates: {
-      lat: 25.2987,
-      lng: 45.5079,
+      lat: 25.298999,
+      lng: 45.5072916,
     },
   },
   {
@@ -200,11 +200,11 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     category: "ضيافة ومقاهٍ",
     address: "نطاق القرية التراثية بالقصب",
     description: "أبرز مقاهي القصب: قهوة بدور إبراهيم (4.9 نجوم)، شاهي ناقع (4.7 نجوم)، آرت كافيه (4.8 نجوم)، ديوانية المنيع (4.8 نجوم).",
-    geocodingQuery: "coffee near Al Qasab 25.2994467, 45.5111576",
+    geocodingQuery: "coffee near Al Qasab 25.2994, 45.5060",
     directionsUrl: GOOGLE_MAPS_COFFEE_URL,
     coordinates: {
-      lat: 25.2994467,
-      lng: 45.5111576,
+      lat: 25.2994,
+      lng: 45.506,
     },
   },
 ];
@@ -328,11 +328,11 @@ export const AL_MARQAB_LOCATION = {
 export const CAFES_LOCATION = {
   name: "مقاهي وديوانيات القصب التراثية",
   address: "مدينة القصب - منطقة القرية التراثية",
-  geocodingQuery: "coffee near Al Qasab 25.2994467, 45.5111576",
+  geocodingQuery: "coffee near Al Qasab 25.2994, 45.5060",
   directionsUrl: GOOGLE_MAPS_COFFEE_URL,
   coordinates: {
-    lat: 25.2994467,
-    lng: 45.5111576,
+    lat: 25.2994,
+    lng: 45.506,
   },
   type: "cafes" as const,
   places: AL_QASAB_CAFES,
