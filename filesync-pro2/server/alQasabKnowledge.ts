@@ -61,8 +61,8 @@ const SALT_PAN_IMAGES: PlaceImage[] = [
   },
   {
     src: "/images/places/sabkha-pink-lake.jpg",
-    captionAr: "ماء شديد الملوحة بلون وردي في الصْبَخَة",
-    captionEn: "Pink, highly saline brine in Al-Sabkha",
+    captionAr: "ماء شديد الملوحة بلون وردي في أحواض الملح",
+    captionEn: "Pink, highly saline brine in the salt basins",
   },
 ];
 
@@ -81,27 +81,31 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     coordinates: { lat: 25.260929, lng: 45.548462 },
   },
   {
-    id: "salt_pans",
-    titleAr: "مَمَالح القَصَب (الجِفار)",
-    titleEn: "Al-Qasab salt pans (Al-Jifar)",
-    keywords: ["مملحه", "ممالح", "المملحه", "الممالح", "جفار", "الجفاره", "ملاحات", "salt pan", "saltworks", "salt flat"],
-    answerAr:
-      "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلحة متجاورة في أرض الصْبَخَة، تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت صْبَخَة ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. ومن مَمَالحها المعروفة مَمْلحة المقحم النموذجية (أبو سهيل). وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من القصب، تعال شوفها بعينك!",
-    answerEn:
-      "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans in the salt flat, about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into a salt flat, and salt has been harvested here for around three centuries, first by hand, today with modern purification and packing. The site now welcomes visitors with wooden walkways and reed shades.",
-    images: [...SALT_PAN_IMAGES, MUQHIM_IMAGES[0], MUQHIM_IMAGES[2], MUQHIM_IMAGES[4]],
-    mapsUrl: MUQHIM_PAN_MAPS_URL,
-  },
-  {
     id: "sabkha",
     titleAr: "صْبَخَة القَصَب",
     titleEn: "Al-Sabkha",
     keywords: ["سبخه", "صبخه", "السبخه", "الصبخه", "sabkha"],
     answerAr:
-      "الصْبَخَة أرض ملحية واسعة جنوب القَصَب، وفيها المَمَالح. ماؤها شديد الملوحة، وأحياناً يصير لونه وردي من كائنات دقيقة تعيش في الماء المالح، وحولها قشرة ملح بيضاء تلمع. وفي ليالي الصيف تكون أبرد من اللي حولها بخمس إلى عشر درجات، جوها يونّس!",
+      "صْبَخَة القَصَب مكان مستقل وغير عن مَمْلحة القَصَب (الجِفار)، لا تخلط بينهم! أرض سبخية مفتوحة جنوب البلد بحوالي ٣ كيلو، أرضها حصى وتراب مستوي على مد النظر، يطلع لها أهل القَصَب والزوار في الليل يفرشون ويتقهوون ويكشتون، وتشوف أنوار البلد بعيد على الأفق. وفي ليالي الصيف تكون أبرد من اللي حولها بخمس إلى عشر درجات، جوها يونّس!",
     answerEn:
-      "Al-Sabkha is the wide salt flat south of Al-Qasab where the salt pans lie. Its brine is very salty, sometimes pink from salt-loving microorganisms, edged with sparkling white crust, and on summer nights it is 5–10°C cooler than its surroundings.",
-    images: [SALT_PAN_IMAGES[4], SALT_PAN_IMAGES[3], SALT_PAN_IMAGES[1]],
+      "Al-Sabkha is a separate place from the Al-Qasab salt pans (Al-Jifar), so never mix them up. It is an open flat plain about 3 km south of town, gravel and packed earth as far as the eye can see, where locals and visitors spread a rug at night for coffee and stargazing with the town lights on the horizon. On summer nights it is 5–10°C cooler than its surroundings.",
+    images: [
+      { src: "/images/places/sabkha-night.jpg", captionAr: "جلسة ليلية على أرض الصْبَخَة وأنوار القَصَب في الأفق", captionEn: "A night rug on Al-Sabkha with Al-Qasab's lights on the horizon", credit: GM },
+    ],
+    mapsUrl: "https://maps.app.goo.gl/BYu4pZc2gGV15dEG8",
+    coordinates: { lat: 25.2664295, lng: 45.5109836 },
+  },
+  {
+    id: "salt_pans",
+    titleAr: "مَمَالح القَصَب (الجِفار)",
+    titleEn: "Al-Qasab salt pans (Al-Jifar)",
+    keywords: ["مملحه", "ممالح", "المملحه", "الممالح", "جفار", "الجفاره", "ملاحات", "salt pan", "saltworks", "salt flat"],
+    answerAr:
+      "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلحة متجاورة تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت صْبَخَة ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. ومن مَمَالحها المعروفة مَمْلحة المقحم النموذجية (أبو سهيل). وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من القصب، تعال شوفها بعينك!",
+    answerEn:
+      "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into a salt flat, and salt has been harvested here for around three centuries, first by hand, today with modern purification and packing. The site now welcomes visitors with wooden walkways and reed shades.",
+    images: [...SALT_PAN_IMAGES, MUQHIM_IMAGES[0], MUQHIM_IMAGES[2], MUQHIM_IMAGES[4]],
+    mapsUrl: MUQHIM_PAN_MAPS_URL,
   },
   {
     id: "zahim_palace",

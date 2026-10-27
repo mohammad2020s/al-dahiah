@@ -6,7 +6,8 @@ import type { Language } from "../i18n";
 import { LeafletMap, directionsUrl, type MapPoint } from "./LeafletMap";
 
 // A half-day route through Al-Qasab, ordered for the light: salt pans in the
-// soft morning, the old town midday, the watchtower at sunset, coffee after.
+// soft morning, the old town midday, the watchtower at sunset, coffee after,
+// then a night out on Al-Sabkha (a separate place from the salt pans).
 type Stop = {
   landmarkId: string;
   timeAr: string;
@@ -30,17 +31,6 @@ const STOPS: Stop[] = [
     tipEn: "Walk the wooden paths between the salt basins while the light is soft.",
     askAr: "علمني عن ممالح القصب",
     askEn: "Tell me about the Al-Qasab salt pans",
-  },
-  {
-    landmarkId: "sabkha",
-    timeAr: "الضحى",
-    timeEn: "Mid-morning",
-    titleAr: "الصْبَخَة",
-    titleEn: "Al-Sabkha salt flat",
-    tipAr: "شوف قشرة الملح البيضاء والماء الوردي، وانتبه لا تدخل على الطين الرطب.",
-    tipEn: "See the white salt crust and pink brine; stay off the soft wet ground.",
-    askAr: "وش قصة الصبخة؟",
-    askEn: "What is Al-Sabkha?",
   },
   {
     landmarkId: "ibn_zahim_palace",
@@ -85,6 +75,17 @@ const STOPS: Stop[] = [
     tipEn: "End the day with Saudi coffee and dates at Bdor Ibrahim.",
     askAr: "وش أفضل المقاهي في القصب؟",
     askEn: "What are the best cafes in Al-Qasab?",
+  },
+  {
+    landmarkId: "sabkha",
+    timeAr: "الليل",
+    timeEn: "Night",
+    titleAr: "الصْبَخَة",
+    titleEn: "Al-Sabkha",
+    tipAr: "اختم ليلتك بفرشة وقهوة على أرض الصْبَخَة، جوها أبرد بالصيف وأنوار البلد على الأفق.",
+    tipEn: "End the night on a rug with coffee on the open plain; cooler in summer, town lights on the horizon.",
+    askAr: "وش قصة الصبخة؟",
+    askEn: "What is Al-Sabkha?",
   },
 ];
 

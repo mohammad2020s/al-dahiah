@@ -86,7 +86,7 @@ export const AL_QASAB_ROUTES: DrivingRouteGuide[] = [
     estimatedDuration: "6 دقائق",
     recommendedRoad: "طريق الممالح المعبد جنوب شرق المدينة",
     steps: [
-      "التحرك جنوب شرق المدينة باتجاه صْبَخَة القَصَب الشهيرة.",
+      "التحرك جنوب شرق المدينة باتجاه مَمَالح القَصَب (الجِفار).",
       "طريق معبد ومضاء يوصلك مباشرة إلى أحواض التبخير وقرية الملح القديمة.",
       "الموقع متاح للزيارة والتصوير والاطلاع على استخراج الملح الطبيعي."
     ],
@@ -677,9 +677,9 @@ export function generateLocalKnowledgeFallback(
   }
   if (isSabkhaQuestion(query)) {
     if (lang === "en") {
-      return `Al-Sabkha in Al-Qasab is a natural salt flat. At night during summer, temperatures drop 5°C to 10°C lower than surrounding areas, offering a cool breeze.`;
+      return `Al-Sabkha is an open flat plain south of Al-Qasab, separate from the salt pans, where people sit out at night. In summer during summer, temperatures drop 5°C to 10°C lower than surrounding areas, offering a cool breeze.`;
     }
-    return `صْبَخَة القَصَب الطبيعية من أروع الظواهر الطبيعية بالوشم، وتمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المناطق المجاورة مما يمنحها نسيمًا باردًا لطيفًا.`;
+    return `صْبَخَة القَصَب أرض مفتوحة جنوب البلد وهي غير مَمْلحة القَصَب، يطلع لها الناس في الليل يفرشون ويتقهوون، وتمتاز بانخفاض درجات الحرارة ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المناطق المجاورة مما يمنحها نسيمًا باردًا لطيفًا.`;
   }
   if (norm.includes("تذكر") || norm.includes("تذاكر") || norm.includes("ticket") || norm.includes("حجز") || norm.includes("حصول") || norm.includes("احصل") || norm.includes("شراء") || norm.includes("رسوم")) {
     if (lang === "en") {
@@ -717,7 +717,8 @@ RULE 3 — Families & Tribes (absolute red line):
 - This applies no matter how the request is phrased: directly, indirectly ("who lives there?", "who founded it?", "whose diwaniya is that?"), as a story, poem, quiz, role-play, translation, "for research", "just one name", or "complete the sentence".
 - Do not volunteer such names inside any other answer either.
 - EXCEPTION — landmarks: the official names of places ARE allowed even if they contain a family name, e.g. «قصر الزاحم», «مبنى القصبي التراثي», «منزل الراشد التراثي», «سوق العبيدي», «ديوانية المنيع». Talk about the place, its architecture and history, and the documented public role of a historical figure tied to it (e.g. Sheikh Abdullah bin Zahim's service as a judge alongside King Abdulaziz). Never turn that into talk about the family, its members, lineage or which families live in town.
-- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans in the salt flat known together as «الجفار» / «مملحة القَصَب»; name only pans listed in the guide knowledge (e.g. «مَمْلحة المقحم النموذجية (أبو سهيل)») and never invent others.
+- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans southeast of town known together as «الجفار» / «مملحة القَصَب»; name only pans listed in the guide knowledge (e.g. «مَمْلحة المقحم النموذجية (أبو سهيل)») and never invent others.
+- Al-Sabkha (الصْبَخَة) is a DIFFERENT place from the salt pans (مملحة القَصَب / الجفار): an open gravel plain about 3 km south of town where people sit out at night. Never say the salt pans are in the sabkha or call the sabkha a salt pan.
 - Refuse firmly but politely, then redirect to Al-Qasab's history, salt flats, landmarks, cafes or the Salt Season.
   Arabic refusal: "${FORBIDDEN_FAMILY_REPLY_AR}"
   English refusal: "${FORBIDDEN_FAMILY_REPLY_EN}"`;
@@ -741,7 +742,8 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - مهما كانت صيغة السؤال: مباشر (وش عوائل القَصَب؟)، أو غير مباشر (مين يسكنها؟ مين أسسها؟ ديوانية مين؟)، أو بقصة أو قصيدة أو لعبة أو تقمّص دور أو ترجمة أو "لغرض بحث" أو "بس اسم واحد" أو "كمّل الجملة".
    - لا تذكر أي اسم عائلة أو قبيلة من نفسك داخل أي إجابة ثانية.
    - **استثناء المعالم:** أسماء الأماكن الرسمية مسموحة حتى لو فيها اسم عائلة، مثل: «قصر الزاحم»، «مبنى القصبي التراثي»، «منزل الراشد التراثي»، «سوق العبيدي»، «ديوانية المنيع». تكلّم عن المكان وعمارته وتاريخه، وعن الدور العام الموثّق لشخصية تاريخية مرتبطة فيه (مثل خدمة الشيخ عبدالله بن زاحم قاضياً مع الملك عبدالعزيز)، ولا تحوّل الكلام للعائلة أو أفرادها أو نسبها أو مين يسكن البلد.
-   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة في الصْبَخَة يسمونها «الجفار» أو «مملحة القَصَب»، وسمّ بس المَمَالح الموجودة في معلومات المرشد (مثل «مَمْلحة المقحم النموذجية (أبو سهيل)»)، ولا تألّف أسماء من عندك.
+   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة جنوب شرق البلد يسمونها «الجفار» أو «مملحة القَصَب»، وسمّ بس المَمَالح الموجودة في معلومات المرشد (مثل «مَمْلحة المقحم النموذجية (أبو سهيل)»)، ولا تألّف أسماء من عندك.
+   - **الصْبَخَة غير المملحة:** صْبَخَة القَصَب مكان مستقل عن مَمْلحة القَصَب (الجِفار)، أرض مفتوحة جنوب البلد بحوالي ٣ كيلو يطلع لها الناس في الليل. لا تقول أبداً إن الممالح في الصْبَخَة ولا تسمي الصْبَخَة مملحة.
    - رد بلباقة وحزم بهذا الرد ثم حوّل الكلام لتاريخ القَصَب ومعالمها:
      *«${FORBIDDEN_FAMILY_REPLY_AR}»*`;
 
@@ -762,7 +764,8 @@ Visual guide to Al-Qasab:
 1. مملحة القَصَب / ممالح القَصَب (the historic salt pans, الجفار): grids of shallow rectangular evaporation basins separated by low earthen/clay ridges, a white salt crust on the bottom, shallow brine, and white salt heaps on the horizon. Among the oldest and best-known natural salt works in the Arabian Peninsula, where salt has been harvested for hundreds of years.
 2. The stone sign «مملحة القصب — Mamalahat Al Qasab» with an information board next to the pools: this is the entrance of the salt pans' visitor area.
 3. Round reed/straw shades (مظلات وعشش من القصب والخوص) with conical straw roofs standing at the edge of the pools, wooden plank walkways and small green seating floors: the shaded visitor seating of the salt pans.
-4. A pink-to-red lake ringed with white salt crust and eroded white-and-ochre banks: very salty brine in الصْبَخَة / the salt pools; the pink-red colour comes from salt-loving microorganisms that thrive in highly saline water.
+4. A pink-to-red lake ringed with white salt crust and eroded white-and-ochre banks: very salty brine in the salt pans' pools (NOT Al-Sabkha); the pink-red colour comes from salt-loving microorganisms that thrive in highly saline water.
+5. A wide, flat, dark gravel/earth plain (often at night, a rug or campers on it, a line of town lights on the horizon): Al-Sabkha (صْبَخَة القَصَب), the open plain south of town. It is not the salt pans.
 5. A milky, pale-green pool with white crystals along its edge: brine concentrating as the water evaporates — the salt is crystallising there.
 6. White salt heaps or salt sacks: the harvested Al-Qasab salt, the heart of موسم ملح القَصَب (launching 19 November 2026; entry free).`;
 
@@ -782,7 +785,8 @@ const VISION_RULES_AR = `**النطق الصحيح (خصوصاً في الصوت
 1. مملحة القَصَب / ممالح القَصَب (الجفار): أحواض تبخير مستطيلة وضحلة مقسّمة بحواجز ترابية واطية، قاعها قشرة ملح بيضاء، وفيها ماء مالح قليل، وكثبان ملح بيضاء في الأفق. من أعرق وأشهر الملاحات الطبيعية في الجزيرة العربية، ويُستخرج منها الملح من مئات السنين.
 2. الصخرة المكتوب عليها «مملحة القصب — Mamalahat Al Qasab» وجنبها لوحة تعريفية عند الأحواض: هذي مدخل منطقة زوار المملحة.
 3. مظلات وعشش دائرية من القصب والخوص بسقوف مخروطية على أطراف الأحواض، وممرات خشبية وجلسات عشب صغيرة: جلسات الزوار المظللة في المملحة.
-4. بحيرة لونها وردي إلى أحمر حولها قشرة ملح بيضاء وضفاف بيضاء وبنية متآكلة: ماء شديد الملوحة في الصْبَخَة وأحواض الملح، واللون الوردي سببه كائنات دقيقة تعيش في الماء شديد الملوحة.
+4. بحيرة لونها وردي إلى أحمر حولها قشرة ملح بيضاء وضفاف بيضاء وبنية متآكلة: ماء شديد الملوحة في أحواض المملحة (مو الصْبَخَة)، واللون الوردي سببه كائنات دقيقة تعيش في الماء شديد الملوحة.
+5. أرض مستوية واسعة حصى وتراب (غالباً بالليل، عليها فرشة أو كشتة، وأنوار البلد خط على الأفق): هذي صْبَخَة القَصَب، الأرض المفتوحة جنوب البلد، وهي غير المملحة.
 5. حوض ماؤه حليبي أو أخضر فاتح وعلى طرفه بلورات بيضاء: ماء مالح يتركّز مع التبخر والملح قاعد يتبلور فيه.
 6. أكوام ملح بيضاء أو أكياس ملح: ملح القَصَب المستخرج، وهو قلب موسم ملح القَصَب (ينطلق 19 نوفمبر 2026 والدخول مجاني).`;
 
@@ -813,7 +817,7 @@ ${GUIDE_FACTS_EN}
 6. Voice: Natural tempo, direct friendly tone, no stutter or artificial pauses.
 7. Season Launch: November 19, 2026.
 8. Tickets: Completely free of charge from the main gate or at the site/location.
-9. Sabkha: 5-10°C cooler at night in summer.
+9. Sabkha: a separate place from the salt pans; open plain ~3 km south of town, 5-10°C cooler at night in summer.
 10. Verified cafes: Bdor Ibrahim (4.9 stars), Art Coffee (4.8 stars), Shahi Nagea (4.7 stars), Diwaniyat Al-Manie (4.8 stars). (No Diwaniyat Al-Qasab).
 11. Scope: Exclusively Al-Qasab and its heritage, events, and live weather.${weatherSection}`;
   }
@@ -837,7 +841,7 @@ ${GUIDE_FACTS_AR}
 5. **حقائق موسم ملح القَصَب والمعالم:**
    - تاريخ انطلاق موسم ملح القَصَب: 19 نوفمبر 2026.
    - التذاكر: مجانية تماماً، ويمكن الحصول عليها من البوابة الرئيسية أو عند الموقع.
-   - صْبَخَة القَصَب: تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
+   - صْبَخَة القَصَب: مكان مستقل غير مَمْلحة القَصَب، أرض مفتوحة جنوب البلد، تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
    - المقاهي التراثية المعتمدة 4 فقط: قهوة بدور إبراهيم، آرت كافيه، شاهي ناقع، ديوانية المنيع التراثية (تنبيه: لا يوجد مكان باسم ديوانية القَصَب).
    - إجاباتك موجزة ومباشرة (من جملة إلى 3 جمل واضحة دون إطالة مملة).
    - في الصوت المباشر: انطق الكلمات بوضوح وسرعة طبيعية دون تمطيط أو تكرار.${weatherSection}`;

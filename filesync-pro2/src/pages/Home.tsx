@@ -122,7 +122,7 @@ const ALL_MAP_POINTS: MapPoint[] = [
     title: l.name,
     kind: l.id === "salt_flat" || l.id === "sabkha" ? ("nature" as const) : undefined,
   })),
-  ...PLACE_TOPICS.filter((t) => t.coordinates).map((t) => ({
+  ...PLACE_TOPICS.filter((t) => t.coordinates && !AL_QASAB_LANDMARKS.some((l) => l.id === t.id)).map((t) => ({
     id: t.id,
     lat: t.coordinates!.lat,
     lng: t.coordinates!.lng,
