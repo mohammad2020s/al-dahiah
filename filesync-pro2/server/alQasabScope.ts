@@ -121,8 +121,7 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     address: "مدينة القصب - أرض الفعاليات التراثية (إحداثيات: 25.298446, 45.507268)",
     description: "مقر احتفالات وفعاليات موسم ملح القصب السنوي والمعارض التراثية والأسواق الشعبية.",
     geocodingQuery: "25.298445880677342, 45.507267904132114",
-    directionsUrl:
-      "https://www.google.com/maps/dir/?api=1&destination=25.298445880677342,45.507267904132114",
+    directionsUrl: "https://maps.app.goo.gl/ANX6a26KTspG5we88",
     coordinates: {
       lat: 25.298445880677342,
       lng: 45.507267904132114,
@@ -162,8 +161,7 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     address: "وسط القصب القديمة",
     description: "مبانٍ طينية نجدية أصيلة، أزقة تاريخية ومجالس تراثية تعكس تاريخ أهل القصب العريق.",
     geocodingQuery: "25.29880, 45.50650",
-    directionsUrl:
-      "https://www.google.com/maps/dir/?api=1&destination=25.29880,45.50650",
+    directionsUrl: "https://maps.app.goo.gl/uadCKcKUxtJ74JwB7",
     coordinates: {
       lat: 25.2988,
       lng: 45.5065,
@@ -176,8 +174,7 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     address: "القصب القديمة",
     description: "أحد أبرز القصور التاريخية والمعالم الشامخة في القصب الدالة على كرم وريادة أهلها.",
     geocodingQuery: "25.29870, 45.50790",
-    directionsUrl:
-      "https://www.google.com/maps/dir/?api=1&destination=25.29870,45.50790",
+    directionsUrl: "https://maps.app.goo.gl/LG8vwuh1cFSnZYAC7",
     coordinates: {
       lat: 25.2987,
       lng: 45.5079,
@@ -240,7 +237,7 @@ export const AL_QASAB_CAFES: CafePlace[] = [
       lat: 25.2991008,
       lng: 45.5061342,
     },
-    directionsUrl: "https://maps.app.goo.gl/KxaK5XDUQ48qpFgJ7",
+    directionsUrl: "https://maps.app.goo.gl/DahvMKeDTudeTqiYA",
   },
   {
     id: "art_coffee",
@@ -254,7 +251,7 @@ export const AL_QASAB_CAFES: CafePlace[] = [
       lat: 25.2997841,
       lng: 45.5051558,
     },
-    directionsUrl: "https://maps.app.goo.gl/ywM6qBuz57z79RHFA",
+    directionsUrl: "https://maps.app.goo.gl/FZm1u1UGwCNRYoDy5",
   },
   {
     id: "shahi_nagea",
@@ -268,7 +265,7 @@ export const AL_QASAB_CAFES: CafePlace[] = [
       lat: 25.2992775,
       lng: 45.5061188,
     },
-    directionsUrl: "https://maps.app.goo.gl/uPAzmcUFzPSpYuHp9",
+    directionsUrl: "https://maps.app.goo.gl/E85ebv9hs9tWwrks6",
   },
   {
     id: "diwaniyat_al_manie",
