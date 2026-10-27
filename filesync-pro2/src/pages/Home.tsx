@@ -780,13 +780,15 @@ export default function Home() {
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder={t.defaultPlaceholder}
+                    aria-label={t.defaultPlaceholder}
                     rows={1}
                     disabled={isStreaming}
-                    className="flex-1 resize-none border-0 bg-transparent px-2 py-3 text-sm focus:outline-none"
+                    className="flex-1 resize-none border-0 bg-transparent px-2 py-3 text-base sm:text-sm focus:outline-none"
                   />
 
                   <button
                     type="submit"
+                    aria-label={language === "en" ? "Send" : "إرسال"}
                     disabled={!input.trim() || isStreaming}
                     className="size-11 shrink-0 rounded-2xl bg-[#b82e24] text-white flex items-center justify-center hover:bg-[#992017] transition disabled:opacity-50"
                   >
