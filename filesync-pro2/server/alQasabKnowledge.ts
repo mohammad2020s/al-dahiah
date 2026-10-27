@@ -12,9 +12,9 @@ export interface PlaceImage {
 }
 
 const GM = "google_maps_visitors" as const;
-// Photos of مَمْلحة المقحم (أبو سهيل), cropped from visitors' photos on its Google Maps page
+// Photos of مَمْلحة المقحم النموذجية (أبو سهيل), cropped from visitors' photos on its Google Maps page
 const MUQHIM_IMAGES: PlaceImage[] = [
-  { src: "/images/places/muqhim-sign.jpg", captionAr: "لوحة مَمْلحة المقحم عند المدخل", captionEn: "Al-Muqhim salt pan sign at the entrance", credit: GM },
+  { src: "/images/places/muqhim-sign.jpg", captionAr: "لوحة مَمْلحة المقحم النموذجية عند المدخل", captionEn: "Al-Muqhim Model Salt Pan sign at the entrance", credit: GM },
   { src: "/images/places/muqhim-night-green.jpg", captionAr: "الأحواض في الليل بالإنارة الخضراء", captionEn: "The basins at night under green lights", credit: GM },
   { src: "/images/places/muqhim-reed-shades.jpg", captionAr: "مظلات الخوص فوق ماء الأحواض", captionEn: "Reed shades over the brine pools", credit: GM },
   { src: "/images/places/muqhim-night-pools.jpg", captionAr: "انعكاس الأنوار على الماء ليلاً", captionEn: "Lights reflected on the water at night", credit: GM },
@@ -73,13 +73,13 @@ const SALT_PAN_IMAGES: PlaceImage[] = [
 export const PLACE_TOPICS: PlaceTopic[] = [
   {
     id: "muqhim_pan",
-    titleAr: "مَمْلحة المقحم (أبو سهيل)",
-    titleEn: "Al-Muqhim salt pan (Abu Suhail)",
+    titleAr: "مَمْلحة المقحم النموذجية (أبو سهيل)",
+    titleEn: "Al-Muqhim Model Salt Pan (Abu Suhail)",
     keywords: ["المقحم", "مقحم", "ابوسهيل", "ابو سهيل"],
     answerAr:
-      "مَمْلحة المقحم (أبو سهيل) من مَمَالح القَصَب في الجِفار جنوب شرق البلد، فيها أحواض الملح المستطيلة اللي يتبخر فيها الماء ويبقى الملح الأبيض. تقدر تشوف صورها وموقعها على خرائط Google، وإذا جيتها تعال الصبح بدري والشمس هادية.",
+      "مَمْلحة المقحم النموذجية (أبو سهيل) من مَمَالح القَصَب في الجِفار جنوب شرق البلد، فيها أحواض الملح المستطيلة اللي يتبخر فيها الماء ويبقى الملح الأبيض. تقدر تشوف صورها وموقعها على خرائط Google، وإذا جيتها تعال الصبح بدري والشمس هادية.",
     answerEn:
-      "Al-Muqhim salt pan (Abu Suhail) is one of the Al-Qasab salt pans in Al-Jifar, southeast of town, with rectangular basins where the water evaporates and leaves white salt. Its photos and location are on Google Maps; come early in the morning for the best light.",
+      "Al-Muqhim Model Salt Pan (Abu Suhail) is one of the Al-Qasab salt pans in Al-Jifar, southeast of town, with rectangular basins where the water evaporates and leaves white salt. Its photos and location are on Google Maps; come early in the morning for the best light.",
     images: MUQHIM_IMAGES,
     mapsUrl: MUQHIM_PAN_MAPS_URL,
     coordinates: { lat: 25.260929, lng: 45.548462 },
@@ -90,7 +90,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Al-Qasab salt pans (Al-Jifar)",
     keywords: ["مملحه", "ممالح", "المملحه", "الممالح", "جفار", "الجفاره", "ملاحات", "salt pan", "saltworks", "salt flat"],
     answerAr:
-      "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلحة متجاورة في أرض الصْبَخَة، تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت صْبَخَة ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. ومن مَمَالحها المعروفة مَمْلحة المقحم (أبو سهيل). وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من القصب، تعال شوفها بعينك!",
+      "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلحة متجاورة في أرض الصْبَخَة، تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت صْبَخَة ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. ومن مَمَالحها المعروفة مَمْلحة المقحم النموذجية (أبو سهيل). وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من القصب، تعال شوفها بعينك!",
     answerEn:
       "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans in the salt flat, about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into a salt flat, and salt has been harvested here for around three centuries, first by hand, today with modern purification and packing. The site now welcomes visitors with wooden walkways and reed shades.",
     images: [...SALT_PAN_IMAGES, MUQHIM_IMAGES[1], MUQHIM_IMAGES[2], MUQHIM_IMAGES[5]],
@@ -149,13 +149,13 @@ export const PLACE_TOPICS: PlaceTopic[] = [
   },
   {
     id: "old_town",
-    titleAr: "البلدة القديمة وسور العقدة",
-    titleEn: "The old town and Al-Aqda wall",
-    keywords: ["البلده القديمه", "الديره القديمه", "السور", "العقده", "بوابات", "الطين", "طينيه"],
+    titleAr: "البلدة القديمة",
+    titleEn: "The old town",
+    keywords: ["البلده القديمه", "الديره القديمه", "السور", "بوابات", "الطين", "طينيه"],
     answerAr:
-      "البلدة القديمة في القَصَب كلها بيوت طين نجدية وأزقة، وكان يحيط فيها سور اسمه «العقدة»، انهدمت أجزاء منه وانرممت آثار باقية. وفيها سوق العبيدي وقصر الزاحم ومنزل الراشد ومبنى القصبي، مشوار يومك كله تراث!",
+      "البلدة القديمة في القَصَب كلها بيوت طين نجدية وأزقة. وفيها سوق العبيدي وقصر الزاحم ومنزل الراشد ومبنى القصبي، مشوار يومك كله تراث!",
     answerEn:
-      "Al-Qasab's old town is a maze of Najdi mud-brick houses and lanes, once enclosed by a wall called «Al-Aqda», parts of which survive restored. Souq Al-Obaidi, Al-Zahim Palace, the Al-Rashid house and the Al-Qusaibi building are all here.",
+      "Al-Qasab's old town is a maze of Najdi mud-brick houses and lanes. Souq Al-Obaidi, Al-Zahim Palace, the Al-Rashid house and the Al-Qusaibi building are all here.",
   },
   {
     id: "marqab",
@@ -193,7 +193,7 @@ const normalize = (value: string) =>
   (value || "")
     .normalize("NFKC")
     .toLowerCase()
-    .replace(/[ً-ٰٟ]/g, "")
+    .replace(/[ً-ٰٟ]/g, "")
     .replace(/[أإآ]/g, "ا")
     .replace(/ة/g, "ه")
     .replace(/ى/g, "ي")

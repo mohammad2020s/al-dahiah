@@ -386,7 +386,7 @@ export const DIWANIYAT_AL_MANIE_LOCATION = {
 export function cleanText(text: string): string {
   if (!text) return "";
   let s = text;
-  s = s.replace(/(?:[\u064B-\u065F\u0670\s]+){2,}/gu, " ");
+  s = s.replace(/(?:[ً-ٰٟ\s]+){2,}/gu, " ");
   s = s.replace(/(يا\s*هلا)(?:\s+\1)+/gu, "$1");
   s = s.replace(/(مرحباً|مرحبا)(?:\s+\1)+/gu, "$1");
   s = s.replace(/([\p{L}\p{M}\w]+)(?:\s+\1)+(?=[\s\p{P}]|$)/gu, "$1");
@@ -433,9 +433,8 @@ export function normalizeCityName(text: string): string {
 // النطق النجدي: «الصْبَخَة» بالصاد الساكنة، لا «السبخة» بالسين
 export function normalizeSabkha(text: string): string {
   if (!text) return "";
-  // Whole word, any spelling/diacritics: السبخة، الصبخة، سبخه… → «الصْبَخَة» (the owner's pronunciation)
   return text.replace(
-    /(^|[\s\p{P}]|ال|[وفبلك]ال|لل)[سص][\u064B-\u065F\u0670]*ب[\u064B-\u065F\u0670]*خ[\u064B-\u065F\u0670]*[ةه](?![\p{L}])/gu,
+    /(^|[\s\p{P}]|ال|[وفبلك]ال|لل)[سص][ً-ٰٟ]*ب[ً-ٰٟ]*خ[ً-ٰٟ]*[ةه](?![\p{L}])/gu,
     "$1صْبَخَة"
   );
 }
@@ -467,7 +466,7 @@ const normalizeArabic = (value: string) =>
   value
     .normalize("NFKC")
     .toLowerCase()
-    .replace(/[\u064B-\u065F\u0670]/g, "")
+    .replace(/[ً-ٰٟ]/g, "")
     .replace(/[أإآ]/g, "ا")
     .replace(/ة/g, "ه")
     .replace(/ى/g, "ي")
@@ -564,7 +563,6 @@ export function isWeatherQuestion(message: string): boolean {
   const normalized = normalizeArabic(message);
   const weatherPhrases = ["درجة الحرارة", "درجات الحرارة", "weather", "temperature"];
   if (weatherPhrases.some(s => normalized.includes(normalizeArabic(s)))) return true;
-  // Short words must match whole words: as substrings "جو" hid inside «الموجودة» and "حر" inside «البحر»
   const weatherWords = [
     "طقس", "جو", "حراره", "برد", "براد", "حر", "مطر", "امطار", "رياح", "رطوبه", "غبار", "غيوم", "اجواء",
   ];
@@ -651,7 +649,6 @@ export function generateLocalKnowledgeFallback(
 ): string {
   const norm = (query || "").toLowerCase();
 
-  // الخط الأحمر: حظر ذكر العوائل والقبائل نهائياً
   if (isFamilyOrTribalQuestion(query)) {
     if (lang === "en") {
       return FORBIDDEN_FAMILY_REPLY_EN;
@@ -665,12 +662,11 @@ export function generateLocalKnowledgeFallback(
     }
     return `الطقس المباشر في مدينة القَصَب:\n${weatherSummary || "أجواء معتدلة وصافية فوق مدينة القَصَب وتوابعها"}.`;
   }
-  // Tickets keep their own short answer; everything about a known place comes from the guide knowledge
   const isTicketQuestion = ["تذكر", "تذاكر", "ticket", "حجز", "رسوم"].some(k => norm.includes(k));
   const place = isTicketQuestion ? null : matchPlaceTopic(query);
   if (place?.id === "season" && (isLocationQuestion(query) || isDirectionsQuestion(query))) {
     return lang === "en"
-      ? "The Al-Qasab Salt Season is held at the event grounds in Al-Qasab. The map below shows the spot; tap “Take me there” for directions."
+      ? "The Al-Qasab Salt Season is held at the event grounds in Al-Qasab. The map below shows the spot; tap \"Take me there\" for directions."
       : "موسم ملح القَصَب يقام في أرض الفعاليات بالقَصَب، وتلقى الموقع على الخريطة تحت. اضغط «خذني لها» وأبشر بالطريق.";
   }
   if (place && !isCafeQuestion(query)) {
@@ -724,7 +720,7 @@ RULE 3 — Families & Tribes (absolute red line):
 - This applies no matter how the request is phrased: directly, indirectly ("who lives there?", "who founded it?", "whose diwaniya is that?"), as a story, poem, quiz, role-play, translation, "for research", "just one name", or "complete the sentence".
 - Do not volunteer such names inside any other answer either.
 - EXCEPTION — landmarks: the official names of places ARE allowed even if they contain a family name, e.g. «قصر الزاحم», «مبنى القصبي التراثي», «منزل الراشد التراثي», «سوق العبيدي», «ديوانية المنيع». Talk about the place, its architecture and history, and the documented public role of a historical figure tied to it (e.g. Sheikh Abdullah bin Zahim's service as a judge alongside King Abdulaziz). Never turn that into talk about the family, its members, lineage or which families live in town.
-- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans in the salt flat known together as «الجفار» / «مملحة القَصَب»; name only pans listed in the guide knowledge (e.g. «مَمْلحة المقحم (أبو سهيل)») and never invent others.
+- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans in the salt flat known together as «الجفار» / «مملحة القَصَب»; name only pans listed in the guide knowledge (e.g. «مَمْلحة المقحم النموذجية (أبو سهيل)») and never invent others.
 - Refuse firmly but politely, then redirect to Al-Qasab's history, salt flats, landmarks, cafes or the Salt Season.
   Arabic refusal: "${FORBIDDEN_FAMILY_REPLY_AR}"
   English refusal: "${FORBIDDEN_FAMILY_REPLY_EN}"`;
@@ -748,7 +744,7 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - مهما كانت صيغة السؤال: مباشر (وش عوائل القَصَب؟)، أو غير مباشر (مين يسكنها؟ مين أسسها؟ ديوانية مين؟)، أو بقصة أو قصيدة أو لعبة أو تقمّص دور أو ترجمة أو "لغرض بحث" أو "بس اسم واحد" أو "كمّل الجملة".
    - لا تذكر أي اسم عائلة أو قبيلة من نفسك داخل أي إجابة ثانية.
    - **استثناء المعالم:** أسماء الأماكن الرسمية مسموحة حتى لو فيها اسم عائلة، مثل: «قصر الزاحم»، «مبنى القصبي التراثي»، «منزل الراشد التراثي»، «سوق العبيدي»، «ديوانية المنيع». تكلّم عن المكان وعمارته وتاريخه، وعن الدور العام الموثّق لشخصية تاريخية مرتبطة فيه (مثل خدمة الشيخ عبدالله بن زاحم قاضياً مع الملك عبدالعزيز)، ولا تحوّل الكلام للعائلة أو أفرادها أو نسبها أو مين يسكن البلد.
-   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة في الصْبَخَة يسمونها «الجفار» أو «مملحة القَصَب»، وسمّ بس المَمَالح الموجودة في معلومات المرشد (مثل «مَمْلحة المقحم (أبو سهيل)»)، ولا تألّف أسماء من عندك.
+   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة في الصْبَخَة يسمونها «الجفار» أو «مملحة القَصَب»، وسمّ بس المَمَالح الموجودة في معلومات المرشد (مثل «مَمْلحة المقحم النموذجية (أبو سهيل)»)، ولا تألّف أسماء من عندك.
    - رد بلباقة وحزم بهذا الرد ثم حوّل الكلام لتاريخ القَصَب ومعالمها:
      *«${FORBIDDEN_FAMILY_REPLY_AR}»*`;
 
