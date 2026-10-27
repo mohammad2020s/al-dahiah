@@ -89,7 +89,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
       "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلحة متجاورة في أرض الصْبَخَة، تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت صْبَخَة ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. ومن مَمَالحها المعروفة مَمْلحة المقحم النموذجية (أبو سهيل). وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من القصب، تعال شوفها بعينك!",
     answerEn:
       "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans in the salt flat, about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into a salt flat, and salt has been harvested here for around three centuries, first by hand, today with modern purification and packing. The site now welcomes visitors with wooden walkways and reed shades.",
-    images: [...SALT_PAN_IMAGES, MUQHIM_IMAGES[1], MUQHIM_IMAGES[2], MUQHIM_IMAGES[5]],
+    images: [...SALT_PAN_IMAGES, MUQHIM_IMAGES[0], MUQHIM_IMAGES[2], MUQHIM_IMAGES[4]],
     mapsUrl: MUQHIM_PAN_MAPS_URL,
   },
   {
