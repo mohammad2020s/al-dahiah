@@ -38,6 +38,8 @@ import { fetchAlQasabWeather, weatherSummaryEn } from "./weather.ts";
 import { rateLimitMiddleware } from "./rateLimit.ts";
 import { getPlaceImages, getPlaceLocation, getPlaceMapsUrl, matchPlaceTopic, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
 import { recordQuestion, getQuestionStats } from "./questionStats.ts";
+import { getFollowUps, followUpTopic } from "./followUps.ts";
+import { stopForCode, stopsWithCodes } from "./passportCodes.ts";
 import { availableChatEngines, streamChatWithFallback, voiceKeys, pauseVoice, type Engine } from "./geminiFallback.ts";
 import { timingSafeEqual } from "node:crypto";
 
@@ -72,15 +74,41 @@ apiRouter.get("/location", (req, res) => {
   return res.json(FESTIVAL_LOCATION);
 });
 
-// Owner-only question stats. Disabled unless STATS_KEY is set on the server.
-apiRouter.get("/stats", async (req, res) => {
+/** Owner pages (stats, stamp signs): the request must carry STATS_KEY. Answers itself when it doesn't. */
+function ownerOnly(req: Request, res: Response): boolean {
   const expected = process.env.STATS_KEY || "";
   const given = String(req.query.key || req.headers["x-stats-key"] || "");
   const ok =
     expected.length > 0 &&
     given.length === expected.length &&
     timingSafeEqual(Buffer.from(given), Buffer.from(expected));
-  if (!ok) return res.status(expected ? 401 : 404).json({ error: expected ? "Wrong key" : "Stats are disabled" });
+  if (!ok) res.status(expected ? 401 : 404).json({ error: expected ? "Wrong key" : "Owner pages are disabled" });
+  return ok;
+}
+
+// «جواز الملح»: a scanned QR code → which stop it stamps (codes never reach the page's JS)
+const stampLimit = rateLimitMiddleware({
+  windowMs: 60_000,
+  max: 20,
+  messageAr: "محاولات كثيرة، انتظر دقيقة.",
+  messageEn: "Too many tries, please wait a minute.",
+});
+apiRouter.get("/passport/stamp", stampLimit, (req, res) => {
+  const stop = stopForCode(String(req.query.code || ""));
+  if (!stop) return res.status(404).json({ error: "Unknown code" });
+  res.json({ id: stop.id });
+});
+
+// Owner: codes for the printable QR signs at /stamps
+apiRouter.get("/passport/codes", (req, res) => {
+  if (!ownerOnly(req, res)) return;
+  res.setHeader("Cache-Control", "no-store");
+  res.json({ stops: stopsWithCodes() });
+});
+
+// Owner-only question stats. Disabled unless STATS_KEY is set on the server.
+apiRouter.get("/stats", async (req, res) => {
+  if (!ownerOnly(req, res)) return;
   res.setHeader("Cache-Control", "no-store");
   res.json(await getQuestionStats(Math.min(Number(req.query.limit) || 50, 200)));
 });
@@ -136,9 +164,21 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
   const requestStartTime = Date.now();
   try {
     // Correct «القصيب» → «القَصَب» before anything (guards, Gemini) sees the message
-    const userPrompt = normalizeCityName((req.body?.message || "").trim());
-    const rawHistory = Array.isArray(req.body?.history) ? req.body.history : [];
+    // «صوّر واسأل»: an optional photo (JPEG/PNG/WebP, base64) sent with the question
+    const rawImage = req.body?.image;
+    const photo =
+      rawImage &&
+      typeof rawImage.data === "string" &&
+      /^image\/(jpeg|png|webp)$/.test(String(rawImage.mimeType)) &&
+      rawImage.data.length < 6_000_000 &&
+      /^[A-Za-z0-9+/=]+$/.test(rawImage.data.slice(0, 200))
+        ? { mimeType: String(rawImage.mimeType), data: rawImage.data as string }
+        : null;
     const requestedLang = req.body?.language || "ar";
+    const userPrompt = normalizeCityName(
+      (req.body?.message || "").trim() || (photo ? (requestedLang === "en" ? "What is this place?" : "وش هذا المكان؟") : "")
+    );
+    const rawHistory = Array.isArray(req.body?.history) ? req.body.history : [];
 
     if (!userPrompt) {
       sendEvent({ type: "error", message: "Message is required" });
@@ -151,7 +191,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     const lang: "ar" | "en" = hasArabic ? "ar" : hasEnglish ? "en" : requestedLang;
 
     // Fast-path: Instant Salam greeting
-    if (isPureSalamGreeting(userPrompt, lang)) {
+    if (!photo && isPureSalamGreeting(userPrompt, lang)) {
       const instantAnswer = getInstantSalamReply(lang, userPrompt);
       recordQuestion(userPrompt, "greeting", null, lang);
       sendEvent({ type: "chunk", content: instantAnswer });
@@ -190,7 +230,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       .slice(-8)
       .map((turn: { content: string }) => turn.content);
 
-    if (!isSmallTalk(userPrompt) && !isAlQasabTopic(userPrompt, recentMessages)) {
+    if (!photo && !isSmallTalk(userPrompt) && !isAlQasabTopic(userPrompt, recentMessages)) {
       const outOfScopeAnswer = getOutOfScopeMessage(lang);
       recordQuestion(userPrompt, "out_of_scope", null, lang);
       sendEvent({ type: "chunk", content: outOfScopeAnswer });
@@ -207,7 +247,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     }
 
     // Fast-path: Weather question
-    const isWeather = isWeatherQuestion(userPrompt);
+    const isWeather = !photo && isWeatherQuestion(userPrompt);
     if (isWeather) {
       recordQuestion(userPrompt, "weather", "weather", lang);
       const weatherData = await fetchAlQasabWeather();
@@ -233,6 +273,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
           showMap: false,
           locationData: null,
           weather: weatherData,
+          followUps: getFollowUps(userPrompt, lang, "weather"),
         });
         res.end();
       }
@@ -253,7 +294,20 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
           });
         }
       }
-      contents.push({ role: "user", parts: [{ text: userPrompt }] });
+      contents.push({
+        role: "user",
+        parts: photo
+          ? [
+              { inlineData: { mimeType: photo.mimeType, data: photo.data } },
+              {
+                text:
+                  (lang === "en"
+                    ? "[The visitor sent this photo from Al-Qasab. Use the visual guide to Al-Qasab; name a landmark only if the signs are clear, otherwise say what you see and that you are not sure.] "
+                    : "[الزائر أرسل هذي الصورة. استخدم دليل التعرف على معالم القَصَب، ولا تسمّي معلَم إلا إذا العلامات واضحة، وإذا مو متأكد قلها بصراحة.] ") + userPrompt,
+              },
+            ]
+          : [{ text: userPrompt }],
+      });
 
       const result = await streamChatWithFallback({
         contents,
@@ -269,7 +323,11 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
 
     if (!rawAnswer || rawAnswer.trim().length === 0) {
       usedFallback = true;
-      const fallbackText = generateLocalKnowledgeFallback(userPrompt, lang);
+      const fallbackText = photo
+        ? lang === "en"
+          ? "I couldn't look at the photo right now. Tell me the name of the place, or ask me about the salt pans, Al-Sabkha, Al-Zahim palace or the old town."
+          : "اعذرني يا الغالي، ما قدرت أشوف الصورة الحين. قل لي وش اسم المكان، أو اسألني عن الممالح أو الصْبَخَة أو قصر الزاحم أو البلدة القديمة وأبشر."
+        : generateLocalKnowledgeFallback(userPrompt, lang);
       rawAnswer = fallbackText;
       const words = fallbackText.split(" ");
       for (let i = 0; i < words.length; i += 3) {
@@ -292,23 +350,25 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     const isGenericWelcome =
       usedFallback && /مرشدك السياحي في ديرتنا|^Welcome to Al-Qasab! I am/.test(rawAnswer);
     recordQuestion(
-      userPrompt,
+      photo ? `(صورة) ${userPrompt}` : userPrompt,
       isGenericWelcome ? "unanswered" : usedFallback ? "local" : "gemini",
       matchPlaceTopic(userPrompt)?.id || (isCafeQuestion(userPrompt) ? "cafes" : null),
       lang,
       answeredBy ? `${answeredBy.tier}:${answeredBy.model}` : usedFallback ? "local" : null
     );
 
-    // Real photos of the place being asked about (e.g. the salt pans), shown as a gallery under the answer
-    const images = getPlaceImages(userPrompt, lang);
-    const mapsUrl = getPlaceMapsUrl(userPrompt);
+    // Real photos of the place being asked about (e.g. the salt pans), shown as a gallery under the answer.
+    // For a visitor's photo the place comes from what the guide recognised in it.
+    const placeText = photo ? (usedFallback ? "" : finalAnswer) : userPrompt;
+    const images = getPlaceImages(placeText, lang);
+    const mapsUrl = getPlaceMapsUrl(placeText);
 
-    const showMap =
+    const showMap = !photo && (
       isLocationQuestion(userPrompt) ||
       isCafeQuestion(userPrompt) ||
       isDirectionsQuestion(userPrompt) ||
       // Look at the answer text only for real Gemini answers (the canned welcome mentions cafes)
-      (!usedFallback && (isLocationQuestion(finalAnswer) || isCafeQuestion(finalAnswer)));
+      (!usedFallback && (isLocationQuestion(finalAnswer) || isCafeQuestion(finalAnswer))));
 
     const locationData = showMap ? getPlaceLocation(userPrompt, lang) || getLocationForQuery(userPrompt, finalAnswer) : null;
     const totalResponseTimeMs = Date.now() - requestStartTime;
@@ -323,6 +383,11 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         weather: null,
         images,
         mapsUrl,
+        followUps: getFollowUps(
+          userPrompt,
+          lang,
+          photo ? (placeText && followUpTopic(placeText) !== "other" ? followUpTopic(placeText) : "photo") : undefined
+        ),
         responseTimeMs: totalResponseTimeMs,
       });
       res.end();

@@ -19,6 +19,9 @@ import {
   Volume2,
   BadgeCheck,
   ArrowUpLeft,
+  Camera,
+  X,
+  CornerDownLeft,
 } from "lucide-react";
 import { MalhAlQasabLogo, TanmiahLogo } from "../components/BrandLogos";
 // The call screen pulls in three.js and the salt bag; load it only when someone calls
@@ -32,6 +35,7 @@ import { PLACE_TOPICS } from "../../server/alQasabKnowledge.ts";
 import { TourRoute } from "../components/TourRoute";
 import { PlaceGallery, type PlaceImage } from "../components/PlaceGallery";
 import { SeasonCountdown } from "../components/SeasonCountdown";
+import { SaltPassport } from "../components/SaltPassport";
 import { Language, translations } from "../i18n";
 
 type WeatherData = {
@@ -60,7 +64,37 @@ type ChatMessage = {
   images?: PlaceImage[];
   mapsUrl?: string;
   audio?: string;
+  /** Next questions to tap under an answer */
+  followUps?: string[];
+  /** «صوّر واسأل»: the visitor's photo (small preview data URL) */
+  photo?: string;
 };
+
+type PendingPhoto = { preview: string; data: string; mimeType: string };
+
+/** Shrinks a camera photo to ≤1024 px JPEG so it uploads fast on mobile data. */
+function shrinkPhoto(file: File): Promise<PendingPhoto> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const max = 1024;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+      resolve({ preview: dataUrl, data: dataUrl.split(",")[1], mimeType: "image/jpeg" });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("bad image"));
+    };
+    img.src = url;
+  });
+}
 
 function WeatherCard({ weather, language = "ar" }: { weather: WeatherData; language?: Language }) {
   const t = translations[language];
@@ -274,6 +308,13 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
     <div className={`flex flex-col ${isUser ? "items-start" : "items-start w-full"}`}>
       {isUser ? (
         <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-[#b82e24] px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-red-950/10">
+          {message.photo && (
+            <img
+              src={message.photo}
+              alt={language === "en" ? "Your photo" : "صورتك"}
+              className="mb-2 max-h-56 w-auto max-w-full rounded-xl border-2 border-white/30 object-cover"
+            />
+          )}
           <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
         </div>
       ) : (
@@ -353,6 +394,9 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [pendingPhoto, setPendingPhoto] = useState<PendingPhoto | null>(null);
+  const [photoError, setPhotoError] = useState("");
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -391,8 +435,22 @@ export default function Home() {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isStreaming]);
 
-  const askQuestion = async (question: string) => {
-    const text = question.trim();
+  const onPickPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // same photo can be picked again
+    if (!file) return;
+    setPhotoError("");
+    try {
+      setPendingPhoto(await shrinkPhoto(file));
+      textareaRef.current?.focus();
+    } catch {
+      setPhotoError(language === "en" ? "Couldn't open that photo, try another one." : "ما قدرت أفتح الصورة، جرّب صورة ثانية.");
+    }
+  };
+
+  const askQuestion = async (question: string, withPhoto: PendingPhoto | null = null) => {
+    const photo = withPhoto;
+    const text = question.trim() || (photo ? (language === "en" ? "What is this place?" : "وش هذا المكان؟") : "");
     if (!text || isStreaming) return;
 
     if (abortControllerRef.current) {
@@ -405,6 +463,7 @@ export default function Home() {
       id: `u-${Date.now()}`,
       role: "user",
       content: text,
+      ...(photo ? { photo: photo.preview } : {}),
     };
 
     const assistantId = `a-${Date.now() + 1}`;
@@ -416,6 +475,7 @@ export default function Home() {
 
     setMessages(prev => [...prev, userMessage, assistantPlaceholder]);
     setInput("");
+    setPendingPhoto(null);
     setIsStreaming(true);
 
     let accumulated = "";
@@ -426,8 +486,10 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: text,
-          history: messages.slice(-4),
+          // Text only: earlier photos are not sent again
+          history: messages.slice(-4).map(m => ({ role: m.role, content: m.content })),
           language,
+          ...(photo ? { image: { mimeType: photo.mimeType, data: photo.data } } : {}),
         }),
         signal: abortController.signal,
       });
@@ -475,6 +537,7 @@ export default function Home() {
                         weather: data.weather,
                         images: Array.isArray(data.images) ? data.images : undefined,
                         mapsUrl: typeof data.mapsUrl === "string" ? data.mapsUrl : undefined,
+                        followUps: Array.isArray(data.followUps) ? data.followUps.slice(0, 3) : undefined,
                       }
                     : m
                 )
@@ -497,15 +560,17 @@ export default function Home() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    askQuestion(input);
+    askQuestion(input, pendingPhoto);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      askQuestion(input);
+      askQuestion(input, pendingPhoto);
     }
   };
+
+  const lastAssistantId = [...messages].reverse().find(m => m.role === "assistant")?.id;
 
   return (
     <main
@@ -613,6 +678,8 @@ export default function Home() {
 
             <TourRoute language={language} onAsk={askQuestion} />
 
+            <SaltPassport language={language} />
+
             {/* Weather Card */}
             {weatherData && (
               <div className="rounded-[1.7rem] border border-[#f2d6d3] bg-white p-4 shadow-sm">
@@ -716,6 +783,21 @@ export default function Home() {
                       {m.role === "assistant" && m.showMap && m.locationData && (
                         <LocationMapCard location={m.locationData} language={language} />
                       )}
+                      {m.role === "assistant" && m.id === lastAssistantId && !isStreaming && m.followUps && m.followUps.length > 0 && (
+                        <div className="pg-enter mt-3 flex flex-wrap gap-2" aria-label={language === "en" ? "Ask next" : "اسأل بعدها"}>
+                          {m.followUps.map(q => (
+                            <button
+                              key={q}
+                              type="button"
+                              onClick={() => askQuestion(q)}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-[#f2d4d1] bg-[#fffbfb] px-3 py-1.5 text-xs font-semibold text-[#8e1b12] shadow-xs hover:border-[#b82e24] hover:bg-[#feeceb] transition active:scale-95"
+                            >
+                              <CornerDownLeft className={`size-3.5 text-[#b82e24] ${language === "en" ? "-scale-x-100" : ""}`} />
+                              {q}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                   <div ref={messageEndRef} />
@@ -748,6 +830,26 @@ export default function Home() {
 
               {/* Chat Input Bar */}
               <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
+                {(pendingPhoto || photoError) && (
+                  <div className="mb-2 flex items-center gap-2 px-1">
+                    {pendingPhoto && (
+                      <div className="relative">
+                        <img src={pendingPhoto.preview} alt={language === "en" ? "Photo to send" : "الصورة اللي بترسلها"} className="size-14 rounded-xl border border-[#f2d6d3] object-cover shadow-xs" />
+                        <button
+                          type="button"
+                          onClick={() => setPendingPhoto(null)}
+                          className="absolute -top-2 -left-2 grid size-6 place-items-center rounded-full bg-[#3a1210] text-white shadow"
+                          aria-label={language === "en" ? "Remove photo" : "احذف الصورة"}
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </div>
+                    )}
+                    <p className={`text-[11px] ${photoError ? "text-[#b82e24]" : "text-[#7d6564]"}`}>
+                      {photoError || (language === "en" ? "Add a question, or just send: Al-Dahiya will tell you what it is." : "اكتب سؤالك أو أرسلها كذا، والداهية يقول لك وش هي.")}
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center gap-2 rounded-[1.35rem] border border-[#f0d0cc] bg-white p-2 shadow-sm focus-within:border-[#b82e24] focus-within:ring-2 focus-within:ring-[#b82e24]/10">
                   <button
                     ref={callButtonRef}
@@ -768,10 +870,32 @@ export default function Home() {
                     type="button"
                     onClick={handleStartCall}
                     disabled={isCallAnimating}
-                    className="size-11 shrink-0 rounded-2xl bg-[#feeceb] hover:bg-[#fcd9d6] text-[#b82e24] flex items-center justify-center transition shadow-xs disabled:opacity-80 cursor-pointer"
+                    // Opens the same voice call as the phone button: hidden on phones to leave room for typing
+                    className="hidden sm:flex size-11 shrink-0 rounded-2xl bg-[#feeceb] hover:bg-[#fcd9d6] text-[#b82e24] items-center justify-center transition shadow-xs disabled:opacity-80 cursor-pointer"
                     title={t.micHoldTooltip}
                   >
                     <Mic className="size-5" />
+                  </button>
+
+                  <input
+                    ref={photoInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={onPickPhoto}
+                    className="hidden"
+                    aria-hidden
+                    tabIndex={-1}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => photoInputRef.current?.click()}
+                    disabled={isStreaming}
+                    className="size-11 shrink-0 rounded-2xl bg-[#feeceb] hover:bg-[#fcd9d6] text-[#b82e24] flex items-center justify-center transition shadow-xs disabled:opacity-60 cursor-pointer"
+                    title={language === "en" ? "Snap & ask: send a photo" : "صوّر واسأل"}
+                    aria-label={language === "en" ? "Snap & ask: send a photo" : "صوّر واسأل"}
+                  >
+                    <Camera className="size-5" />
                   </button>
 
                   <textarea
@@ -789,7 +913,7 @@ export default function Home() {
                   <button
                     type="submit"
                     aria-label={language === "en" ? "Send" : "إرسال"}
-                    disabled={!input.trim() || isStreaming}
+                    disabled={(!input.trim() && !pendingPhoto) || isStreaming}
                     className="size-11 shrink-0 rounded-2xl bg-[#b82e24] text-white flex items-center justify-center hover:bg-[#992017] transition disabled:opacity-50"
                   >
                     {isStreaming ? (

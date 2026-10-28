@@ -6,6 +6,7 @@ import fs from "fs";
 import { setupLiveAudio } from "./server/live-audio.ts";
 import { apiRouter } from "./server/api.ts";
 import { STATS_PAGE_HTML } from "./server/statsPage.ts";
+import { STAMPS_PAGE_HTML } from "./server/stampsPage.ts";
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = "0.0.0.0";
@@ -16,7 +17,8 @@ async function startServer() {
   app.set("trust proxy", 1);
   const server = createServer(app);
 
-  app.use(express.json({ limit: "1mb" }));
+  // 8 MB: room for a visitor's photo («صوّر واسأل»), which the page shrinks to ~1024 px first
+  app.use(express.json({ limit: "8mb" }));
   app.use(express.urlencoded({ limit: "1mb", extended: true }));
 
   // Static image directories
@@ -29,6 +31,10 @@ async function startServer() {
   // Owner page: what visitors ask (data needs STATS_KEY)
   app.get("/stats", (_req, res) => {
     res.set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" }).send(STATS_PAGE_HTML);
+  });
+  // Owner page: printable QR signs for «جواز الملح» (codes need STATS_KEY)
+  app.get("/stamps", (_req, res) => {
+    res.set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" }).send(STAMPS_PAGE_HTML);
   });
 
   // Setup Gemini Live WebSocket
