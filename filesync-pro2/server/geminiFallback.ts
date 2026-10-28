@@ -124,6 +124,8 @@ export async function streamChatWithFallback(opts: {
   systemInstruction: string;
   maxOutputTokens: number;
   budgetMs: number;
+  /** Time a model gets to start answering (photos need longer) */
+  firstWordMs?: number;
   onChunk: (text: string) => void;
   isCancelled: () => boolean;
 }): Promise<StreamResult> {
@@ -140,7 +142,7 @@ export async function streamChatWithFallback(opts: {
     const abort = new AbortController();
     const startedAt = Date.now();
     let firstWordAt = 0;
-    const timer = setTimeout(() => abort.abort(), Math.min(left, FIRST_WORD_MS));
+    const timer = setTimeout(() => abort.abort(), Math.min(left, opts.firstWordMs || FIRST_WORD_MS));
     const timedOut = new Promise<"timeout">((resolve) => abort.signal.addEventListener("abort", () => resolve("timeout")));
     let text = "";
     try {

@@ -313,7 +313,10 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         contents,
         systemInstruction: buildAlQasabSystemPrompt(undefined, lang),
         maxOutputTokens: 400,
-        budgetMs: 20_000, // never leave the visitor waiting longer than this (each model gets 7 s to start)
+        // Never leave the visitor waiting longer than this. Each model gets 7 s to start
+        // (a photo takes the models longer to look at: 15 s each, 35 s in all)
+        budgetMs: photo ? 35_000 : 20_000,
+        firstWordMs: photo ? 15_000 : undefined,
         onChunk: (t) => sendEvent({ type: "chunk", content: t }),
         isCancelled: () => clientDisconnected,
       });
