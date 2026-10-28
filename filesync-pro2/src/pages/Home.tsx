@@ -396,6 +396,14 @@ export default function Home() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [pendingPhoto, setPendingPhoto] = useState<PendingPhoto | null>(null);
   const [photoError, setPhotoError] = useState("");
+  // Phones: the long placeholder (which also mentions the hidden mic) doesn't fit the input
+  const [isNarrow, setIsNarrow] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const on = () => setIsNarrow(mq.matches);
+    mq.addEventListener?.("change", on);
+    return () => mq.removeEventListener?.("change", on);
+  }, []);
   const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
@@ -903,11 +911,11 @@ export default function Home() {
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={t.defaultPlaceholder}
+                    placeholder={isNarrow ? (language === "en" ? "Ask Al-Dahiya..." : "اسأل الداهية...") : t.defaultPlaceholder}
                     aria-label={t.defaultPlaceholder}
                     rows={1}
                     disabled={isStreaming}
-                    className="flex-1 resize-none border-0 bg-transparent px-2 py-3 text-base sm:text-sm focus:outline-none"
+                    className="no-scrollbar min-w-0 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-base sm:text-sm focus:outline-none"
                   />
 
                   <button
