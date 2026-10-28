@@ -189,7 +189,7 @@ test("tour guide knowledge: salt pans, palaces and the weather false positive", 
   assert.equal(isAlQasabTopic("علمني عن قصر الزاحم"), true);
   assert.ok(generateLocalKnowledgeFallback("علمني عن قصر الزاحم", "ar").includes("١٤٣٦"));
   assert.ok(generateLocalKnowledgeFallback("وش مبنى القصبي التراثي", "ar").includes("سوق العبيدي"));
-  assert.equal(getPlaceImages("علمني عن قصر الزاحم", "ar").length, 0);
+  assert.equal(getPlaceImages("علمني عن قصر الزاحم", "ar").length, 5); // visitors' photos from Google Maps
   // Families are still off limits
   assert.equal(isFamilyOrTribalQuestion("وش عوائل القصب"), true);
 });

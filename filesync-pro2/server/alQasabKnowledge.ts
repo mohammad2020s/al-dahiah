@@ -21,6 +21,15 @@ const MUQHIM_IMAGES: PlaceImage[] = [
   { src: "/images/places/muqhim-sign-new.jpg", captionAr: "لوحة مملحة المقحم والأكواخ في الخلف", captionEn: "Al-Muqhim Salt Shop sign with reed huts in background", credit: GM },
 ];
 
+// Photos of قصر الشيخ عبدالله بن زاحم, cropped from visitors' photos on its Google Maps page
+const ZAHIM_IMAGES: PlaceImage[] = [
+  { src: "/images/places/zahim-entrance.jpg", captionAr: "مدخل القصر واللوحة التعريفية بالشيخ عبدالله بن زاحم", captionEn: "The palace entrance and the sign about Sheikh Abdullah bin Zahim", credit: GM },
+  { src: "/images/places/zahim-reception-hall.jpg", captionAr: "مجلس الاستقبال بسقفه الخشبي ووثائق وصور من تاريخ الدولة", captionEn: "Reception hall with its wooden ceiling, documents and photos of the Saudi state", credit: GM },
+  { src: "/images/places/zahim-hall-columns.jpg", captionAr: "القاعة بأعمدتها البيضاء والمعرض على جدرانها", captionEn: "The hall with white columns and the exhibition on its walls", credit: GM },
+  { src: "/images/places/zahim-pillars-exhibit.jpg", captionAr: "جلسة نجدية بين الأعمدة الطينية ولوحات عن سيرة الشيخ", captionEn: "Najdi seating between mud pillars and panels on the Sheikh's life", credit: GM },
+  { src: "/images/places/zahim-majlis-carpets.jpg", captionAr: "مجلس نجدي مفروش بالسجاد والزخارف الجصية", captionEn: "A carpeted Najdi majlis with white plaster decorations", credit: GM },
+];
+
 export interface PlaceTopic {
   id: string;
   titleAr: string;
@@ -116,6 +125,8 @@ export const PLACE_TOPICS: PlaceTopic[] = [
       "قصر الزاحم من أبرز معالم القَصَب، جنب الجامع في البلدة القديمة، وعمره فوق المية سنة، وهو بيت الشيخ عبدالله بن عبدالوهاب بن زاحم رحمه الله، اللي ولد في القَصَب وصار قاضي ورافق الملك عبدالعزيز في توحيد البلاد، منها ضم حائل والحجاز، وآخر عمله رئاسة المحاكم الشرعية في المدينة المنورة وتوفي فيها عام ١٣٧٤هـ. البيت صار محكمة البلد عام ١٣٨٠هـ، وانرمم عام ١٤٣٦هـ، وفيه اليوم وثائق وصور من تاريخ الدولة، وأبوابه مفتوحة للزوار مع مرشدين وضيافة.",
     answerEn:
       "Al-Zahim Palace stands beside the old town's main mosque and is over a century old. It was the home of Sheikh Abdullah bin Abdulwahhab bin Zahim, born in Al-Qasab, a judge who accompanied King Abdulaziz during the unification (including Hail and the Hijaz) and later headed the Sharia courts in Madinah, where he died in 1374 AH. The house served as the town court from 1380 AH, was restored in 1436 AH, and now displays documents and photos from the history of the Saudi state, open to visitors with guides and hospitality.",
+    images: ZAHIM_IMAGES,
+    mapsUrl: "https://maps.app.goo.gl/LG8vwuh1cFSnZYAC7",
   },
   {
     id: "qusaibi_building",
