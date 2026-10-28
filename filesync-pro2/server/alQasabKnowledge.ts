@@ -30,6 +30,14 @@ const ZAHIM_IMAGES: PlaceImage[] = [
   { src: "/images/places/zahim-majlis-carpets.jpg", captionAr: "مجلس نجدي مفروش بالسجاد والزخارف الجصية", captionEn: "A carpeted Najdi majlis with white plaster decorations", credit: GM },
 ];
 
+// Photos of مملحة مركز القصب, cropped from visitors' photos on its Google Maps page
+const MAMLAHA_VISITOR_IMAGES: PlaceImage[] = [
+  { src: "/images/places/mamlaha-harvest.jpg", captionAr: "أكوام الملح الأبيض جنب الأحواض وقت الاستخراج", captionEn: "White salt heaps beside the basins during harvest", credit: GM },
+  { src: "/images/places/mamlaha-salt-hill.jpg", captionAr: "تلّة ملح على طرف حوض التبخير", captionEn: "A hill of salt at the edge of an evaporation basin", credit: GM },
+  { src: "/images/places/mamlaha-green-pool.jpg", captionAr: "حوض ماء مالح صافي وعلى حافته قشرة الملح", captionEn: "A clear brine pool rimmed with salt crust", credit: GM },
+  { src: "/images/places/mamlaha-salt-heaps.jpg", captionAr: "صف أكوام الملح على امتداد الممالح", captionEn: "Rows of salt heaps along the salt pans", credit: GM },
+];
+
 export interface PlaceTopic {
   id: string;
   titleAr: string;
@@ -113,7 +121,8 @@ export const PLACE_TOPICS: PlaceTopic[] = [
       "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلَحَة متجاورة تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت أرض ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. ومن مَمَالحها المعروفة مَمْلَحَة المقحم النموذجية (أبو سهيل). وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من الخوص، تعال شوفها بعينك!",
     answerEn:
       "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into salt ground, and salt has been harvested here for around three centuries, first by hand, today with modern purification and packing. The site now welcomes visitors with wooden walkways and reed shades.",
-    images: [...SALT_PAN_IMAGES, MUQHIM_IMAGES[0], MUQHIM_IMAGES[2], MUQHIM_IMAGES[4]],
+    // Visitors' photos of the working salt pans first, then the visitor area
+    images: [...MAMLAHA_VISITOR_IMAGES, SALT_PAN_IMAGES[0], SALT_PAN_IMAGES[1], SALT_PAN_IMAGES[2], MUQHIM_IMAGES[0]],
     mapsUrl: MUQHIM_PAN_MAPS_URL,
   },
   {
