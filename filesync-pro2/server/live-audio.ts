@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "http";
 import "dotenv/config";
-import { buildAlQasabSystemPrompt } from "./alQasabScope.ts";
+import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE } from "./alQasabScope.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { createLimiter, clientIp } from "./rateLimit.ts";
 import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
@@ -56,19 +56,18 @@ export function setupLiveAudio(server: Server) {
     // Bilingual prompt: the caller may switch language mid-call (English → English, Arabic → Najdi only)
     // In a call he can put a place on the caller's screen: show it first, then explain
     const placeList = PLACE_TOPICS.map((t) => `${t.id} = ${t.titleAr} / ${t.titleEn}`).join("\n");
-    const systemInstruction = `${buildAlQasabSystemPrompt(undefined, "auto")}
+    // Pronunciation first (models follow the start of the instructions most closely) and a reminder at the end
+    const systemInstruction = `VOICE CALL — READ THIS FIRST.
+${PRONUNCIATION_GUIDE}
 
-VOICE CALL — PRONUNCIATION (critical — enforce on every word you say):
-- «القَصَب»: القاف مفتوحة وزن فَعَل (fatha on ق then fatha on ص then sukoon on ب). Say "al-QA-sab" — never "al-qasab" with a neutral schwa or a kasra.
-- «الجِفار»: ⚠️ تبدأ بحرف الجيم (J) لا القاف (Q/K). جِيم مكسورة ثم فاء ثم ألف ثم راء. Say "al-JI-far" — NEVER say "القفار" or "al-qafar". This word begins with ج not ق.
-- «الصْبَخَة»: الصاد ساكنة (sukoon), الباء مفتوحة, الخاء مفتوحة. Say "aṣ-BAK-ha".
-- «الوَشْم»: الواو مفتوحة, الشين ساكنة. Say "al-WASM" — short 'a' on the waaw, no kasra.
-- «المَمْلَحَة»: مَمْلَحَة — فتحة على الميم الأولى, سكون على الميم الثانية, فتحة على اللام, فتحة على الحاء. Say "al-MAM-la-ḥa" (four syllables: MAM·la·ḥa). NEVER "المملِحة" or "المملُحة".
+${buildAlQasabSystemPrompt(undefined, "auto")}
 
 VOICE CALL — SHOWING PLACES ON THE CALLER'S SCREEN:
 Whenever the caller asks about one of these Al-Qasab places, or you start explaining one, FIRST call the tool show_place with its id (their screen then shows its real photos, or an info card), THEN explain it like a tour guide in 2–4 short sentences from the guide knowledge, and offer to tell more. Call it once per place, not again while you keep talking about the same place.
 Places:
-${placeList}`;
+${placeList}
+
+FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab" with a real ق (never "al-gasab", never "al-qassab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha"; «المَمْلَحَة» = "al-mamlaha".`;
 
     // Built once; sent on every connection attempt
     const setupMessage = {
@@ -100,6 +99,8 @@ ${placeList}`;
         ],
         generationConfig: {
           responseModalities: ["AUDIO"],
+          // Calmer sampling: names come out the same way every time
+          temperature: 0.6,
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {

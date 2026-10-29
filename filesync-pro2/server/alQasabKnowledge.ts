@@ -15,9 +15,9 @@ const GM = "google_maps_visitors" as const;
 // Photos of مَمْلَحَة المقحم النموذجية (أبو سهيل), cropped from visitors' photos on its Google Maps page
 const MUQHIM_IMAGES: PlaceImage[] = [
   { src: "/images/places/muqhim-visitors-walkway.jpg", captionAr: "زوار على الممشى الخشبي بين أكواخ الخوص", captionEn: "Visitors on the wooden walkway between reed huts", credit: GM },
-  { src: "/images/places/muqhim-entrance-stone.jpg", captionAr: "صخرة مملحة القصب عند المدخل مع الأحواض", captionEn: "Mamalahat Al Qasab entrance stone with the basins", credit: GM },
+  { src: "/images/places/muqhim-entrance-stone.jpg", captionAr: "الصخرة عند مدخل مَمْلَحَة المقحم النموذجية وأحواضها", captionEn: "The stone at the entrance of the Al-Muqhim model salt pan, with its basins", credit: GM },
   { src: "/images/places/muqhim-wooden-bridge.jpg", captionAr: "الجسر الخشبي وأحواض الملح في الفجر", captionEn: "Wooden bridge over the salt basins at dawn", credit: GM },
-  { src: "/images/places/muqhim-salt-booth.jpg", captionAr: "كشك الملح الطبيعي داخل المملحة", captionEn: "Natural salt kiosk inside the salt pan", credit: GM },
+  { src: "/images/places/muqhim-salt-booth.jpg", captionAr: "كشك الملح الطبيعي في مَمْلَحَة المقحم", captionEn: "The natural salt kiosk at Al-Muqhim", credit: GM },
   { src: "/images/places/muqhim-sign-new.jpg", captionAr: "لوحة مملحة المقحم والأكواخ في الخلف", captionEn: "Al-Muqhim Salt Shop sign with reed huts in background", credit: GM },
 ];
 
@@ -54,34 +54,9 @@ export interface PlaceTopic {
 }
 
 const MUQHIM_PAN_MAPS_URL = "https://maps.app.goo.gl/DsMP4ruDfFH2wwZh9";
+// «مملحة مركز القصب» on Google Maps (the big working salt pans, not Al-Muqhim)
+const QASAB_SALT_PANS_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=%D9%85%D9%85%D9%84%D8%AD%D8%A9%20%D9%85%D8%B1%D9%83%D8%B2%20%D8%A7%D9%84%D9%82%D8%B5%D8%A8";
 
-const SALT_PAN_IMAGES: PlaceImage[] = [
-  {
-    src: "/images/places/mamlaha-sign.jpg",
-    captionAr: "مدخل مَمْلَحَة القَصَب واللوحة التعريفية",
-    captionEn: "Entrance sign of the Al-Qasab salt pans",
-  },
-  {
-    src: "/images/places/mamlaha-basins.jpg",
-    captionAr: "أحواض تبخير الملح في المَمْلَحَة",
-    captionEn: "Salt evaporation basins",
-  },
-  {
-    src: "/images/places/mamlaha-reed-shades.jpg",
-    captionAr: "مظلات القصب والخوص لجلسات الزوار",
-    captionEn: "Reed shades for visitors at the salt pans",
-  },
-  {
-    src: "/images/places/mamlaha-crystal-pool.jpg",
-    captionAr: "حوض يتبلور فيه الملح مع التبخر",
-    captionEn: "A brine pool where salt crystallises",
-  },
-  {
-    src: "/images/places/sabkha-pink-lake.jpg",
-    captionAr: "ماء شديد الملوحة بلون وردي في أحواض الملح",
-    captionEn: "Pink, highly saline brine in the salt basins",
-  },
-];
 
 export const PLACE_TOPICS: PlaceTopic[] = [
   {
@@ -90,9 +65,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Al-Muqhim Model Salt Pan (Abu Suhail)",
     keywords: ["المقحم", "مقحم", "ابوسهيل", "ابو سهيل"],
     answerAr:
-      "مَمْلَحَة المقحم النموذجية (أبو سهيل) من مَمَالح القَصَب في الجِفار جنوب شرق البلد، فيها أحواض الملح المستطيلة اللي يتبخر فيها الماء ويبقى الملح الأبيض. تقدر تشوف صورها وموقعها على خرائط Google، وإذا جيتها تعال الصبح بدري والشمس هادية.",
+      "مَمْلَحَة المقحم النموذجية (أبو سهيل) غير مَمْلَحَة القَصَب، لا تخلط بينهم! مَمْلَحَة القَصَب هي الممالح الكبيرة (الجِفار) اللي ينستخرج منها الملح بكميات وتشوف فيها أكوام الملح والمعدّات، أما المقحم فمَمْلَحَة نموذجية مهيّأة للزوار جنوب شرق البلد: فيها ممشى وجسر خشبي بين أحواض الملح، وأكواخ من الخوص تجلس فيها، وكشك تشتري منه ملح طبيعي. تعال لها الصبح بدري والشمس هادية، وتلقى صورها وموقعها تحت.",
     answerEn:
-      "Al-Muqhim Model Salt Pan (Abu Suhail) is one of the Al-Qasab salt pans in Al-Jifar, southeast of town, with rectangular basins where the water evaporates and leaves white salt. Its photos and location are on Google Maps; come early in the morning for the best light.",
+      "The Al-Muqhim Model Salt Pan (Abu Suhail) is NOT the Al-Qasab salt pans, so don't mix them up. The Al-Qasab salt pans (Al-Jifar) are the big working pans where salt is harvested in bulk, with salt heaps and machinery; Al-Muqhim is a model salt pan set up for visitors southeast of town, with a wooden walkway and bridge between the basins, reed huts to sit in, and a kiosk selling natural salt. Come early in the morning for the soft light; its photos and location are below.",
     images: MUQHIM_IMAGES,
     mapsUrl: MUQHIM_PAN_MAPS_URL,
     coordinates: { lat: 25.260929, lng: 45.548462 },
@@ -118,12 +93,33 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Al-Qasab salt pans (Al-Jifar)",
     keywords: ["مملحه", "ممالح", "المملحه", "الممالح", "جفار", "الجفاره", "ملاحات", "salt pan", "saltworks", "salt flat"],
     answerAr:
-      "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلَحَة متجاورة تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت أرض ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم فيه تنقية وتعبئة حديثة. ومن مَمَالحها المعروفة مَمْلَحَة المقحم النموذجية (أبو سهيل). وتراها اليوم مزار سياحي فيه ممرات خشبية ومظلات من الخوص، تعال شوفها بعينك!",
+      "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلَحَة متجاورة تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت أرض ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم بالمعدّات وفيه تنقية وتعبئة حديثة، وتشوف فيها أحواض الماء المالح وأكوام الملح الأبيض مثل التلال. ولا تخلطها بمَمْلَحَة المقحم النموذجية، هذيك غيرها: مَمْلَحَة صغيرة مهيّأة للزوار فيها ممشى خشبي وأكواخ خوص.",
     answerEn:
-      "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into salt ground, and salt has been harvested here for around three centuries, first by hand, today with modern purification and packing. The site now welcomes visitors with wooden walkways and reed shades.",
-    // Visitors' photos of the working salt pans first, then the visitor area
-    images: [...MAMLAHA_VISITOR_IMAGES, SALT_PAN_IMAGES[0], SALT_PAN_IMAGES[1], SALT_PAN_IMAGES[2], MUQHIM_IMAGES[0]],
-    mapsUrl: MUQHIM_PAN_MAPS_URL,
+      "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into salt ground, and salt has been harvested here for around three centuries, first by hand, today with machinery, purification and packing; you see brine basins and white salt heaps like hills. Don't confuse them with the Al-Muqhim Model Salt Pan, a separate small pan set up for visitors with a wooden walkway and reed huts.",
+    // Only photos of مملحة مركز القصب itself (Al-Muqhim has its own)
+    images: MAMLAHA_VISITOR_IMAGES,
+    mapsUrl: QASAB_SALT_PANS_MAPS_URL,
+  },
+  {
+    id: "heritage_places",
+    titleAr: "الأماكن التراثية في القَصَب",
+    titleEn: "Heritage places in Al-Qasab",
+    keywords: ["الاماكن التراثيه", "اماكن تراثيه", "المعالم التراثيه", "معالم تراثيه", "الاماكن التاريخيه", "المعالم التاريخيه", "اماكن تاريخيه", "heritage places", "heritage sites", "historic places"],
+    answerAr:
+      "القَصَب مليانة تراث يا بعد حيي! هذي أبرز أماكنها التراثية:\n١. قصر الشيخ عبدالله بن زاحم جنب الجامع، فيه وثائق وصور من تاريخ الدولة.\n٢. سوق العبيدي، من أقدم أسواق نجد.\n٣. مبنى القصبي التراثي وسط السوق.\n٤. منزل الراشد على السور القديم.\n٥. مرقب القَصَب، برج المراقبة شرق البلد.\n٦. القرية التراثية بأزقتها وبيوتها الطينية ومقاهيها.\nتبي أعلّمك عن وحدة منها؟",
+    answerEn:
+      "Al-Qasab is full of heritage! Its main heritage places:\n1. Sheikh Abdullah bin Zahim's palace beside the mosque, with documents and photos from the history of the Saudi state.\n2. Souq Al-Obaidi, one of Najd's oldest markets.\n3. The Al-Qusaibi heritage building in the souq.\n4. The Al-Rashid house on the old town wall.\n5. The Al-Qasab watchtower east of town.\n6. The heritage village with its mud-brick lanes and cafes.\nWant to hear about one of them?",
+    images: ZAHIM_IMAGES.slice(0, 2),
+  },
+  {
+    id: "tourist_places",
+    titleAr: "الأماكن السياحية في القَصَب",
+    titleEn: "Tourist places in Al-Qasab",
+    keywords: ["الاماكن السياحيه", "اماكن سياحيه", "المعالم السياحيه", "معالم سياحيه", "اماكن القصب", "معالم القصب", "tourist places", "attractions", "places to visit", "sights"],
+    answerAr:
+      "أبشر! هذي أماكن القَصَب السياحية، وتلقاها كلها على الخريطة التفاعلية تحت، اضغط على أي دبوس يطلع لك اسمه:\n• مَمْلَحَة القَصَب (الجِفار): الممالح الكبيرة وأكوام الملح الأبيض.\n• مَمْلَحَة المقحم النموذجية: ممشى خشبي وأكواخ خوص وكشك ملح.\n• الصْبَخَة: جلسات الليل جنوب البلد.\n• أرض موسم ملح القَصَب.\n• القرية التراثية وقصر ابن زاحم.\n• مرقب القَصَب.\n• والمقاهي التراثية الأربع.\nوش تبي أعلّمك عنه أكثر؟",
+    answerEn:
+      "Here are Al-Qasab's tourist places, all pinned on the interactive map below (tap a pin to see its name):\n• The Al-Qasab salt pans (Al-Jifar): the big pans and hills of white salt.\n• The Al-Muqhim model salt pan: wooden walkway, reed huts and a salt kiosk.\n• Al-Sabkha: night gatherings south of town.\n• The Salt Season grounds.\n• The heritage village and Ibn Zahim's palace.\n• The Al-Qasab watchtower.\n• The four heritage cafes.\nWhat would you like to know more about?",
   },
   {
     id: "zahim_palace",
@@ -224,7 +220,9 @@ const normalize = (value: string) =>
 export function matchPlaceTopic(message: string): PlaceTopic | null {
   const norm = normalize(message);
   // Specific landmarks first; the general "season"/"town" topics last
-  const ordered = [...PLACE_TOPICS].sort((a, b) => (a.id === "season" || a.id === "town" ? 1 : 0) - (b.id === "season" || b.id === "town" ? 1 : 0));
+  // General topics (overviews, season, town) only when no specific place matches
+  const general = new Set(["heritage_places", "tourist_places", "season", "town"]);
+  const ordered = [...PLACE_TOPICS].sort((a, b) => (general.has(a.id) ? 1 : 0) - (general.has(b.id) ? 1 : 0));
   return ordered.find(t => t.keywords.some(k => norm.includes(normalize(k)))) || null;
 }
 
@@ -253,21 +251,38 @@ export function getPlaceLocation(message: string, lang: "ar" | "en" = "ar") {
 }
 
 // Greetings in the voice of a hospitable Najdi tour guide
-const SALAM_REPLIES_AR = [
-  "وعليكم السلام ورحمة الله وبركاته، حيّاك الله في ديرتنا القَصَب، يا هلا ومسهلا! أنا «الداهية» مرشدك السياحي هنا. وش ودك نبدأ فيه: المَمَالح والصْبَخَة، ولا البلدة القديمة وقصورها، ولا موسم الملح؟",
-  "وعليكم السلام ورحمة الله وبركاته، يا مرحبا وألف هلا! نوّرت ديرتنا القَصَب، ديرة الملح والطين. أنا «الداهية» مرشدك، آمرني وين تبي أوديك اليوم؟",
-  "وعليكم السلام ورحمة الله، حيّاك الله وبيّاك في القَصَب! أنا «الداهية» مرشدك السياحي، اسألني عن الجِفار والصْبَخَة وقصر الزاحم وسوق العبيدي وموسم الملح، وأبشر بعزك.",
+// Greeting with nothing else: return it, introduce «الداهية» and offer the three options
+// (they also appear as buttons under the reply, see GREETING_OPTIONS).
+const GREETING_OPENERS_AR_SALAM = [
+  "وعليكم السلام ورحمة الله وبركاته، حيّاك الله في ديرتنا القَصَب!",
+  "وعليكم السلام ورحمة الله وبركاته، يا هلا ومسهلا، نوّرت القَصَب!",
 ];
-const WELCOME_REPLIES_EN = [
-  "Welcome to our hometown, Al-Qasab! I'm «Al-Dahiya», your local tour guide. Shall we start with the salt pans and Al-Sabkha, the old town and its palaces, or the Salt Season?",
-  "A warm welcome to Al-Qasab, the town of salt and mud-brick heritage! I'm «Al-Dahiya», your guide. Where would you like to go today?",
-];
+const GREETING_OPENERS_AR = ["يا هلا والله ومسهلا، حيّاك الله في القَصَب!", "يا مرحبا وألف هلا، نوّرت القَصَب!"];
+const GREETING_MENU_AR =
+  "أنا «الداهية»، مرشدك السياحي في القَصَب. وش تبي أخدمك فيه؟\n" +
+  "١. معلومات عن موسم ملح القَصَب\n" +
+  "٢. الأماكن التراثية في القَصَب\n" +
+  "٣. الأماكن السياحية ومواقعها على الخريطة التفاعلية\n" +
+  "اختر من الأزرار تحت، أو اسألني اللي في خاطرك.";
+const GREETING_MENU_EN =
+  "I'm «Al-Dahiya», your tour guide in Al-Qasab. How can I help?\n" +
+  "1. The Al-Qasab Salt Season\n" +
+  "2. Heritage places in Al-Qasab\n" +
+  "3. Tourist places and their locations on the interactive map\n" +
+  "Pick one below, or ask me anything.";
 
-/** Greeting reply; in English it opens with "Wa alaykum assalam" only when the user actually said salam. */
+/** The three options as tappable questions (each has a real answer). */
+export const GREETING_OPTIONS: Record<"ar" | "en", string[]> = {
+  ar: ["حدثني عن موسم ملح القصب", "وش الأماكن التراثية في القصب؟", "وين الأماكن السياحية في القصب على الخريطة؟"],
+  en: ["Tell me about the Al-Qasab Salt Season", "What are the heritage places in Al-Qasab?", "Show me the tourist places in Al-Qasab on the map"],
+};
+
+const pick = (a: string[]) => a[Math.floor(Math.random() * a.length)];
+
+/** Reply to a greeting: «وعليكم السلام» only when the visitor actually said salam. */
 export function pickSalamReply(lang: "ar" | "en" = "ar", userSaidSalam = true): string {
-  if (lang === "ar") return SALAM_REPLIES_AR[Math.floor(Math.random() * SALAM_REPLIES_AR.length)];
-  const welcome = WELCOME_REPLIES_EN[Math.floor(Math.random() * WELCOME_REPLIES_EN.length)];
-  return userSaidSalam ? `Wa alaykum assalam! ${welcome}` : `Hello! ${welcome}`;
+  if (lang === "ar") return `${pick(userSaidSalam ? GREETING_OPENERS_AR_SALAM : GREETING_OPENERS_AR)} ${GREETING_MENU_AR}`;
+  return `${userSaidSalam ? "Wa alaykum assalam, welcome to Al-Qasab!" : "Hello, welcome to Al-Qasab!"} ${GREETING_MENU_EN}`;
 }
 
 /** Short greeting to put in front of an answer when the user opened with «السلام عليكم» plus a question. */

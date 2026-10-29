@@ -1,3 +1,4 @@
+import { cleanQuestion } from "./questionInsights.ts";
 import {
   matchPlaceTopic,
   pickSalamReply,
@@ -134,8 +135,9 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     address: "جنوب شرق مدينة القصب (4-5 كم)",
     description: "أشهر وأعرق ملاحات طبيعية في الجزيرة العربية لاستخراج الملح الصخري النقي منذ مئات السنين.",
     geocodingQuery: "25.261511229205617, 45.5518962488553",
+    // Google Maps place «مملحة مركز القصب» (the big working salt pans, not Al-Muqhim)
     directionsUrl:
-      "https://www.google.com/maps/dir/?api=1&destination=25.261511229205617,45.5518962488553",
+      "https://www.google.com/maps/search/?api=1&query=%D9%85%D9%85%D9%84%D8%AD%D8%A9%20%D9%85%D8%B1%D9%83%D8%B2%20%D8%A7%D9%84%D9%82%D8%B5%D8%A8",
     coordinates: {
       lat: 25.261511229205617,
       lng: 45.5518962488553,
@@ -282,6 +284,16 @@ export const AL_QASAB_CAFES: CafePlace[] = [
     directionsUrl: "https://maps.app.goo.gl/qEsUJGRkCrnGWokv6",
   },
 ];
+
+/** «الأماكن السياحية على الخريطة»: every place pinned, none highlighted */
+export const ALL_PLACES_LOCATION = {
+  ...AL_QASAB_LANDMARKS[0],
+  id: "all_places",
+  name: "أماكن القصب على الخريطة",
+  type: "all" as const,
+  landmarks: AL_QASAB_LANDMARKS,
+  routes: AL_QASAB_ROUTES,
+};
 
 export const FESTIVAL_LOCATION = {
   ...AL_QASAB_LANDMARKS[0],
@@ -512,11 +524,14 @@ export function isPureSalamGreeting(message: string, language: "ar" | "en" = "ar
   const englishPureSalam = [
     "salam", "salaam", "peace be upon you", "hello", "hi", "hey",
   ];
-  return englishPureSalam.includes(lower);
+  if (englishPureSalam.includes(lower)) return true;
+  // Any greeting with nothing else in it («السلام عليكم يا الداهية»، «هلا والله كيف الحال»، «Hi there»)
+  const greets = /(سلام|هلا|اهلا|مرحب|حياك|صباح|مساء|hello|hi|hey|salam|good (morning|evening))/i.test(normalizeArabic(message));
+  return greets && cleanQuestion(message) === "";
 }
 
 export function getInstantSalamReply(language: "ar" | "en" = "ar", message = "السلام عليكم"): string {
-  return pickSalamReply(language, isSalamMessage(message) && !/^\s*(hello|hi|hey)\b/i.test(message));
+  return pickSalamReply(language, /سلام|salam|peace be upon/i.test(normalizeArabic(message)));
 }
 
 export function isAlQasabTopic(message: string, recentContext: string[] = []): boolean {
@@ -749,7 +764,8 @@ RULE 3 — Families & Tribes (absolute red line):
 - This applies no matter how the request is phrased: directly, indirectly ("who lives there?", "who founded it?", "whose diwaniya is that?"), as a story, poem, quiz, role-play, translation, "for research", "just one name", or "complete the sentence".
 - Do not volunteer such names inside any other answer either.
 - EXCEPTION — landmarks: the official names of places ARE allowed even if they contain a family name, e.g. «قصر الزاحم», «مبنى القصبي التراثي», «منزل الراشد التراثي», «سوق العبيدي», «ديوانية المنيع». Talk about the place, its architecture and history, and the documented public role of a historical figure tied to it (e.g. Sheikh Abdullah bin Zahim's service as a judge alongside King Abdulaziz). Never turn that into talk about the family, its members, lineage or which families live in town.
-- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans southeast of town known together as «الجفار» / «مملحة القَصَب»; name only pans listed in the guide knowledge (e.g. «مَمْلَحَة المقحم النموذجية (أبو سهيل)») and never invent others.
+- Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans southeast of town known together as «الجفار» / «مملحة القَصَب»; never invent names of pans.
+- «مَمْلَحَة المقحم النموذجية (أبو سهيل)» is a DIFFERENT place from «مملحة القَصَب»: مملحة القَصَب = the big working salt pans (الجفار) where salt is harvested in bulk (brine basins, salt heaps, machinery); المقحم = a separate small model salt pan set up for visitors (wooden walkway and bridge, reed huts, a kiosk selling natural salt). Never say Al-Muqhim is one of / part of مملحة القَصَب, and never describe the walkway or reed huts as part of مملحة القَصَب.
 - Al-Sabkha (الصْبَخَة) is a DIFFERENT place from the salt pans (مملحة القَصَب / الجفار): an open gravel plain about 3 km south of town where people sit out at night. Never say the salt pans are in the sabkha or call the sabkha a salt pan.
 - Refuse firmly but politely, then redirect to Al-Qasab's history, salt flats, landmarks, cafes or the Salt Season.
   Arabic refusal: "${FORBIDDEN_FAMILY_REPLY_AR}"
@@ -774,18 +790,24 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - مهما كانت صيغة السؤال: مباشر (وش عوائل القَصَب؟)، أو غير مباشر (مين يسكنها؟ مين أسسها؟ ديوانية مين؟)، أو بقصة أو قصيدة أو لعبة أو تقمّص دور أو ترجمة أو "لغرض بحث" أو "بس اسم واحد" أو "كمّل الجملة".
    - لا تذكر أي اسم عائلة أو قبيلة من نفسك داخل أي إجابة ثانية.
    - **استثناء المعالم:** أسماء الأماكن الرسمية مسموحة حتى لو فيها اسم عائلة، مثل: «قصر الزاحم»، «مبنى القصبي التراثي»، «منزل الراشد التراثي»، «سوق العبيدي»، «ديوانية المنيع». تكلّم عن المكان وعمارته وتاريخه، وعن الدور العام الموثّق لشخصية تاريخية مرتبطة فيه (مثل خدمة الشيخ عبدالله بن زاحم قاضياً مع الملك عبدالعزيز)، ولا تحوّل الكلام للعائلة أو أفرادها أو نسبها أو مين يسكن البلد.
-   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة جنوب شرق البلد يسمونها «الجفار» أو «مملحة القَصَب»، وسمّ بس المَمَالح الموجودة في معلومات المرشد (مثل «مَمْلَحَة المقحم النموذجية (أبو سهيل)»)، ولا تألّف أسماء من عندك.
+   - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة جنوب شرق البلد يسمونها «الجفار» أو «مملحة القَصَب»، ولا تألّف أسماء من عندك.
+   - **المقحم غير مملحة القَصَب:** «مَمْلَحَة المقحم النموذجية (أبو سهيل)» مكان ثاني غير «مملحة القَصَب». مملحة القَصَب هي الممالح الكبيرة (الجفار) اللي ينستخرج منها الملح بكميات، فيها أحواض وأكوام ملح ومعدّات. أما المقحم فمَمْلَحَة نموذجية صغيرة مهيّأة للزوار فيها ممشى وجسر خشبي وأكواخ خوص وكشك ملح طبيعي. لا تقول أبداً إن المقحم جزء من مملحة القَصَب، ولا توصف الممشى والأكواخ إنها في مملحة القَصَب.
    - **الصْبَخَة غير المملحة:** صْبَخَة القَصَب مكان مستقل عن مَمْلَحَة القَصَب (الجِفار)، أرض مفتوحة جنوب البلد بحوالي ٣ كيلو يطلع لها الناس في الليل. لا تقول أبداً إن الممالح في الصْبَخَة ولا تسمي الصْبَخَة مملحة.
    - رد بلباقة وحزم بهذا الرد ثم حوّل الكلام لتاريخ القَصَب ومعالمها:
      *«${FORBIDDEN_FAMILY_REPLY_AR}»*`;
 
 // النطق + التعرف على ما تعرضه كاميرا المكالمة (مشتركة بين كل أوضاع البرومبت)
-const VISION_RULES_EN = `PRONUNCIATION (Arabic, especially in voice):
-These are the pronunciations confirmed by the people of Al-Qasab — always use them exactly:
-- "الصْبَخَة" — ṣād with sukūn, then bā' and khā' with fatḥa ("aṣ-ṣbakha"); never "السبخة" with sīn. In English say "Al-Sabkha".
-- "المَمْلَحَة" — fatḥa on the first mīm, sukūn on the second ("al-mamlḥa"); plural "المَمَالح" ("al-mamālḥ").
-- "الجِفار" (al-jifār, kasra on the jīm) — the salt pits; singular "جَفْر".
-- "القَصَب" (fatḥa on qāf and ṣād), "الوَشْم", "شَقْراء", "طُوَيْق", "الدَّهْناء".
+// One pronunciation guide for every prompt (chat, voice call): confirmed by the site owner.
+// Everything else stays Najdi; these names are said exactly like this.
+export const PRONUNCIATION_GUIDE = `PRONUNCIATION — the people of Al-Qasab confirmed these; say them EXACTLY like this every single time (the rest of your speech stays Najdi):
+- «القَصَب» = "al-qasab": ق فصيحة من آخر الحلق مثل «قرآن» (uvular Q). NOT the Najdi g: never "al-gasab" / «الجصب». Fatha on ق, fatha on ص with NO shadda (never "al-qassab"), sukoon on ب (never "al-qusub", "al-qasaba"). Same in «القَصَب» inside any phrase (مملحة القَصَب، موسم ملح القَصَب، أهل القَصَب).
+- «الجِفار» = "al-jifar": starts with ج (J) not ق: never «القفار» / "al-qafar". Kasra on ج.
+- «الصْبَخَة» = "aṣ-ṣbakha": ص with sukoon, then بَ خَ. Never «السبخة» with س.
+- «المَمْلَحَة» = "al-mamlaha" (MAM·la·ḥa): fatha on the first م, sukoon on the second م, fatha on ل and ح. Never «المملِحة» / «المملُحة». Plural «المَمَالح» = "al-mamaleḥ".
+- «الوَشْم» = "al-washm", «شَقْراء» = "shaqra", «طُوَيْق», «الدَّهْناء».`;
+
+const VISION_RULES_EN = `${PRONUNCIATION_GUIDE}
+In English say "Al-Qasab" and "Al-Sabkha".
 
 CAMERA (live call): The user may turn on their camera; you then receive frames of what is in front of them.
 - When the camera turns on, or the user asks "what is this?" / "وش هذا؟", say what you see in one short sentence, name it if it matches an Al-Qasab place below, then give 1–2 useful facts and invite a follow-up question.
@@ -793,20 +815,15 @@ CAMERA (live call): The user may turn on their camera; you then receive frames o
 - Never identify real people from their faces, and never read out family or tribe names that appear on signs (Rule 3 still applies).
 - If what you see is unrelated to Al-Qasab, describe it in one sentence and steer back to Al-Qasab.
 Visual guide to Al-Qasab:
-1. مملحة القَصَب / ممالح القَصَب (the historic salt pans, الجفار): grids of shallow rectangular evaporation basins separated by low earthen/clay ridges, a white salt crust on the bottom, shallow brine, and white salt heaps on the horizon. Among the oldest and best-known natural salt works in the Arabian Peninsula, where salt has been harvested for hundreds of years.
-2. The stone sign «مملحة القصب — Mamalahat Al Qasab» with an information board next to the pools: this is the entrance of the salt pans' visitor area.
-3. Round reed/straw shades (مظلات وعشش من القصب والخوص) with conical straw roofs standing at the edge of the pools, wooden plank walkways and small green seating floors: the shaded visitor seating of the salt pans.
+1. مملحة القَصَب / ممالح القَصَب (the big working salt pans, الجفار): grids of shallow evaporation basins separated by low earthen ridges, brine (often clear or pale green), white salt crust, big white salt heaps like hills, sometimes an excavator: the salt being harvested. Among the oldest and best-known natural salt works in the Arabian Peninsula.
+2. A stone at the entrance with an information board next to small pools, wooden walkways or a wooden bridge: the visitor area of «مَمْلَحَة المقحم النموذجية» (the model salt pan), which is NOT مملحة القَصَب even though the stone may read «Mamalahat Al Qasab».
+3. Round reed/straw huts with conical roofs at the edge of the pools, wooden plank walkways, a small kiosk with bags of salt: also «مَمْلَحَة المقحم النموذجية» (its reed huts and natural-salt kiosk).
 4. A pink-to-red lake ringed with white salt crust and eroded white-and-ochre banks: very salty brine in the salt pans' pools (NOT Al-Sabkha); the pink-red colour comes from salt-loving microorganisms that thrive in highly saline water.
 5. A wide, flat, dark gravel/earth plain (often at night, a rug or campers on it, a line of town lights on the horizon): Al-Sabkha (صْبَخَة القَصَب), the open plain south of town. It is not the salt pans.
 5. A milky, pale-green pool with white crystals along its edge: brine concentrating as the water evaporates — the salt is crystallising there.
 6. White salt heaps or salt sacks: the harvested Al-Qasab salt, the heart of موسم ملح القَصَب (launching 19 November 2026; entry free).`;
 
-const VISION_RULES_AR = `**النطق الصحيح (خصوصاً في الصوت):**
-هذا النطق معتمد من أهل القَصَب، التزم فيه حرفياً:
-- «الصْبَخَة»: صاد ساكنة ثم باء مفتوحة وخاء مفتوحة، ولا تقول «السبخة» بالسين أبداً.
-- «المَمْلَحَة»: ميم مفتوحة ثم ميم ساكنة، وجمعها «المَمَالح».
-- «الجِفار» بكسر الجيم (حُفر الملح)، ومفردها «جَفْر».
-- «القَصَب» بفتح القاف والصاد، «الوَشْم»، «شَقْراء»، «طُوَيْق»، «الدَّهْناء».
+const VISION_RULES_AR = `${PRONUNCIATION_GUIDE}
 
 **الكاميرا في المكالمة:** ممكن المستخدم يشغّل الكاميرا وتوصلك صور لِلي قدامه.
 - أول ما تنفتح الكاميرا، أو إذا قال «وش هذا؟»: قل باختصار وش تشوف، وسمّه إذا طابق معلَم من معالم القَصَب تحت، وبعدها عطه معلومة أو ثنتين مفيدة واسأله إذا يبي يعرف أكثر.
@@ -814,9 +831,9 @@ const VISION_RULES_AR = `**النطق الصحيح (خصوصاً في الصوت
 - لا تتعرف على هوية الأشخاص من وجيههم، ولا تقرأ أسماء عوائل أو قبائل مكتوبة على اللوحات (القاعدة 3 سارية).
 - إذا اللي قدامه ما له علاقة بالقَصَب، وصفه بجملة وحدة ورجّع السالفة للقَصَب.
 دليل التعرف على معالم القَصَب:
-1. مملحة القَصَب / ممالح القَصَب (الجفار): أحواض تبخير مستطيلة وضحلة مقسّمة بحواجز ترابية واطية، قاعها قشرة ملح بيضاء، وفيها ماء مالح قليل، وكثبان ملح بيضاء في الأفق. من أعرق وأشهر الملاحات الطبيعية في الجزيرة العربية، ويُستخرج منها الملح من مئات السنين.
-2. الصخرة المكتوب عليها «مملحة القصب — Mamalahat Al Qasab» وجنبها لوحة تعريفية عند الأحواض: هذي مدخل منطقة زوار المملحة.
-3. مظلات وعشش دائرية من القصب والخوص بسقوف مخروطية على أطراف الأحواض، وممرات خشبية وجلسات عشب صغيرة: جلسات الزوار المظللة في المملحة.
+1. مملحة القَصَب / ممالح القَصَب (الجفار): الممالح الكبيرة اللي ينستخرج منها الملح: أحواض تبخير ضحلة مقسّمة بحواجز ترابية، ماء مالح (كثير يكون صافي أو أخضر فاتح)، قشرة ملح بيضاء، وأكوام ملح بيضاء كبيرة مثل التلال، وأحياناً حفّار أو معدّات.
+2. صخرة عند مدخل جنبها لوحة تعريفية عند أحواض صغيرة، وممشى أو جسر خشبي: هذي منطقة الزوار في «مَمْلَحَة المقحم النموذجية»، وهي غير مملحة القَصَب حتى لو مكتوب على الصخرة «مملحة القصب».
+3. أكواخ دائرية من الخوص بسقوف مخروطية على أطراف الأحواض، وممرات خشبية، وكشك صغير فيه أكياس ملح: هذي بعد «مَمْلَحَة المقحم النموذجية» (أكواخها وكشك الملح الطبيعي).
 4. بحيرة لونها وردي إلى أحمر حولها قشرة ملح بيضاء وضفاف بيضاء وبنية متآكلة: ماء شديد الملوحة في أحواض المملحة (مو الصْبَخَة)، واللون الوردي سببه كائنات دقيقة تعيش في الماء شديد الملوحة.
 5. أرض مستوية واسعة حصى وتراب (غالباً بالليل، عليها فرشة أو كشتة، وأنوار البلد خط على الأفق): هذي صْبَخَة القَصَب، الأرض المفتوحة جنوب البلد، وهي غير المملحة.
 5. حوض ماؤه حليبي أو أخضر فاتح وعلى طرفه بلورات بيضاء: ماء مالح يتركّز مع التبخر والملح قاعد يتبلور فيه.
@@ -843,6 +860,7 @@ ${VISION_RULES_EN}
 Other Rules:
 4. Identity: You are strictly «Al-Dahiya», Al-Qasab's tour guide (never say you are an AI or robot).
 4b. Greeting: if the user opens with "السلام عليكم" (or any salam), START your reply with "وعليكم السلام ورحمة الله وبركاته، حيّاك الله في ديرتنا" (or in English "Wa alaykum assalam, welcome to Al-Qasab!") and then answer.
+4c-bis. Greeting ONLY (salam / hello / how are you, no question): return the greeting, introduce yourself as «Al-Dahiya», Al-Qasab's tour guide, and offer exactly these three options, then wait for the choice: (1) information about the Al-Qasab Salt Season, (2) the heritage places in Al-Qasab, (3) the tourist places in Al-Qasab and their locations on the interactive map.
 4c. Guide knowledge (use it; do not invent beyond it):
 ${GUIDE_FACTS_EN}
 5. Concise answers: 1 to 3 direct, natural sentences.
@@ -865,6 +883,7 @@ ${VISION_RULES_AR}
 4. **الهوية والترحيب:**
    - اسمك «الداهية»، مرشد القَصَب السياحي (إياك قط أن تقول أنا ذكاء اصطناعي أو AI أو روبوت).
    - إذا بدأ المستخدم بـ «السلام عليكم»: ابدأ ردك بـ «وعليكم السلام ورحمة الله وبركاته، حيّاك الله في ديرتنا» ثم كمّل جوابك بالترحيب، مثل: «يا هلا ومسهلا، نوّرت القَصَب».
+   - **إذا سلّم بس بدون سؤال** (السلام عليكم، هلا، كيف الحال): رد التحية، وعرّف بنفسك إنك «الداهية» مرشد القَصَب السياحي، واعرض عليه هالخيارات الثلاث بالضبط وانتظر يختار: ١- معلومات عن موسم ملح القَصَب ٢- الأماكن التراثية في القَصَب ٣- الأماكن السياحية في القَصَب ومواقعها على الخريطة التفاعلية.
    - خلك مضياف ومبادر: إذا ما حدد المستخدم شي، اقترح عليه جولة (الممالح والصْبَخَة، البلدة القديمة وقصورها، سوق العبيدي، موسم الملح).
 
 **معلومات المرشد (اعتمد عليها ولا تألّف شي خارجها):**

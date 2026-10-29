@@ -6,13 +6,23 @@ type Pair = [ar: string, en: string];
 
 const BY_TOPIC: Record<string, Pair[]> = {
   salt_pans: [
-    ["وريني مملحة المقحم", "Show me Al-Muqhim salt pan"],
+    ["وش الفرق بين مملحة القصب ومملحة المقحم؟", "How is Al-Muqhim different from the Al-Qasab salt pans?"],
     ["وش الفرق بين المملحة والصبخة؟", "How is Al-Sabkha different from the salt pans?"],
     ["وش أحسن وقت أزور فيه المملحة؟", "When is the best time to visit the salt pans?"],
     ["كيف أوصل للممالح؟", "How do I get to the salt pans?"],
   ],
+  heritage_places: [
+    ["علمني عن قصر الزاحم", "Tell me about Al-Zahim palace"],
+    ["وش سوق العبيدي؟", "What is Souq Al-Obaidi?"],
+    ["وين الأماكن التراثية على الخريطة؟", "Where are the heritage places on the map?"],
+  ],
+  tourist_places: [
+    ["حدثني عن مملحة القصب", "Tell me about the Al-Qasab salt pans"],
+    ["وش الفرق بين مملحة القصب ومملحة المقحم؟", "How is Al-Muqhim different from the Al-Qasab salt pans?"],
+    ["وش قصة الصبخة؟", "What is Al-Sabkha?"],
+  ],
   muqhim_pan: [
-    ["حدثني عن ممالح القصب كلها", "Tell me about all the Al-Qasab salt pans"],
+    ["حدثني عن مملحة القصب", "Tell me about the Al-Qasab salt pans"],
     ["وين مملحة المقحم على الخريطة؟", "Where is Al-Muqhim salt pan on the map?"],
     ["وش أحسن وقت أزور فيه المملحة؟", "When is the best time to visit the salt pans?"],
   ],

@@ -11,6 +11,7 @@ import {
   isWeatherQuestion,
   getLocationForQuery,
   FESTIVAL_LOCATION,
+  ALL_PLACES_LOCATION,
   SALT_FLAT_LOCATION,
   SABKHA_LOCATION,
   HERITAGE_VILLAGE_LOCATION,
@@ -36,7 +37,7 @@ import {
 } from "./alQasabScope.ts";
 import { fetchAlQasabWeather, weatherSummaryEn } from "./weather.ts";
 import { rateLimitMiddleware } from "./rateLimit.ts";
-import { getPlaceImages, getPlaceLocation, getPlaceMapsUrl, matchPlaceTopic, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
+import { getPlaceImages, getPlaceLocation, getPlaceMapsUrl, matchPlaceTopic, GREETING_OPTIONS, SALAM_PREFIX_AR, SALAM_PREFIX_EN } from "./alQasabKnowledge.ts";
 import { recordQuestion, getQuestionStats } from "./questionStats.ts";
 import { getFollowUps, followUpTopic } from "./followUps.ts";
 import { stopForCode, stopsWithCodes } from "./passportCodes.ts";
@@ -202,6 +203,8 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         showMap: false,
         locationData: null,
         weather: null,
+        // The three options from the greeting, as buttons
+        followUps: GREETING_OPTIONS[lang],
       });
       res.end();
       return;
@@ -366,14 +369,21 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     const images = getPlaceImages(placeText, lang);
     const mapsUrl = getPlaceMapsUrl(placeText);
 
-    const showMap = !photo && (
+    const topicId = photo ? null : matchPlaceTopic(userPrompt)?.id;
+    const allPlacesMap =
+      topicId === "tourist_places" || (topicId === "heritage_places" && isLocationQuestion(userPrompt));
+    const showMap = allPlacesMap || !photo && (
       isLocationQuestion(userPrompt) ||
       isCafeQuestion(userPrompt) ||
       isDirectionsQuestion(userPrompt) ||
       // Look at the answer text only for real Gemini answers (the canned welcome mentions cafes)
       (!usedFallback && (isLocationQuestion(finalAnswer) || isCafeQuestion(finalAnswer))));
 
-    const locationData = showMap ? getPlaceLocation(userPrompt, lang) || getLocationForQuery(userPrompt, finalAnswer) : null;
+    const locationData = allPlacesMap
+      ? ALL_PLACES_LOCATION
+      : showMap
+        ? getPlaceLocation(userPrompt, lang) || getLocationForQuery(userPrompt, finalAnswer)
+        : null;
     const totalResponseTimeMs = Date.now() - requestStartTime;
 
     if (!res.writableEnded && !res.destroyed) {

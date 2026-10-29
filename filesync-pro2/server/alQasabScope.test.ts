@@ -36,7 +36,18 @@ test("identifies greetings and salam correctly", () => {
   const replyAr = getInstantSalamReply("ar");
   assert.match(replyAr, /وعليكم السلام/);
   assert.match(getInstantSalamReply("en", "salam"), /^Wa alaykum assalam/);
-  assert.match(getInstantSalamReply("en", "hello"), /^Hello!/);
+  assert.match(getInstantSalamReply("en", "hello"), /^Hello, welcome/);
+  // A greeting alone gets the self-introduction and the three options
+  for (const r of [replyAr, getInstantSalamReply("ar", "هلا")]) {
+    assert.match(r, /«الداهية»/);
+    assert.match(r, /موسم ملح القَصَب/);
+    assert.match(r, /الأماكن التراثية/);
+    assert.match(r, /الخريطة التفاعلية/);
+  }
+  assert.doesNotMatch(getInstantSalamReply("ar", "هلا"), /وعليكم السلام/); // no salam → no «وعليكم السلام»
+  assert.equal(isPureSalamGreeting("السلام عليكم يا الداهية"), true);
+  assert.equal(isPureSalamGreeting("هلا والله كيف الحال"), true);
+  assert.equal(isPureSalamGreeting("السلام عليكم وين المملحة"), false);
 });
 
 test("identifies Al-Qasab domain topics accurately", () => {
@@ -184,7 +195,7 @@ test("tour guide knowledge: salt pans, palaces and the weather false positive", 
     const a = generateLocalKnowledgeFallback(q, "ar");
     assert.ok(a.includes("الجِفار"), q);
     assert.ok(!a.includes("ما أذكر أسماء عوائل"), q);
-    assert.equal(getPlaceImages(q, "ar").length, 8, q);
+    assert.equal(getPlaceImages(q, "ar").length, 4, q); // only photos of مملحة مركز القصب (Al-Muqhim has its own)
   }
   assert.equal(isAlQasabTopic("علمني عن قصر الزاحم"), true);
   assert.ok(generateLocalKnowledgeFallback("علمني عن قصر الزاحم", "ar").includes("١٤٣٦"));

@@ -177,18 +177,22 @@ const CAFE_PIN_IDS = AL_QASAB_CAFES.map((c) => c.id);
 function LocationMapCard({ location, language = "ar" }: { location: any; language?: Language }) {
   const isCafes = location.type === "cafes" || Boolean(location.places && location.places.length > 0);
   const activeCoordinates = location.coordinates || { lat: 25.2984, lng: 45.5073 };
-  const locationTitle = location.name || (language === "en" ? "Al-Qasab Salt Season - Event Grounds" : "موسم ملح القصب - أرض الفعاليات");
+  // «الأماكن السياحية على الخريطة»: every pin, none highlighted, framed together
+  const allPlaces = location.type === "all";
+  const locationTitle = allPlaces
+    ? language === "en" ? "Al-Qasab places on the map" : "أماكن القصب على الخريطة"
+    : location.name || (language === "en" ? "Al-Qasab Salt Season - Event Grounds" : "موسم ملح القصب - أرض الفعاليات");
   // Several cafes → frame the 4 cafes; otherwise focus the place being asked about
   const multiPin = isCafes && Array.isArray(location.places) && location.places.length > 1;
   const { mapPoints, activeId } = useMemo(() => {
     const points: MapPoint[] = [...ALL_MAP_POINTS];
-    if (multiPin) return { mapPoints: points, activeId: undefined };
+    if (multiPin || allPlaces) return { mapPoints: points, activeId: undefined };
     const byId = location.id && points.find((p) => p.id === location.id);
     const near = byId || points.find((p) => Math.abs(p.lat - activeCoordinates.lat) < 0.0004 && Math.abs(p.lng - activeCoordinates.lng) < 0.0004);
     if (near) return { mapPoints: points, activeId: near.id };
     points.push({ id: "here", lat: activeCoordinates.lat, lng: activeCoordinates.lng, title: locationTitle });
     return { mapPoints: points, activeId: "here" };
-  }, [multiPin, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]);
+  }, [multiPin, allPlaces, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]);
 
   return (
     <div className="my-4 overflow-hidden rounded-3xl border border-[#f2d4d1] bg-white shadow-lg shadow-gray-200/50 w-full">
@@ -201,6 +205,9 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
       />
       <div className="flex items-center justify-between gap-2 border-t border-[#f4dedd] px-3 py-2.5">
         <span className="min-w-0 truncate text-xs font-bold text-[#321210]">{locationTitle}</span>
+        {allPlaces ? (
+          <span className="shrink-0 text-[11px] text-[#7d6564]">{language === "en" ? "Tap a pin to see its name" : "اضغط على أي دبوس يطلع اسمه"}</span>
+        ) : (
         <a
           href={directionsUrl(activeCoordinates.lat, activeCoordinates.lng)}
           target="_blank"
@@ -210,6 +217,7 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
           <ExternalLink className="size-3.5" />
           {language === "en" ? "Take me there" : "خذني لها"}
         </a>
+        )}
       </div>
 
       {isCafes && location.places && (
