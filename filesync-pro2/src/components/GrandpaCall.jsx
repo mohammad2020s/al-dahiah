@@ -29,31 +29,57 @@ const fragmentShader = `
   // Mouth + beard region that moves when he talks
   const vec2 MOUTH_C = vec2(390.0, 429.0);
   const vec2 MOUTH_R = vec2(113.2, 113.2);
+  // Jaw: the upper lip stays, everything from the lower lip to the beard's tip drops by JAW_DROP
+  // px between the closed and the open painting (measured on the two images)
+  const float UPPER_LIP_Y = 372.0;
+  const float LOWER_LIP_Y = 408.0;
+  const float BEARD_END_Y = 485.0;
+  const float NECK_Y = 515.0;
+  const float JAW_DROP = 28.0;
+  const float JAW_HALF_W = 92.0;
   // Eyes
   const vec2 EYE_L = vec2(325.5, 247.5);
   const vec2 EYE_R = vec2(450.8, 248.2);
   const vec2 EYE_RAD = vec2(42.0, 27.0);
 
-  // 1 inside the ellipse, fading to 0 over a soft rim
   float ell(vec2 px, vec2 c, vec2 r) {
     float d = length((px - c) / r);
     return 1.0 - smoothstep(0.75, 1.25, d);
   }
+  vec3 tex(sampler2D t, vec2 px) { return texture2D(t, vec2(px.x / SIZE, 1.0 - px.y / SIZE)).rgb; }
+
+  // How much of the jaw movement applies at this pixel (0 above the lip and outside the chin)
+  float jaw(vec2 px) {
+    float v = smoothstep(UPPER_LIP_Y, LOWER_LIP_Y, px.y) * (1.0 - smoothstep(BEARD_END_Y, NECK_Y, px.y));
+    float h = 1.0 - smoothstep(JAW_HALF_W * 0.6, JAW_HALF_W * 1.25, abs(px.x - MOUTH_C.x));
+    return v * h;
+  }
 
   void main() {
     vec2 px = vec2(vUv.x, 1.0 - vUv.y) * SIZE;
-    vec4 col = texture2D(uBase, vUv);
-    float m = ell(px, MOUTH_C, MOUTH_R) * uOpen;
-    if (m > 0.001) col.rgb = mix(col.rgb, texture2D(uMouth, vUv).rgb, m);
+    vec3 col = tex(uBase, px);
+
+    float area = ell(px, MOUTH_C, MOUTH_R);
+    if (uOpen > 0.001 && area > 0.001) {
+      float w = jaw(px);
+      // Closed painting with its jaw pulled down to the current opening…
+      vec3 closedNow = tex(uBase, px - vec2(0.0, uOpen * JAW_DROP * w));
+      // …and the open painting with its jaw pushed up to the same opening
+      vec3 openNow = tex(uMouth, px + vec2(0.0, (1.0 - uOpen) * JAW_DROP * w));
+      // Both now line up, so blending them never shows two mouths
+      vec3 talking = mix(closedNow, openNow, smoothstep(0.15, 0.85, uOpen));
+      col = mix(col, talking, area);
+    }
+
     float e = max(ell(px, EYE_L, EYE_RAD), ell(px, EYE_R, EYE_RAD)) * uBlink;
-    if (e > 0.001) col.rgb = mix(col.rgb, texture2D(uEyes, vUv).rgb, e);
-    gl_FragColor = vec4(col.rgb, 1.0);
+    if (e > 0.001) col = mix(col, tex(uEyes, px), e);
+    gl_FragColor = vec4(col, 1.0);
   }
 `;
 
 const SILENCE_THRESHOLD = 0.02;
-const ATTACK_TIME = 0.04;
-const RELEASE_TIME = 0.09;
+const ATTACK_TIME = 0.06;
+const RELEASE_TIME = 0.13;
 const CLOSED_EPSILON = 0.015;
 // The face sits a bit above the picture's centre: show it larger and shifted down so the face fills the circle
 const PLANE_SIZE = 2.6;
@@ -89,13 +115,6 @@ function GrandpaScene({ audioLevel = 0, isSpeaking = false, analyserNode = null 
     [base, mouth, eyes]
   );
 
-  useEffect(() => {
-    if (!isSpeaking) {
-      smoothAudioRef.current = 0;
-      if (materialRef.current) materialRef.current.uniforms.uOpen.value = 0;
-    }
-  }, [isSpeaking]);
-
   useFrame((state, delta) => {
     timeRef.current += delta;
     const t = timeRef.current;
@@ -124,25 +143,25 @@ function GrandpaScene({ audioLevel = 0, isSpeaking = false, analyserNode = null 
         targetVol = (0.2 + 0.8 * wave) * (Math.sin(t * 5.5) > -0.6 ? 1.0 : 0.1);
       }
     }
-    if (!isSpeaking) {
-      smoothAudioRef.current = 0;
-    } else {
-      if (targetVol <= SILENCE_THRESHOLD) targetVol = 0;
+    {
+      // Speech over or a pause: ease the jaw closed instead of snapping shut
+      if (!isSpeaking || targetVol <= SILENCE_THRESHOLD) targetVol = 0;
       const tau = targetVol > smoothAudioRef.current ? ATTACK_TIME : RELEASE_TIME;
       const k = 1 - Math.exp(-Math.min(delta, 0.1) / tau);
       smoothAudioRef.current = THREE.MathUtils.lerp(smoothAudioRef.current, targetVol, k);
       if (targetVol === 0 && smoothAudioRef.current < CLOSED_EPSILON) smoothAudioRef.current = 0;
     }
-    // Spend little time half-blended: quiet sounds keep it closed, normal speech opens it
-    const open = THREE.MathUtils.smoothstep(smoothAudioRef.current, 0.06, 0.55);
+    // The jaw moves continuously now, so a gentle curve: soft sounds open it a little
+    const open = Math.min(1, Math.pow(Math.max(0, smoothAudioRef.current - 0.03) / 0.6, 0.8));
 
     // Natural blinks at irregular intervals (2.5–5.5 s), each ~0.2 s
     if (t >= nextBlinkRef.current) {
       blinkStartRef.current = t;
       nextBlinkRef.current = t + 2.5 + Math.random() * 3;
     }
-    const bt = (t - blinkStartRef.current) / 0.2;
-    const blink = bt >= 0 && bt <= 1 ? Math.sin(bt * Math.PI) : 0;
+    const bt = (t - blinkStartRef.current) / 0.26;
+    // Eyelids close quickly and open a little slower, like a real blink
+    const blink = bt >= 0 && bt <= 1 ? (bt < 0.4 ? THREE.MathUtils.smoothstep(bt, 0, 0.4) : 1 - THREE.MathUtils.smoothstep(bt, 0.4, 1)) : 0;
 
     if (materialRef.current) {
       materialRef.current.uniforms.uOpen.value = open;
