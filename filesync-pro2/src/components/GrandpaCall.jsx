@@ -1,12 +1,13 @@
 import React, { useRef, useMemo, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
+import { GRANDPA_FRAMES as FRAMES } from './grandpaFrames';
 
 // «الداهية» as a realistic 2D Najdi grandfather for the live call (replaces the salt bag).
 // Three pixel-aligned paintings of the same portrait: mouth closed / mouth open / eyes closed.
 // The shader shows the base and blends in only the mouth area (with the voice level) and only
 // the eye area (for blinks), so the rest of the picture never ghosts.
-// Coordinates are pixels in the 1024×1024 images (y grows downwards).
+// Coordinates are pixels in the 768×768 images (y grows downwards).
 
 const vertexShader = `
   varying vec2 vUv;
@@ -24,14 +25,14 @@ const fragmentShader = `
   uniform float uOpen;
   uniform float uBlink;
 
-  const float SIZE = 1024.0;
+  const float SIZE = 768.0;
   // Mouth + beard region that moves when he talks
-  const vec2 MOUTH_C = vec2(520.0, 572.0);
-  const vec2 MOUTH_R = vec2(151.0, 151.0);
+  const vec2 MOUTH_C = vec2(390.0, 429.0);
+  const vec2 MOUTH_R = vec2(113.2, 113.2);
   // Eyes
-  const vec2 EYE_L = vec2(434.0, 330.0);
-  const vec2 EYE_R = vec2(601.0, 331.0);
-  const vec2 EYE_RAD = vec2(56.0, 36.0);
+  const vec2 EYE_L = vec2(325.5, 247.5);
+  const vec2 EYE_R = vec2(450.8, 248.2);
+  const vec2 EYE_RAD = vec2(42.0, 27.0);
 
   // 1 inside the ellipse, fading to 0 over a soft rim
   float ell(vec2 px, vec2 c, vec2 r) {
@@ -58,7 +59,6 @@ const CLOSED_EPSILON = 0.015;
 const PLANE_SIZE = 2.6;
 const PLANE_Y = -0.2;
 
-const FRAMES = ['/images/shayeb/base.jpg', '/images/shayeb/mouth.jpg', '/images/shayeb/eyes.jpg'];
 
 function GrandpaScene({ audioLevel = 0, isSpeaking = false, analyserNode = null }) {
   const meshRef = useRef();

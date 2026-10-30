@@ -25,7 +25,12 @@ import {
 } from "lucide-react";
 import { MalhAlQasabLogo, TanmiahLogo } from "../components/BrandLogos";
 // The call screen pulls in three.js and the salt bag; load it only when someone calls
-const loadVoiceCall = () => import("../components/VoiceCall");
+import { preloadGrandpa } from "../components/grandpaFrames";
+// Fetch the call screen and the grandfather's paintings together
+const loadVoiceCall = () => {
+  preloadGrandpa();
+  return import("../components/VoiceCall");
+};
 const VoiceCall = lazy(() => loadVoiceCall().then((m) => ({ default: m.VoiceCall })));
 import { CallButtonAnimation } from "../components/CallButtonAnimation";
 import { LanguageModal } from "../components/LanguageModal";
