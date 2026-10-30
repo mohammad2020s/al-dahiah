@@ -44,6 +44,13 @@ export function setupLiveAudio(server: Server) {
     const reqUrl = new URL(request?.url || "", `http://${request?.headers?.host || "localhost"}`);
     const lang = reqUrl.searchParams.get("lang") === "en" ? "en" : "ar";
     console.log(`[Live Audio] Client connected (language: ${lang})`);
+    // Owner-only voice test (?voice=…&key=STATS_KEY); visitors always get the default voice
+    const ownerKey = process.env.STATS_KEY || "";
+    const testVoice =
+      ownerKey && reqUrl.searchParams.get("key") === ownerKey && /^[A-Z][a-z]{2,15}$/.test(reqUrl.searchParams.get("voice") || "")
+        ? String(reqUrl.searchParams.get("voice"))
+        : "";
+    const voiceName = testVoice || process.env.LIVE_VOICE || "Puck";
 
     // Free key first; the paid key (GEMINI_PAID_API_KEY) only if the free one is refused
     const keys = voiceKeys("live");
@@ -109,7 +116,7 @@ FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab",
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
-                voiceName: "Puck"
+                voiceName
               }
             }
           }
