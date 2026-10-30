@@ -161,7 +161,8 @@ const ALL_MAP_POINTS: MapPoint[] = [
     lat: t.coordinates!.lat,
     lng: t.coordinates!.lng,
     title: t.titleAr,
-    kind: "nature" as const,
+    // Salt pans / sabkha are nature (amber); souq and houses are heritage (red)
+    kind: t.id === "muqhim_pan" || t.id === "sabkha" ? ("nature" as const) : undefined,
   })),
   ...AL_QASAB_CAFES.map((c, i) => ({
     id: c.id,

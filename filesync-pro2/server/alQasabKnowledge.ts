@@ -152,6 +152,13 @@ export const PLACE_TOPICS: PlaceTopic[] = [
       "سوق العبيدي هو سوق القَصَب المركزي في البلدة القديمة قرب الجامع بحي القصر، والدكاكين تحيط فيه من كل الجهات إلا الجنوب، وتذكر المصادر إن تاريخه يرجع لأكثر من ٢٥٠ سنة، ويعد من أقدم أسواق نجد. حوله مباني تراثية مثل مبنى القصبي، ويتولاه اليوم بلدية القَصَب.",
     answerEn:
       "Souq Al-Obaidi is Al-Qasab's central market in the old town near the main mosque, in the Al-Qasr quarter, ringed by shops on every side but the south. Sources date it back more than 250 years, making it one of Najd's oldest markets. Heritage buildings such as the Al-Qusaibi building surround it.",
+    images: [
+      { src: "/images/places/souq-street.jpg", captionAr: "دكاكين سوق العبيدي بأعمدتها البيضاء وأبوابها الخشبية", captionEn: "The shops of Souq Al-Obaidi with white columns and wooden doors", credit: GM },
+      { src: "/images/places/souq-mud-house.jpg", captionAr: "بيت طيني بزخارفه النجدية في سوق العبيدي", captionEn: "A mud-brick house with Najdi decoration in the souq", credit: GM },
+      { src: "/images/places/souq-gate.jpg", captionAr: "بوابة طينية بشعار «ملح القصب» عند السوق", captionEn: "A mud gate with the «Malh Al-Qasab» logo by the souq", credit: GM },
+    ],
+    mapsUrl: "https://www.google.com/maps/place/%D8%B3%D9%88%D9%82+%D8%A7%D9%84%D8%B9%D8%A8%D9%8A%D8%AF%D9%8A+%D8%A7%D9%84%D8%AA%D8%B1%D8%A7%D8%AB%D9%8A+%D8%A8%D8%A7%D9%84%D9%82%D8%B5%D8%A8/@25.2991872,45.5063997,17z",
+    coordinates: { lat: 25.2991872, lng: 45.5063997 },
   },
   {
     id: "rashid_house",
@@ -162,16 +169,28 @@ export const PLACE_TOPICS: PlaceTopic[] = [
       "منزل (قصر) الراشد التراثي في الجهة الجنوبية الغربية من البلدة، مبني على السور القديم ويضم أحد أبراجه، دورين فيها ١٤ غرفة و٢١ عمود حجري. استلمته هيئة السياحة والتراث عام ١٤٣٣هـ ورممته، وتشغّله بلدية القَصَب، ومجلسه مؤثث بأثاث شعبي.",
     answerEn:
       "The Al-Rashid heritage house sits on the southwestern edge of town, built into the old wall and including one of its towers: two floors, 14 rooms and 21 stone pillars. The heritage authority took it over and restored it from 1433 AH, and the municipality runs it with a traditionally furnished majlis.",
+    images: [
+      { src: "/images/places/rashid-sign.jpg", captionAr: "لوحة «بيت الراشد للتراث» على جداره الطيني", captionEn: "The «Al-Rashed House for Heritage» sign on its mud wall", credit: GM },
+      { src: "/images/places/rashid-wall-towers.jpg", captionAr: "السور الطيني وأبراجه عند بيت الراشد", captionEn: "The mud wall and its towers by the Al-Rashid house", credit: GM },
+    ],
+    mapsUrl: "https://www.google.com/maps/place/%D8%A8%D9%8A%D8%AA+%D8%A7%D9%84%D8%B1%D8%A7%D8%B4%D8%AF+%D9%84%D9%84%D8%AA%D8%B1%D8%A7%D8%AB/@25.2978335,45.5067437,17z",
+    coordinates: { lat: 25.2978335, lng: 45.5067437 },
   },
   {
     id: "old_town",
     titleAr: "البلدة القديمة",
     titleEn: "The old town",
-    keywords: ["البلده القديمه", "الديره القديمه", "السور", "بوابات", "الطين", "طينيه"],
+    keywords: ["البلده القديمه", "الديره القديمه", "القريه التراثيه", "الديره التراثيه", "السور", "بوابات", "الطين", "طينيه", "heritage village", "old town"],
     answerAr:
       "البلدة القديمة في القَصَب كلها بيوت طين نجدية وأزقة. وفيها سوق العبيدي وقصر الزاحم ومنزل الراشد ومبنى القصبي، مشوار يومك كله تراث!",
     answerEn:
       "Al-Qasab's old town is a maze of Najdi mud-brick houses and lanes. Souq Al-Obaidi, Al-Zahim Palace, the Al-Rashid house and the Al-Qusaibi building are all here.",
+    images: [
+      { src: "/images/places/village-gate-season.jpg", captionAr: "بوابة القرية التراثية بأبراجها أيام موسم ملح القَصَب", captionEn: "The heritage village gate and towers during the Salt Season", credit: GM },
+      { src: "/images/places/village-corridor.jpg", captionAr: "ممر مسقوف بالخشب والجريد وأبوابه الخشبية في القرية التراثية", captionEn: "A wood-and-palm-roofed passage with wooden doors in the heritage village", credit: GM },
+      { src: "/images/places/souq-street.jpg", captionAr: "دكاكين سوق العبيدي في قلب البلدة القديمة", captionEn: "The shops of Souq Al-Obaidi in the old town", credit: GM },
+    ],
+    mapsUrl: "https://maps.app.goo.gl/uadCKcKUxtJ74JwB7",
   },
   {
     id: "marqab",
@@ -192,6 +211,11 @@ export const PLACE_TOPICS: PlaceTopic[] = [
       "موسم ملح القَصَب تنظمه أمانة منطقة الرياض عن طريق بلدية القَصَب، يحتفي بالذهب الأبيض وطرق استخراجه. النسخة الأولى كانت في مارس ٢٠٢٣، والثانية في فبراير ٢٠٢٤، والثالثة من ٢٠ إلى ٢٧ فبراير ٢٠٢٥ بأكثر من ٦٠ عارض. وفيه مَمْلَحَة نموذجية تشرح مراحل الاستخراج، ومسارات للملح، ومسرح ثقافي وكتاتيب، وركن للأطفال، والأسر المنتجة، وعروض خيل وإبل وسيارات كلاسيكية. وموعد الموسم الجاي ١٩ نوفمبر ٢٠٢٦ بإذن الله، والدخول مجاني.",
     answerEn:
       "The Al-Qasab Salt Season is organised by the Riyadh Region Municipality through Al-Qasab Municipality to celebrate the town's 'white gold'. Editions ran in March 2023, February 2024 and 20–27 February 2025 (60+ exhibitors), with a model salt pan, salt trails, a cultural theatre, traditional kuttab schools, a kids' zone, family producers, and horse, camel and classic-car shows. The next season launches on 19 November 2026, with free entry.",
+    images: [
+      { src: "/images/places/season-sign.jpg", captionAr: "لوحة «موسم ملح القصب» في أرض الموسم", captionEn: "The «Al-Qasab Salt Season» sign at the grounds", credit: GM },
+      { src: "/images/places/village-gate-season.jpg", captionAr: "بوابة القرية التراثية بشعار ملح القصب وقت الموسم", captionEn: "The heritage village gate with the Malh Al-Qasab logo during the season", credit: GM },
+    ],
+    mapsUrl: "https://maps.app.goo.gl/ANX6a26KTspG5we88",
   },
   {
     id: "town",
