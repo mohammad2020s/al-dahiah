@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
+import { fileContextFor } from "./qasabFile.ts";
 import {
   buildAlQasabSystemPrompt,
   getOutOfScopeMessage,
@@ -314,8 +315,9 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
 
       const result = await streamChatWithFallback({
         contents,
-        systemInstruction: buildAlQasabSystemPrompt(undefined, lang),
-        maxOutputTokens: 400,
+        systemInstruction: withFileContext(buildAlQasabSystemPrompt(undefined, lang), userPrompt, rawHistory),
+        // A poem or a list from the season file (teachers, stations) needs more room than a short answer
+        maxOutputTokens: /قصيد|قصايد|قصائد|ابيات|أبيات|شعر|poem|معلم|محطات|امثال|أمثال/i.test(userPrompt) ? 900 : 400,
         // Never leave the visitor waiting longer than this. Each model gets 7 s to start
         // (a photo takes the models longer to look at: 15 s each, 35 s in all)
         budgetMs: photo ? 35_000 : 20_000,
@@ -413,6 +415,17 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     }
   }
 });
+
+/** Adds the official season-file sections this question (or the previous one) is about. */
+function withFileContext(system: string, question: string, history: any[]): string {
+  const previous = [...history].reverse().find((t: any) => t?.role !== "assistant" && t?.content)?.content || "";
+  const context = fileContextFor(question, String(previous));
+  if (!context) return system;
+  return `${system}
+
+OFFICIAL SALT SEASON FILE — sections relevant to this question (from the season's verified information file; this overrides anything above that disagrees). Answer from it: use its facts, names, dates, numbers, poems and proverbs exactly as written (poems word for word), in the visitor's language/dialect. When the visitor asks for a poem, verses, a list of names or the season stations, give it in full even if longer than the usual 1–3 sentences:
+${context}`;
+}
 
 /**
  * Gemini TTS takes "director's notes" before the transcript. Only the notes for words that are

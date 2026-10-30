@@ -2,6 +2,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "http";
 import "dotenv/config";
 import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE } from "./alQasabScope.ts";
+import { QASAB_FILE_FULL } from "./qasabFile.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { createLimiter, clientIp } from "./rateLimit.ts";
 import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
@@ -61,6 +62,9 @@ export function setupLiveAudio(server: Server) {
 ${PRONUNCIATION_GUIDE}
 
 ${buildAlQasabSystemPrompt(undefined, "auto")}
+
+OFFICIAL SALT SEASON FILE (verified; it overrides anything above that disagrees). Use its facts, names, dates, numbers, poems and proverbs exactly as written when the caller asks; keep spoken answers short and offer more:
+${QASAB_FILE_FULL}
 
 VOICE CALL — SHOWING PLACES ON THE CALLER'S SCREEN:
 Whenever the caller asks about one of these Al-Qasab places, or you start explaining one, FIRST call the tool show_place with its id (their screen then shows its real photos, or an info card), THEN explain it like a tour guide in 2–4 short sentences from the guide knowledge, and offer to tell more. Call it once per place, not again while you keep talking about the same place.
