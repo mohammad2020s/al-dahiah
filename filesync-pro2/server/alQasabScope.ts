@@ -92,7 +92,7 @@ export const AL_QASAB_ROUTES: DrivingRouteGuide[] = [
       "الموقع متاح للزيارة والتصوير والاطلاع على استخراج الملح الطبيعي."
     ],
     googleMapsUrl:
-      "https://www.google.com/maps/dir/?api=1&origin=25.298445880677342,45.507267904132114&destination=25.261511229205617,45.5518962488553&travelmode=driving",
+      "https://www.google.com/maps/dir/?api=1&origin=25.298445880677342,45.507267904132114&destination=25.2476596,45.5482554&travelmode=driving",
   },
   {
     id: "majmaah_qasab",
@@ -134,13 +134,13 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     category: "معالم طبيعية وتراثية",
     address: "جنوب شرق مدينة القصب (4-5 كم)",
     description: "أشهر وأعرق ملاحات طبيعية في الجزيرة العربية لاستخراج الملح الصخري النقي منذ مئات السنين.",
-    geocodingQuery: "25.261511229205617, 45.5518962488553",
+    geocodingQuery: "25.2476596, 45.5482554",
     // Google Maps place «مملحة مركز القصب» (the big working salt pans, not Al-Muqhim)
     directionsUrl:
-      "https://www.google.com/maps/search/?api=1&query=%D9%85%D9%85%D9%84%D8%AD%D8%A9%20%D9%85%D8%B1%D9%83%D8%B2%20%D8%A7%D9%84%D9%82%D8%B5%D8%A8",
+      "https://maps.app.goo.gl/KVeAM8kF1rZ54eF47",
     coordinates: {
-      lat: 25.261511229205617,
-      lng: 45.5518962488553,
+      lat: 25.2476596,
+      lng: 45.5482554,
     },
   },
   {

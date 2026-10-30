@@ -55,7 +55,7 @@ export interface PlaceTopic {
 
 const MUQHIM_PAN_MAPS_URL = "https://maps.app.goo.gl/DsMP4ruDfFH2wwZh9";
 // «مملحة مركز القصب» on Google Maps (the big working salt pans, not Al-Muqhim)
-const QASAB_SALT_PANS_MAPS_URL = "https://www.google.com/maps/search/?api=1&query=%D9%85%D9%85%D9%84%D8%AD%D8%A9%20%D9%85%D8%B1%D9%83%D8%B2%20%D8%A7%D9%84%D9%82%D8%B5%D8%A8";
+const QASAB_SALT_PANS_MAPS_URL = "https://maps.app.goo.gl/KVeAM8kF1rZ54eF47";
 
 
 export const PLACE_TOPICS: PlaceTopic[] = [
