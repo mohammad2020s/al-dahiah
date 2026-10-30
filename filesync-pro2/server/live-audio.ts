@@ -71,6 +71,7 @@ Whenever the caller asks about one of these Al-Qasab places, or you start explai
 Places:
 ${placeList}
 
+RULE 0 AGAIN (strict, above everything): «القَصَب» rhymes exactly with «الخَشَب» — never «القصّاب»; «الصْبَخَة» = «اِصْ-بَخَة» — never «الصَّبْخة». After the first «القَصَب», say «ديرتنا» / «البلد».
 FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab", two short syllables qa·sab like «ذَهَب», with a real ق (never "al-gasab", never «القصّاب» "al-qassab"/"al-qasaab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha" = iṣ·ba·kha (never «الصَّبْخة» "aṣ-ṣabkha"); «المَمْلَحَة» = "al-mamlaha".`;
 
     // Built once; sent on every connection attempt
@@ -116,6 +117,8 @@ FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab",
         systemInstruction: {
           parts: [{ text: systemInstruction }]
         },
+        // A text transcript of what the guide says, so the logs show how it said the place names
+        outputAudioTranscription: {},
         realtimeInputConfig: {
           automaticActivityDetection: {
             startOfSpeechSensitivity: "START_SENSITIVITY_LOW",
@@ -132,6 +135,26 @@ FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab",
     let setupDone = false;
     let clientGone = false;
 
+    // Collects the transcript of each spoken answer; logs it, flagging the known wrong forms
+    let said = "";
+    const logSpokenNames = (raw: string) => {
+      if (!raw.includes("outputTranscription") && !raw.includes("turnComplete")) return;
+      try {
+        const msg = JSON.parse(raw);
+        const piece = msg?.serverContent?.outputTranscription?.text;
+        if (piece) said += piece;
+        if (msg?.serverContent?.turnComplete && said.trim()) {
+          const wrong = /قص[ّ]?ا ?ب|قصّ|صَّبْخ|صبْخ|qass?aa?b|sabkha/i.test(said);
+          if (/قص|صبخ|qasab|sbakha|sabkha/i.test(said)) {
+            console.log(`[Gemini Live] said${wrong ? " (CHECK PRONUNCIATION)" : ""}: ${said.replace(/\s+/g, " ").slice(0, 300)}`);
+          }
+          said = "";
+        }
+      } catch {
+        /* binary/partial frame */
+      }
+    };
+
     const connect = () => {
       const { tier, key } = keys[keyIndex];
       // Official Gemini Live WebSocket endpoint
@@ -146,6 +169,7 @@ FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab",
       ws.on("message", (data) => {
         const text = data.toString();
         if (!setupDone && text.includes("setupComplete")) setupDone = true;
+        logSpokenNames(text);
         if (clientWs.readyState === WebSocket.OPEN) clientWs.send(text);
       });
 

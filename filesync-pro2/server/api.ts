@@ -436,19 +436,19 @@ export function buildSpeechPrompt(transcript: string): string {
   const notes: string[] = [];
   if (/قصب/.test(plain)) {
     notes.push(
-      `«القَصَب» is "al-qasab": two short syllables qa·sab, like «ذَهَب» (dha·hab), with a deep Arabic ق. Never «القصّاب» / "al-qassab" / "al-qasaab".`
+      `«القَصَب» is "al-qasab", said exactly like «الخَشَب» (al-kha-shab): two short syllables qa·sab, both vowels short, single ص, a deep Arabic ق. Never «القصّاب» / "al-qassab" / "al-qasaab".`
     );
   }
   if (/صبخ/.test(plain)) {
     notes.push(
-      `«الصْبَخَة» is "aṣ-ṣbakha" (iṣ·ba·kha): no vowel on ص, the vowel comes after ب. Never «الصَّبْخة» / "aṣ-ṣabkha".`
+      `«الصْبَخَة» is "aṣ-ṣbakha" = «اِصْ-بَخَة» (iṣ·ba·kha): no vowel on ص, the first vowel comes after ب (like the end of «شَبَكَة»). Never «الصَّبْخة» / "aṣ-ṣabkha".`
     );
   }
   if (/جفار/.test(plain)) notes.push(`«الجِفار» is "al-jifar" with ج.`);
   if (/مملح/.test(plain)) notes.push(`«المَمْلَحَة» is "al-mamlaha".`);
   if (!notes.length) return transcript;
   return [
-    "Read the transcript aloud in a warm, calm Saudi Najdi voice. Pronunciation of place names:",
+    "Read the transcript aloud in a warm, calm Saudi Najdi voice. STRICT RULE, above everything else: pronounce these place names exactly as described, a little slower and clearer than the rest:",
     ...notes.map((n) => `- ${n}`),
     "",
     "#### TRANSCRIPT",

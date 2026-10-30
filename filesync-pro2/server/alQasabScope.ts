@@ -810,7 +810,13 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
 // النطق + التعرف على ما تعرضه كاميرا المكالمة (مشتركة بين كل أوضاع البرومبت)
 // One pronunciation guide for every prompt (chat, voice call): confirmed by the site owner.
 // Everything else stays Najdi; these names are said exactly like this.
-export const PRONUNCIATION_GUIDE = `PRONUNCIATION — the people of Al-Qasab confirmed these; say them EXACTLY like this every single time (the rest of your speech stays Najdi):
+export const PRONUNCIATION_GUIDE = `RULE 0 — STRICT PRONUNCIATION (highest priority; it overrides every other instruction, style or habit. Saying one of these names wrong counts as a failed answer, even if everything else is right):
+1. «القَصَب» is pronounced EXACTLY like «الخَشَب» and «الذَّهَب»: same rhythm, two short syllables «قَ-صَبْ», both vowels short, the ص single. NEVER «القصّاب» / «القَصَاب» (al-qassaab / al-qasaab = "the butcher"). If you notice you are stretching the second vowel, stop and say it again correctly.
+2. «الصْبَخَة» is pronounced «اِصْ-بَخَة»: the ص has NO vowel and is glued to «بَخَة» (ba-kha, like the end of «شَبَكَة»). NEVER «الصَّبْخة» (aṣ-ṣab-kha). The first vowel you say after ص is the «a» AFTER ب.
+3. Say these two names a little slower and clearer than the rest of the sentence.
+4. Keep the risk low: after you say «القَصَب» once in an answer, say «ديرتنا» or «البلد» instead of repeating it; say «الصْبَخَة» at most once per answer.
+
+PRONUNCIATION — the people of Al-Qasab confirmed these; say them EXACTLY like this every single time (the rest of your speech stays Najdi):
 - «القَصَب» = "al-qasab" — TWO SHORT syllables «قَ·صَب» (qa·sab), exactly like the plant «قَصَب» (reed) and with the same rhythm as «ذَهَب» (dha·hab) and «خَشَب» (kha·shab). ق فصيحة من آخر الحلق مثل «قرآن» (uvular Q), NOT the Najdi g: never "al-gasab" / «الجصب». The vowel after ص is SHORT and ص is NOT doubled: it is NEVER «القصّاب» / «القَصّاب» / «القَصَاب» / "al-qassab" / "al-qassaab" / "al-qasaab" (that word means "butcher" — a big mistake). Sukoon on the final ب (never "al-qusub", "al-qasaba"). Same in every phrase: مملحة القَصَب، موسم ملح القَصَب، أهل القَصَب.
 - «الجِفار» = "al-jifar": starts with ج (J) not ق: never «القفار» / "al-qafar". Kasra on ج.
 - «الصْبَخَة» = "aṣ-ṣbakha" — say «اِصْ·بَ·خَة» (iṣ·ba·kha): the ص has NO vowel, the first vowel comes AFTER the ب (ba), then خَة (kha). It is NEVER «الصَّبْخة» / "aṣ-ṣabkha" / "sabkha" (vowel after ص and silent ب — wrong), and never «السبخة» with س.
