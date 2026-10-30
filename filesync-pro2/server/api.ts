@@ -456,6 +456,52 @@ export function buildSpeechPrompt(transcript: string): string {
   ].join("\n");
 }
 
+// Owner-only pronunciation lab: speaks each candidate spelling with the site's TTS, then has a
+// Gemini model write down what it HEARS (phonetically, long vowels and doubled consonants marked),
+// so spellings can be compared by evidence instead of by ear.
+function pcmToWav(pcm: Buffer, rate = 24000): Buffer {
+  const h = Buffer.alloc(44);
+  h.write("RIFF", 0); h.writeUInt32LE(36 + pcm.length, 4); h.write("WAVE", 8); h.write("fmt ", 12);
+  h.writeUInt32LE(16, 16); h.writeUInt16LE(1, 20); h.writeUInt16LE(1, 22); h.writeUInt32LE(rate, 24);
+  h.writeUInt32LE(rate * 2, 28); h.writeUInt16LE(2, 32); h.writeUInt16LE(16, 34); h.write("data", 36);
+  h.writeUInt32LE(pcm.length, 40);
+  return Buffer.concat([h, pcm]);
+}
+apiRouter.post("/pron-test", async (req: Request, res: Response) => {
+  if (!ownerOnly(req, res)) return;
+  const texts: string[] = (Array.isArray(req.body?.texts) ? req.body.texts : []).slice(0, 6).map(String);
+  const raw = !!req.body?.raw; // raw = send the text as is (no diacritics pass, no notes)
+  const voice = String(req.body?.voice || "Charon");
+  const keys = voiceKeys("tts");
+  if (!keys.length) return res.status(503).json({ error: "no key" });
+  const ai = new GoogleGenAI({ apiKey: keys[0].key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
+  const out: any[] = [];
+  for (const text of texts) {
+    try {
+      const prompt = raw ? text : buildSpeechPrompt(applyNajdiPhoneticDiacritics(text));
+      const r = await ai.models.generateContent({
+        model: "gemini-3.1-flash-tts-preview",
+        contents: [{ parts: [{ text: prompt }] }],
+        config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
+      });
+      const part: any = r.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data);
+      if (!part) { out.push({ text, error: "no audio" }); continue; }
+      const wav = pcmToWav(Buffer.from(part.inlineData.data, "base64"));
+      const t = await ai.models.generateContent({
+        model: String(req.body?.listener || "gemini-3.5-flash-lite"),
+        contents: [{ parts: [
+          { inlineData: { mimeType: "audio/wav", data: wav.toString("base64") } },
+          { text: "Transcribe EXACTLY how this Arabic speech sounds, as a strict phonetic Latin transcription, word by word. Do NOT correct or normalize to any known word or name. Mark every long vowel by doubling it (aa, ii, uu), every doubled (shadda) consonant by doubling it (ss, bb), and write q for ق, g for a G sound, s for س, S for ص, kh for خ. Then on a new line, write the same speech in fully vowelled Arabic script (with fatha, kasra, damma, sukoon and shadda exactly as heard). Output only those two lines." },
+        ] }],
+      });
+      out.push({ text, heard: t.text?.trim(), seconds: Math.round((wav.length - 44) / 48000 * 10) / 10 });
+    } catch (e: any) {
+      out.push({ text, error: String(e?.message || e).slice(0, 200) });
+    }
+  }
+  res.json({ raw, voice, results: out });
+});
+
 apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   const text = req.body?.text;
   if (!text) return res.status(400).json({ error: "Text is required" });
