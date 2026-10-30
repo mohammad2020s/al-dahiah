@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { fileContextFor } from "./qasabFile.ts";
+import { keyFor } from "./geminiFallback.ts";
 import {
   buildAlQasabSystemPrompt,
   getOutOfScopeMessage,
@@ -500,6 +501,27 @@ apiRouter.post("/pron-test", async (req: Request, res: Response) => {
     }
   }
   res.json({ raw, voice, results: out });
+});
+
+// Owner-only: what does a recorded answer (24 kHz PCM from the voice call) actually sound like?
+apiRouter.post("/pron-listen", async (req: Request, res: Response) => {
+  if (!ownerOnly(req, res)) return;
+  const pcm = Buffer.from(String(req.body?.pcm || ""), "base64");
+  if (pcm.length < 4800) return res.status(400).json({ error: "audio too short" });
+  const key = keyFor("free") || keyFor("paid");
+  const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
+  try {
+    const t = await ai.models.generateContent({
+      model: String(req.body?.listener || "gemini-3.5-flash-lite"),
+      contents: [{ parts: [
+        { inlineData: { mimeType: "audio/wav", data: pcmToWav(pcm).toString("base64") } },
+        { text: "Transcribe EXACTLY how this Arabic speech sounds, as a strict phonetic Latin transcription. Do NOT correct or normalize to any known word or name. Mark every long vowel by doubling it (aa, ii, uu), every doubled (shadda) consonant by doubling it (ss, bb), write q for ق, g for a G sound, S for ص, s for س, kh for خ. Then on a new line write it in fully vowelled Arabic script (fatha, kasra, damma, sukoon, shadda) exactly as heard. Then on a third line, focusing ONLY on the town name (al-qasab) and the word for the flat (as-sbakha): describe precisely how each was pronounced (syllables, vowel lengths, any doubled consonant)." },
+      ] }],
+    });
+    res.json({ heard: t.text?.trim(), seconds: Math.round(pcm.length / 4800) / 10 });
+  } catch (e: any) {
+    res.status(500).json({ error: String(e?.message || e).slice(0, 200) });
+  }
 });
 
 apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
