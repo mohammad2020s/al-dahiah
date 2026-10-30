@@ -811,9 +811,11 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
 // One pronunciation guide for every prompt (chat, voice call): confirmed by the site owner.
 // Everything else stays Najdi; these names are said exactly like this.
 export const PRONUNCIATION_GUIDE = `RULE 0 — STRICT PRONUNCIATION (highest priority; it overrides every other instruction, style or habit. Saying one of these names wrong counts as a failed answer, even if everything else is right):
-1. «القَصَب» is pronounced EXACTLY like «الخَشَب» and «الذَّهَب»: same rhythm, two short syllables «قَ-صَبْ», both vowels short, the ص single. NEVER «القصّاب» / «القَصَاب» (al-qassaab / al-qasaab = "the butcher"). If you notice you are stretching the second vowel, stop and say it again correctly.
+1. «القَصَب» is the SAME word as «قَصَب» in «قَصَب السُّكَّر» (sugar cane) and is pronounced EXACTLY like «الخَشَب» and «الذَّهَب»: same rhythm, two short syllables «قَ-صَبْ», both vowels short, the ص single. NEVER «القصّاب» / «القَصَاب» (al-qassaab / al-qasaab = "the butcher"). If you notice you are stretching the second vowel, stop and say it again correctly.
 2. «الصْبَخَة» is pronounced «اِصْ-بَخَة»: the ص has NO vowel and is glued to «بَخَة» (ba-kha, like the end of «شَبَكَة»). NEVER «الصَّبْخة» (aṣ-ṣab-kha). The first vowel you say after ص is the «a» AFTER ب.
 3. Say these two names a little slower and clearer than the rest of the sentence.
+القاعدة صفر بالعربي (صارمة، فوق كل شي): «القَصَب» تنطقها نفس «قَصَب السُّكَّر» ونفس وزن «الخَشَب»: قَ (قصيرة) + صَبْ (قصيرة)، لا تمدّ الصاد ولا تشدّدها ولا تشيل فتحة القاف، وإياك تقول «القصّاب» أو «القصاب». و«الصْبَخَة» تنطقها «اِصْ-بَخَة»: الصاد ساكنة وبعدها «بَخَة» على طول، وإياك تقول «الصَّبْخة».
+أمثلة تقولها بالضبط كذا: «حيّاك الله في القَصَبْ» — «مَمْلَحَة القَصَبْ» — «نطلع للصْبَخَة بالليل».
 4. Keep the risk low: after you say «القَصَب» once in an answer, say «ديرتنا» or «البلد» instead of repeating it; say «الصْبَخَة» at most once per answer.
 
 PRONUNCIATION — the people of Al-Qasab confirmed these; say them EXACTLY like this every single time (the rest of your speech stays Najdi):
