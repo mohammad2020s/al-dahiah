@@ -74,6 +74,12 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
     <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-[#EAD0CB] bg-white p-4 shadow-sm">
       {/* Salt crystals drifting in the background */}
       <div className="sc-salt pointer-events-none absolute inset-0" aria-hidden="true" />
+      {/* Contour pattern from the «ملح القصب» brand identity */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-2 bg-cover bg-center"
+        style={{ backgroundImage: "url(/images/salt-season-pattern.jpg)" }}
+        aria-hidden="true"
+      />
       <div className="relative flex items-center justify-between gap-3">
         <div>
           <span className="flex items-center gap-1.5 text-xs font-bold text-[#3a1210]">

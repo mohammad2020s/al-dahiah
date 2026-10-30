@@ -4,8 +4,10 @@ import { PASSPORT_STOPS } from "../../server/saltPassport.ts";
 
 const W = 1080;
 const H = 1350;
-const BRAND = "#b82e24";
-const DARK = "#7f1a12";
+// «ملح القصب» brand identity palette
+const BRAND = "#B2512F";
+const DARK = "#8f3c22";
+const SOFT = "#D18372";
 const INK = "#321210";
 const MUTED = "#8a6a67";
 
@@ -63,25 +65,23 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   const complete = done.length === PASSPORT_STOPS.length;
 
   // Background + red header
-  ctx.fillStyle = "#fbf6f4";
+  ctx.fillStyle = "#F1E7E7";
   ctx.fillRect(0, 0, W, H);
   const grad = ctx.createLinearGradient(0, 0, W, 460);
   grad.addColorStop(0, DARK);
-  grad.addColorStop(1, BRAND);
+  grad.addColorStop(1, SOFT);
   ctx.fillStyle = grad;
   roundRect(ctx, 0, -60, W, 520, 60);
   ctx.fill();
 
-  // Salt crystals pattern in the header
-  ctx.fillStyle = "rgba(255,255,255,0.07)";
-  for (let i = 0; i < 26; i++) {
-    const x = (i * 197) % W;
-    const y = 40 + ((i * 83) % 380);
-    const s = 10 + ((i * 7) % 18);
+  // Contour pattern from the brand identity, faint over the header
+  const pattern = await loadImage("/images/salt-season-pattern.jpg");
+  if (pattern) {
     ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(Math.PI / 4);
-    ctx.fillRect(-s / 2, -s / 2, s, s);
+    roundRect(ctx, 0, -60, W, 520, 60);
+    ctx.clip();
+    ctx.globalAlpha = 0.16;
+    ctx.drawImage(pattern, 0, -60, W, (W * pattern.height) / pattern.width);
     ctx.restore();
   }
 
@@ -104,7 +104,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   fitText(ctx, title, W - 120, 800, 84);
   ctx.fillText(title, W / 2, 290);
   ctx.font = '600 34px Alexandria, sans-serif';
-  ctx.fillStyle = "#fde3e1";
+  ctx.fillStyle = "#F1E7E7";
   ctx.fillText(en ? "Al-Qasab Salt Season · Salt Passport" : "موسم ملح القَصَب · جواز الملح", W / 2, 375);
 
   // Name / certificate line
@@ -139,7 +139,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
     ctx.save();
     ctx.lineWidth = 8;
     if (stamped) {
-      ctx.fillStyle = "rgba(184,46,36,0.10)";
+      ctx.fillStyle = "rgba(178,81,47,0.10)";
       ctx.strokeStyle = BRAND;
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -155,7 +155,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
       ctx.lineTo(cx + 25, cy - 16);
       ctx.stroke();
     } else {
-      ctx.strokeStyle = "#e3c9c5";
+      ctx.strokeStyle = "#EAD0CB";
       ctx.setLineDash([14, 12]);
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -175,6 +175,13 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
     ? `${done.length} of ${PASSPORT_STOPS.length} stamps`
     : `${digits(done.length, false)} من ${digits(PASSPORT_STOPS.length, false)} أختام`;
   ctx.fillText(progress, W / 2, H - 112);
+  // Official season logo in the corner
+  const seasonLogo = await loadImage("/images/salt-season-logo.png");
+  if (seasonLogo) {
+    const lh = 110;
+    const lw = (lh * seasonLogo.width) / seasonLogo.height;
+    ctx.drawImage(seasonLogo, en ? W - 60 - lw : 60, H - 150, lw, lh);
+  }
   ctx.fillStyle = MUTED;
   ctx.font = '600 28px Alexandria, sans-serif';
   ctx.fillText(en ? "Ask «Al-Dahiya» · al-dahiah.onrender.com" : "اسأل «الداهية» · al-dahiah.onrender.com", W / 2, H - 56);
