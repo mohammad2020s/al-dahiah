@@ -11,7 +11,7 @@ import {
   SwitchCamera,
   MapPin,
 } from "lucide-react";
-import SaltBagCall from "./SaltBagCall";
+import GrandpaCall from "./GrandpaCall";
 import { matchPlaceTopic, placeById, type PlaceTopic } from "../../server/alQasabKnowledge.ts";
 
 // A burst of salt crystals flying out of a pressed button (pure CSS, see .vc-crystal in index.css)
@@ -1039,8 +1039,7 @@ registerProcessor('mic-processor', MicProcessor);`;
                 scale: isCameraOn || showcase ? "0.34" : "1",
               }}
             >
-              <SaltBagCall
-                imageUrl="/salt-bag.png"
+              <GrandpaCall
                 externalAudioLevel={outputAudioLevel}
                 isSpeaking={status === "speaking" || isGeminiSpeaking}
                 analyserNode={outputAnalyserRef.current || audioAnalyser}
