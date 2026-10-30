@@ -50,7 +50,8 @@ export function setupLiveAudio(server: Server) {
       ownerKey && reqUrl.searchParams.get("key") === ownerKey && /^[A-Z][a-z]{2,15}$/.test(reqUrl.searchParams.get("voice") || "")
         ? String(reqUrl.searchParams.get("voice"))
         : "";
-    const voiceName = testVoice || process.env.LIVE_VOICE || "Puck";
+    // Charon: in recorded tests it said «القَصَب» with two short syllables, where Puck often stretched it to «القصّاب»
+    const voiceName = testVoice || process.env.LIVE_VOICE || "Charon";
 
     // Free key first; the paid key (GEMINI_PAID_API_KEY) only if the free one is refused
     const keys = voiceKeys("live");
