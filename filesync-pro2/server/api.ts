@@ -524,6 +524,56 @@ apiRouter.post("/pron-listen", async (req: Request, res: Response) => {
   }
 });
 
+// Owner-only image studio (character art for the call). GET lists image-capable models;
+// POST generates/edits with one, returning base64 images.
+apiRouter.get("/image-lab/models", async (req: Request, res: Response) => {
+  if (!ownerOnly(req, res)) return;
+  const out: Record<string, string[]> = {};
+  for (const tier of ["free", "paid"] as const) {
+    const key = keyFor(tier);
+    if (!key) continue;
+    try {
+      const ai = new GoogleGenAI({ apiKey: key });
+      const names: string[] = [];
+      const pager = await ai.models.list({ config: { pageSize: 200 } });
+      for await (const m of pager as any) {
+        const n = String(m.name || "");
+        if (/image|imagen/i.test(n)) names.push(n.replace("models/", ""));
+      }
+      out[tier] = names;
+    } catch (e: any) {
+      out[tier] = ["ERR " + String(e?.message || e).slice(0, 120)];
+    }
+  }
+  res.json(out);
+});
+apiRouter.post("/image-lab", async (req: Request, res: Response) => {
+  if (!ownerOnly(req, res)) return;
+  const tier = req.body?.tier === "paid" ? "paid" : "free";
+  const key = keyFor(tier);
+  if (!key) return res.status(400).json({ error: "no key for " + tier });
+  const ai = new GoogleGenAI({ apiKey: key });
+  const parts: any[] = [];
+  for (const img of Array.isArray(req.body?.images) ? req.body.images.slice(0, 3) : []) {
+    parts.push({ inlineData: { mimeType: "image/png", data: String(img) } });
+  }
+  parts.push({ text: String(req.body?.prompt || "") });
+  try {
+    const r = await ai.models.generateContent({
+      model: String(req.body?.model),
+      contents: [{ role: "user", parts }],
+      config: { responseModalities: ["IMAGE", "TEXT"] as any, ...(req.body?.aspectRatio ? { imageConfig: { aspectRatio: String(req.body.aspectRatio) } } : {}) } as any,
+    });
+    const outParts: any[] = r.candidates?.[0]?.content?.parts || [];
+    res.json({
+      images: outParts.filter((p) => p.inlineData?.data).map((p) => p.inlineData.data),
+      text: outParts.filter((p) => p.text).map((p) => p.text).join(" ").slice(0, 300),
+    });
+  } catch (e: any) {
+    res.status(500).json({ error: String(e?.message || e).slice(0, 300) });
+  }
+});
+
 apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   const text = req.body?.text;
   if (!text) return res.status(400).json({ error: "Text is required" });
