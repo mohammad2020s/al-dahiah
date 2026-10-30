@@ -732,9 +732,9 @@ export function generateLocalKnowledgeFallback(
   }
   if (norm.includes("تذكر") || norm.includes("تذاكر") || norm.includes("ticket") || norm.includes("حجز") || norm.includes("حصول") || norm.includes("احصل") || norm.includes("شراء") || norm.includes("رسوم")) {
     if (lang === "en") {
-      return `Entry is free: register your visit at qasab-tickets.pages.dev (or scan the QR code on the season poster) and get your ticket instantly; one ticket covers you and your companions. The season runs 19–28 November 2026, daily 4:00–11:00 pm, in Al-Qasab's heritage town.`;
+      return `Entry is free: register your visit at qasab-tickets.pages.dev (tap «Book your ticket» below) and get your ticket instantly; one ticket covers you and your companions. The season runs 19–28 November 2026, daily 4:00–11:00 pm, in Al-Qasab's heritage town.`;
     }
-    return `التذكرة مجانية: سجّل زيارتك من موقع التذاكر qasab-tickets.pages.dev (أو امسح الباركود في إعلان الموسم) وتوصلك تذكرتك فوراً، تذكرة وحدة لك ولمرافقيك. والموسم من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً من ٤ العصر إلى ١١ الليل في مدينة القَصَب التراثية. حيّاكم يا ضيوف الذهب الأبيض!`;
+    return `التذكرة مجانية: سجّل زيارتك من موقع التذاكر qasab-tickets.pages.dev (تلقى زر «احجز تذكرتك» تحت) وتوصلك تذكرتك فوراً، تذكرة وحدة لك ولمرافقيك. والموسم من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً من ٤ العصر إلى ١١ الليل في مدينة القَصَب التراثية. حيّاكم يا ضيوف الذهب الأبيض!`;
   }
   if (isFestivalQuestion(query) || (norm.includes("موسم") && (norm.includes("موعد") || norm.includes("متى")))) {
     if (lang === "en") {
@@ -885,7 +885,7 @@ ${GUIDE_FACTS_EN}
 5. Concise answers: 1 to 3 direct, natural sentences.
 6. Voice: Natural tempo, direct friendly tone, no stutter or artificial pauses.
 7. The 4th Salt Season: 19–28 November 2026, daily 4:00–11:00 pm, in Al-Qasab's heritage town; Instagram @qasabsaltseason.
-8. Tickets: entry is FREE, but visitors register for a ticket at qasab-tickets.pages.dev (or scan the QR code on the season poster); one ticket covers the visitor and companions. Never say tickets are picked up at the gate.
+8. Tickets: entry is FREE, but visitors register for a ticket at qasab-tickets.pages.dev (a «Book your ticket» button appears under the answer); one ticket covers the visitor and companions. Never say tickets are picked up at the gate.
 9. Sabkha: a separate place from the salt pans; open plain ~3 km south of town, 5-10°C cooler at night in summer.
 10. Verified cafes: Bdor Ibrahim (4.9 stars), Art Coffee (4.8 stars), Shahi Nagea (4.7 stars), Diwaniyat Al-Manie (4.8 stars). (No Diwaniyat Al-Qasab).
 11. Scope: Exclusively Al-Qasab and its heritage, events, and live weather.${weatherSection}`;
@@ -910,7 +910,7 @@ ${GUIDE_FACTS_AR}
 
 5. **حقائق موسم ملح القَصَب والمعالم:**
    - موسم ملح القَصَب الرابع: من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً من ٤ العصر إلى ١١ الليل، في مدينة القَصَب التراثية، وحسابه @qasabsaltseason.
-   - التذاكر: الدخول مجاني، بس الزائر يسجّل زيارته ويحصل على تذكرته من qasab-tickets.pages.dev (أو يمسح الباركود في إعلان الموسم)، وتذكرة وحدة له ولمرافقيه. لا تقول إن التذاكر تنصرف من البوابة.
+   - التذاكر: الدخول مجاني، بس الزائر يسجّل زيارته ويحصل على تذكرته من qasab-tickets.pages.dev (يطلع له زر «احجز تذكرتك» تحت الجواب)، وتذكرة وحدة له ولمرافقيه. لا تقول إن التذاكر تنصرف من البوابة.
    - صْبَخَة القَصَب: مكان مستقل غير مَمْلَحَة القَصَب، أرض مفتوحة جنوب البلد، تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
    - المقاهي التراثية المعتمدة 4 فقط: قهوة بدور إبراهيم، آرت كافيه، شاهي ناقع، ديوانية المنيع التراثية (تنبيه: لا يوجد مكان باسم ديوانية القَصَب).
    - إجاباتك موجزة ومباشرة (من جملة إلى 3 جمل واضحة دون إطالة مملة).

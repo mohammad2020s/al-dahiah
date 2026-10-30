@@ -22,6 +22,7 @@ import {
   Camera,
   X,
   CornerDownLeft,
+  Ticket,
 } from "lucide-react";
 import { MalhAlQasabLogo, TanmiahLogo } from "../components/BrandLogos";
 // The call screen pulls in three.js and the salt bag; load it only when someone calls
@@ -68,6 +69,7 @@ type ChatMessage = {
   weather?: WeatherData | null;
   images?: PlaceImage[];
   mapsUrl?: string;
+  ticketUrl?: string;
   audio?: string;
   /** Next questions to tap under an answer */
   followUps?: string[];
@@ -559,6 +561,7 @@ export default function Home() {
                         weather: data.weather,
                         images: Array.isArray(data.images) ? data.images : undefined,
                         mapsUrl: typeof data.mapsUrl === "string" ? data.mapsUrl : undefined,
+                        ticketUrl: typeof data.ticketUrl === "string" ? data.ticketUrl : undefined,
                         followUps: Array.isArray(data.followUps) ? data.followUps.slice(0, 3) : undefined,
                       }
                     : m
@@ -800,6 +803,17 @@ export default function Home() {
                         >
                           <ExternalLink className="size-3.5" />
                           {language === "en" ? "More photos on Google Maps" : "صور أكثر على Google Maps"}
+                        </a>
+                      )}
+                      {m.role === "assistant" && m.ticketUrl && (
+                        <a
+                          href={m.ticketUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="pg-enter mt-2 ms-2 inline-flex items-center gap-1.5 rounded-xl bg-[#B2512F] px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#963f22]"
+                        >
+                          <Ticket className="size-3.5" />
+                          {language === "en" ? "Book your free ticket" : "احجز تذكرتك المجانية"}
                         </a>
                       )}
                       {m.role === "assistant" && m.showMap && m.locationData && (

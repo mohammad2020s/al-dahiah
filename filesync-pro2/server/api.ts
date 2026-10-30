@@ -371,6 +371,14 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     const placeText = photo ? (usedFallback ? "" : finalAnswer) : userPrompt;
     const images = getPlaceImages(placeText, lang);
     const mapsUrl = getPlaceMapsUrl(placeText);
+    // «احجز تذكرتك» button: ticket questions, the season and its map, or an answer that names the ticket site
+    const ticketTopic = photo ? null : matchPlaceTopic(userPrompt)?.id;
+    const ticketUrl =
+      /تذكر|تذاكر|حجز|احجز|تسجيل|ticket|book/i.test(userPrompt) ||
+      ticketTopic === "season" || ticketTopic === "season_map" ||
+      /qasab-tickets/i.test(finalAnswer)
+        ? "https://qasab-tickets.pages.dev"
+        : undefined;
 
     const topicId = photo ? null : matchPlaceTopic(userPrompt)?.id;
     const allPlacesMap =
@@ -399,6 +407,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         weather: null,
         images,
         mapsUrl,
+        ticketUrl,
         followUps: getFollowUps(
           userPrompt,
           lang,
