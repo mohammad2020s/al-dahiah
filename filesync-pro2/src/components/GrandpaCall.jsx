@@ -55,8 +55,8 @@ const ATTACK_TIME = 0.04;
 const RELEASE_TIME = 0.09;
 const CLOSED_EPSILON = 0.015;
 // The face sits a bit above the picture's centre: show it larger and shifted down so the face fills the circle
-const PLANE_SIZE = 2.75;
-const PLANE_Y = -0.12;
+const PLANE_SIZE = 2.6;
+const PLANE_Y = -0.2;
 
 const FRAMES = ['/images/shayeb/base.jpg', '/images/shayeb/mouth.jpg', '/images/shayeb/eyes.jpg'];
 
@@ -185,7 +185,7 @@ export default function GrandpaCall({
         overflow: 'hidden',
         position: 'relative',
         // Shown while the paintings load
-        background: 'url(/images/shayeb/base.jpg) center 30% / 128% no-repeat, #8a4a32',
+        background: 'url(/images/shayeb/base.jpg) center 22% / 112% no-repeat, #8a4a32',
         boxShadow: '0 25px 60px rgba(0,0,0,0.55)',
         ...style,
       }}
