@@ -63,7 +63,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "muqhim_pan",
     titleAr: "مَمْلَحَة المقحم النموذجية (أبو سهيل)",
     titleEn: "Al-Muqhim Model Salt Pan (Abu Suhail)",
-    keywords: ["المقحم", "مقحم", "ابوسهيل", "ابو سهيل"],
+    keywords: ["المقحم", "مقحم", "ابوسهيل", "ابو سهيل", "muqhim"],
     answerAr:
       "مَمْلَحَة المقحم النموذجية (أبو سهيل) غير مَمْلَحَة القَصَب، لا تخلط بينهم! مَمْلَحَة القَصَب هي الممالح الكبيرة (الجِفار) اللي ينستخرج منها الملح بكميات وتشوف فيها أكوام الملح والمعدّات، أما المقحم فمَمْلَحَة نموذجية مهيّأة للزوار جنوب شرق البلد: فيها ممشى وجسر خشبي بين أحواض الملح، وأكواخ من الخوص تجلس فيها، وكشك تشتري منه ملح طبيعي. تعال لها الصبح بدري والشمس هادية، وتلقى صورها وموقعها تحت.",
     answerEn:
@@ -78,9 +78,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Al-Sabkha",
     keywords: ["سبخه", "صبخه", "السبخه", "الصبخه", "sabkha"],
     answerAr:
-      "صْبَخَة القَصَب مكان مستقل وغير عن مَمْلَحَة القَصَب (الجِفار)، لا تخلط بينهم! أرض سبخية مفتوحة جنوب البلد بحوالي ٣ كيلو، أرضها حصى وتراب مستوي على مد النظر، يطلع لها أهل القَصَب والزوار في الليل يفرشون ويتقهوون ويكشتون، وتشوف أنوار البلد بعيد على الأفق. وفي ليالي الصيف تكون أبرد من اللي حولها بخمس إلى عشر درجات، جوها يونّس!",
+      "صْبَخَة القَصَب مكان مستقل وغير عن مَمْلَحَة القَصَب (الجِفار)، لا تخلط بينهم! أرض سبخية مفتوحة جنوب البلد بحوالي ٣ كيلو، أرضها حصى وتراب مستوي على مد النظر، يطلع لها أهل القَصَب والزوار في الليل يفرشون ويتقهوون ويكشتون، وتشوف أنوار البلد بعيد على الأفق. ويسمونها «منتزه الصْبَخَة الصيفي»: أرضها ندية، وفي ليالي الصيف تكون أبرد من اللي حولها بخمس إلى عشر درجات، وما فيها قوارص ولا حشرات لأن تربتها فيها أملاح. وقال فيها شاعر من القَصَب: «وصبخةٍ في ليالي القيظ نحسّ ان جوّها ممطور».",
     answerEn:
-      "Al-Sabkha is a separate place from the Al-Qasab salt pans (Al-Jifar), so never mix them up. It is an open flat plain about 3 km south of town, gravel and packed earth as far as the eye can see, where locals and visitors spread a rug at night for coffee and stargazing with the town lights on the horizon. On summer nights it is 5–10°C cooler than its surroundings.",
+      "Al-Sabkha is a separate place from the Al-Qasab salt pans (Al-Jifar), so never mix them up. It is an open flat plain about 3 km south of town, gravel and packed earth as far as the eye can see, where locals and visitors spread a rug at night for coffee and stargazing with the town lights on the horizon. Locals call it the summer night park: its ground stays damp, it is 5–10°C cooler than its surroundings on summer nights, and the salt in the soil keeps biting insects away.",
     images: [
       { src: "/images/places/sabkha-night.jpg", captionAr: "جلسة ليلية على أرض الصْبَخَة وأنوار القَصَب في الأفق", captionEn: "A night rug on Al-Sabkha with Al-Qasab's lights on the horizon", credit: GM },
     ],
@@ -91,11 +91,11 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "salt_pans",
     titleAr: "مَمَالح القَصَب (الجِفار)",
     titleEn: "Al-Qasab salt pans (Al-Jifar)",
-    keywords: ["مملحه", "ممالح", "المملحه", "الممالح", "جفار", "الجفاره", "ملاحات", "salt pan", "saltworks", "salt flat"],
+    keywords: ["مملحه", "ممالح", "المملحه", "الممالح", "جفار", "الجفاره", "ملاحات", "الذهب الابيض", "salt pan", "saltworks", "salt flat"],
     answerAr:
-      "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! أكثر من عشرين مَمْلَحَة متجاورة تبعد عن البلد حوالي ٤ إلى ٥ كيلو جنوب شرق، والناس يسمونها «الجِفار» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وصارت أرض ملحية، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم بالمعدّات وفيه تنقية وتعبئة حديثة، وتشوف فيها أحواض الماء المالح وأكوام الملح الأبيض مثل التلال. ولا تخلطها بمَمْلَحَة المقحم النموذجية، هذيك غيرها: مَمْلَحَة صغيرة مهيّأة للزوار فيها ممشى خشبي وأكواخ خوص.",
+      "مَمَالح القَصَب يا بعد حيي هي «الذهب الأبيض»! تقع غرب جبل طويق وجنوب شرق البلد بحوالي ٦ إلى ٨ كيلو، ومساحتها قرابة ٥٠ كيلو متر مربع على شكل مستطيل طوله ١١ كيلو وعرضه ٤، وفيها أكثر من عشرين مَمْلَحَة متجاورة يسمونها أهل القَصَب «الجِفار» أو «الجفارة» من «الجفر» يعني الحفرة الواسعة. كانت بحيرة وجفّت مع الزمن وصارت أرض ملحية، وذكرها الهمداني في «صفة جزيرة العرب» باسم «ملح القُصَيبة»، وأهل القَصَب يستخرجون منها الملح من قرابة ثلاثة قرون، أول باليد وبجهد كبير، واليوم بالمعدّات وفيه تنقية وتعبئة حديثة، وتشوف فيها أحواض الماء المالح وأكوام الملح الأبيض مثل التلال. واليوم تغطي قرابة ثلث احتياج السوق السعودي من ملح الطعام، ويتوزع إنتاجها محلياً وخليجياً. ولا تخلطها بمَمْلَحَة المقحم النموذجية، هذيك غيرها: مَمْلَحَة صغيرة مهيّأة للزوار فيها ممشى خشبي وأكواخ خوص.",
     answerEn:
-      "The Al-Qasab salt pans are the town's 'white gold': more than twenty adjacent pans about 4–5 km southeast of town, known locally as «Al-Jifar» (from jafr, a wide pit). It was once a lake that turned into salt ground, and salt has been harvested here for around three centuries, first by hand, today with machinery, purification and packing; you see brine basins and white salt heaps like hills. Don't confuse them with the Al-Muqhim Model Salt Pan, a separate small pan set up for visitors with a wooden walkway and reed huts.",
+      "The Al-Qasab salt pans are the town's 'white gold': west of the Tuwaiq escarpment, about 6–8 km southeast of town, covering roughly 50 km² in an 11 × 4 km rectangle, with more than twenty adjacent pans known locally as «Al-Jifar» or «Al-Jifara» (from jafr, a wide pit). It was once a lake that dried into salt ground, mentioned by al-Hamdani in «Sifat Jazirat al-Arab» as «the salt of Al-Qusaiba»; and salt has been harvested here for around three centuries, first by hand, today with machinery, purification and packing; you see brine basins and white salt heaps like hills. Today it covers about a third of Saudi Arabia's table-salt needs and is sold locally and across the Gulf. Don't confuse them with the Al-Muqhim Model Salt Pan, a separate small pan set up for visitors with a wooden walkway and reed huts.",
     // Only photos of مملحة مركز القصب itself (Al-Muqhim has its own)
     images: MAMLAHA_VISITOR_IMAGES,
     mapsUrl: QASAB_SALT_PANS_MAPS_URL,
@@ -106,9 +106,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Heritage places in Al-Qasab",
     keywords: ["الاماكن التراثيه", "اماكن تراثيه", "المعالم التراثيه", "معالم تراثيه", "الاماكن التاريخيه", "المعالم التاريخيه", "اماكن تاريخيه", "heritage places", "heritage sites", "historic places"],
     answerAr:
-      "القَصَب مليانة تراث يا بعد حيي! هذي أبرز أماكنها التراثية:\n١. قصر الشيخ عبدالله بن زاحم جنب الجامع، فيه وثائق وصور من تاريخ الدولة.\n٢. سوق العبيدي، من أقدم أسواق نجد.\n٣. مبنى القصبي التراثي وسط السوق.\n٤. منزل الراشد على السور القديم.\n٥. مرقب القَصَب، برج المراقبة شرق البلد.\n٦. القرية التراثية بأزقتها وبيوتها الطينية ومقاهيها.\nتبي أعلّمك عن وحدة منها؟",
+      "القَصَب مليانة تراث يا بعد حيي! هذي أبرز أماكنها التراثية:\n١. قصر الشيخ عبدالله بن زاحم جنب الجامع، فيه وثائق وصور من تاريخ الدولة.\n٢. سوق العبيدي، من أقدم أسواق نجد.\n٣. مبنى القصبي التراثي وسط السوق.\n٤. منزل الراشد على السور القديم.\n٥. مرقب القَصَب، برج المراقبة الطيني.\n٧. أبواب القَصَب وسورها «العَقْدة».\n٦. القرية التراثية بأزقتها وبيوتها الطينية ومقاهيها.\nتبي أعلّمك عن وحدة منها؟",
     answerEn:
-      "Al-Qasab is full of heritage! Its main heritage places:\n1. Sheikh Abdullah bin Zahim's palace beside the mosque, with documents and photos from the history of the Saudi state.\n2. Souq Al-Obaidi, one of Najd's oldest markets.\n3. The Al-Qusaibi heritage building in the souq.\n4. The Al-Rashid house on the old town wall.\n5. The Al-Qasab watchtower east of town.\n6. The heritage village with its mud-brick lanes and cafes.\nWant to hear about one of them?",
+      "Al-Qasab is full of heritage! Its main heritage places:\n1. Sheikh Abdullah bin Zahim's palace beside the mosque, with documents and photos from the history of the Saudi state.\n2. Souq Al-Obaidi, one of Najd's oldest markets.\n3. The Al-Qusaibi heritage building in the souq.\n4. The Al-Rashid house on the old town wall.\n5. The Al-Qasab mud-brick watchtower.\n7. Al-Qasab's old gates and town wall («Al-Aqda»).\n6. The heritage village with its mud-brick lanes and cafes.\nWant to hear about one of them?",
     images: ZAHIM_IMAGES.slice(0, 2),
   },
   {
@@ -125,7 +125,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "zahim_palace",
     titleAr: "قصر الزاحم التاريخي",
     titleEn: "Al-Zahim historic palace",
-    keywords: ["زاحم", "الزاحم"],
+    keywords: ["زاحم", "الزاحم", "zahim"],
     answerAr:
       "قصر الزاحم من أبرز معالم القَصَب، جنب الجامع في البلدة القديمة، وعمره فوق المية سنة، وهو بيت الشيخ عبدالله بن عبدالوهاب بن زاحم رحمه الله، اللي ولد في القَصَب وصار قاضي ورافق الملك عبدالعزيز في توحيد البلاد، منها ضم حائل والحجاز، وآخر عمله رئاسة المحاكم الشرعية في المدينة المنورة وتوفي فيها عام ١٣٧٤هـ. البيت صار محكمة البلد عام ١٣٨٠هـ، وانرمم عام ١٤٣٦هـ، وفيه اليوم وثائق وصور من تاريخ الدولة، وأبوابه مفتوحة للزوار مع مرشدين وضيافة.",
     answerEn:
@@ -137,7 +137,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "qusaibi_building",
     titleAr: "مبنى القصبي التراثي",
     titleEn: "Al-Qusaibi heritage building",
-    keywords: ["القصبي", "قصبي"],
+    keywords: ["القصبي", "قصبي", "qusaibi"],
     answerAr:
       "مبنى القصبي التراثي يقع في قلب البلدة القديمة بالمنطقة المركزية لسوق العبيدي، وأدواره العلوية مفتوحة للزوار والمهتمين، وتشوف منه طابع البناء الطيني النجدي في وسط السوق. ما عندي تفاصيل أكثر موثقة عن تاريخ بنائه، وإذا تبي أدلّك على سوق العبيدي اللي هو فيه فأبشر.",
     answerEn:
@@ -147,7 +147,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "obaidi_souq",
     titleAr: "سوق العبيدي",
     titleEn: "Souq Al-Obaidi",
-    keywords: ["العبيدي", "عبيدي", "السوق القديم"],
+    keywords: ["العبيدي", "عبيدي", "السوق القديم", "obaidi"],
     answerAr:
       "سوق العبيدي هو سوق القَصَب المركزي في البلدة القديمة قرب الجامع بحي القصر، والدكاكين تحيط فيه من كل الجهات إلا الجنوب، وتذكر المصادر إن تاريخه يرجع لأكثر من ٢٥٠ سنة، ويعد من أقدم أسواق نجد. حوله مباني تراثية مثل مبنى القصبي، ويتولاه اليوم بلدية القَصَب.",
     answerEn:
@@ -164,7 +164,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "rashid_house",
     titleAr: "منزل الراشد التراثي",
     titleEn: "Al-Rashid heritage house",
-    keywords: ["الراشد", "راشد"],
+    keywords: ["الراشد", "راشد", "rashid"],
     answerAr:
       "منزل (قصر) الراشد التراثي في الجهة الجنوبية الغربية من البلدة، مبني على السور القديم ويضم أحد أبراجه، دورين فيها ١٤ غرفة و٢١ عمود حجري. استلمته هيئة السياحة والتراث عام ١٤٣٣هـ ورممته، وتشغّله بلدية القَصَب، ومجلسه مؤثث بأثاث شعبي.",
     answerEn:
@@ -180,11 +180,11 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "old_town",
     titleAr: "البلدة القديمة",
     titleEn: "The old town",
-    keywords: ["البلده القديمه", "الديره القديمه", "القريه التراثيه", "الديره التراثيه", "السور", "بوابات", "الطين", "طينيه", "heritage village", "old town"],
+    keywords: ["البلده القديمه", "الديره القديمه", "القريه التراثيه", "الديره التراثيه", "مدينه القصب التراثيه", "الطين", "طينيه", "heritage village", "old town"],
     answerAr:
-      "البلدة القديمة في القَصَب كلها بيوت طين نجدية وأزقة. وفيها سوق العبيدي وقصر الزاحم ومنزل الراشد ومبنى القصبي، مشوار يومك كله تراث!",
+      "البلدة القديمة (مدينة القَصَب التراثية) كلها بيوت طين نجدية وأزقة، وكان يحيط فيها سور «العَقْدة» وفي أركانها أبراج مراقبة. وفيها سوق العبيدي وقصر الزاحم ومنزل الراشد ومبنى القصبي، وفيها يقام موسم ملح القَصَب، مشوار يومك كله تراث!",
     answerEn:
-      "Al-Qasab's old town is a maze of Najdi mud-brick houses and lanes. Souq Al-Obaidi, Al-Zahim Palace, the Al-Rashid house and the Al-Qusaibi building are all here.",
+      "Al-Qasab's old town (the heritage town) is a maze of Najdi mud-brick houses and lanes, once ringed by the «Al-Aqda» wall with watchtowers at its corners. Souq Al-Obaidi, Al-Zahim Palace, the Al-Rashid house and the Al-Qusaibi building are here, and the Salt Season is held here.",
     images: [
       { src: "/images/places/village-gate-season.jpg", captionAr: "بوابة القرية التراثية بأبراجها أيام موسم ملح القَصَب", captionEn: "The heritage village gate and towers during the Salt Season", credit: GM },
       { src: "/images/places/village-corridor.jpg", captionAr: "ممر مسقوف بالخشب والجريد وأبوابه الخشبية في القرية التراثية", captionEn: "A wood-and-palm-roofed passage with wooden doors in the heritage village", credit: GM },
@@ -196,21 +196,125 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "marqab",
     titleAr: "مرقب القَصَب",
     titleEn: "Al-Qasab watchtower",
-    keywords: ["مرقب", "المرقب", "برج"],
+    keywords: ["مرقب", "المرقب", "برج", "watchtower", "marqab"],
     answerAr:
-      "مرقب القَصَب برج مراقبة قديم شرق البلد فوق تل، ويقال إنه كان من سلسلة أبراج تحمي البلدة قديم، تطلع فوقه وتشوف القَصَب كلها.",
+      "مرقب القَصَب برج طيني مخروطي يوصل طوله لحوالي ١٠ أمتار، بنوه أهل القَصَب يراقبون منه المنطقة ومواشيهم اللي ترعى قريب. يطلعه رجل يسمونه «الرقيب» من الصبح لين مغيب الشمس ومعه ماء وتمر، وإذا شاف شي يريبه نبّه أهل البلد وطلعوا للمكان اللي أشّر عليه.",
     answerEn:
-      "The Al-Qasab marqab is an old watchtower east of town on a hill, said to have been part of a chain of towers that protected the town.",
+      "The Al-Qasab marqab is a conical mud-brick watchtower about 10 m tall. A lookout called «Al-Raqib» climbed it from morning to sunset with water and dates to watch over the town and its grazing herds, and alerted the people if he saw danger.",
+  },
+  {
+    id: "season_map",
+    titleAr: "خريطة موسم ملح القَصَب ومحطاته",
+    titleEn: "Salt Season map and stations",
+    keywords: ["خريطه الموسم", "محطات", "مسار الموسم", "وش فيه الموسم", "وش في الموسم", "وش فيه بالموسم", "فعاليات الموسم", "فعاليات موسم", "برنامج الموسم", "مناطق الموسم", "ركن الطفل", "منطقه الطفل", "season map", "stations", "what's on", "whats on", "season program"],
+    answerAr:
+      "أبشر! الدخول والخروج من نفس البوابة، تبدأ من المحطة ١ وتمشي مع المسار:\n١ البوابة ← ٢ نفق تاريخ الملح (٢٥ متر) ← ٣ عن موسم ملح القَصَب ← ٤ تاريخ القَصَب والشعر ← ٥ ماما نورة وسولت ← ٦ الكتاتيب (القرّاية) ← ٧ منطقة الطفل ← ٨ المسرح ← ٩ أيادينا ← ١٠ الفن ← ١١ السوق (٢٠ ركن) ← ١٢ ألعاب وأطفال ← ١٣ الخروج.\nوعلى طريقك بيوت تراثية تدخلها: بيوت الراشد ومدرسة البنات، وديوانية المنيع، وقصر الراشد، وقصر الشيخ عبدالله بن زاحم، ودار حميدان الشويعر، والمدرسة القديمة. وبرّا المسار: خيمة الضيافة، ومنطقة الطيور والخيول، ومطل دار القصبي ومطل الغدير، والكوفيهات، والمواقف.",
+    answerEn:
+      "Entry and exit are through the same gate: start at station 1 and follow the path:\n1 Gate → 2 Salt-history tunnel (25 m) → 3 About the Salt Season → 4 Al-Qasab's history and poetry → 5 Mama Noura & Salt → 6 The kuttab school → 7 Kids' zone → 8 Theatre → 9 «Ayadina» crafts → 10 Art → 11 The souq (20 stalls) → 12 Games & kids → 13 Exit.\nAlong the way you can step into heritage houses: the Al-Rashid houses and girls' school, Diwaniyat Al-Manie, Al-Rashid palace, Sheikh Abdullah bin Zahim's palace, the house of the poet Humaidan Al-Shuwai'ir and the old school. Off the path: the hospitality tent, the birds and horses areas, the Dar Al-Qusaibi and Al-Ghadeer lookouts, coffee stalls and parking.",
+  },
+  {
+    id: "salt_extraction",
+    titleAr: "كيف يستخرجون ملح القَصَب",
+    titleEn: "How Al-Qasab salt is made",
+    keywords: ["استخراج", "يستخرج", "يستخرجون", "يطلعون الملح", "يطلع الملح", "يسوون الملح", "ينتج الملح", "عين الجفر", "طريقه الملح", "تبخير", "how is the salt", "how salt is made", "extraction", "harvested"],
+    answerAr:
+      "أبشر، الملح يطلع من «الجِفار» كذا:\n١. صاحب المَمْلَحَة يحفر عين يسمونها «عين الجفر».\n٢. يبني جنبها خزان كبير من الطين أعلى شوي من الأرض عشان ينزل الماء المالح للبرك.\n٣. يجهّز برك جنب الخزان، متوسطة العمق وأطوالها مختلفة.\n٤. يضخ الماء من الجفر بالمضخات للخزان، ومن الخزان للبرك، ويزيده كل يوم.\n٥. يتبخر الماء ويترسب الملح طبقة بيضاء سميكة على وجه البركة.\nالعملية تاخذ من شهرين إلى أربعة شهور حسب الحرارة وقوة الهوا. وقديم كانوا يستخرجونه باليد بتعب وتكلفة، واليوم المضخات والمعدات خففت الشغل.",
+    answerEn:
+      "Salt is made at «Al-Jifar» like this:\n1. The pan owner digs a well called «Ain Al-Jafr».\n2. Beside it he builds a large mud tank, a little above ground so the brine flows to the pools.\n3. Medium-deep pools of different lengths are prepared next to the tank.\n4. Pumps lift the brine from the well into the tank and on into the pools, topped up daily.\n5. The water evaporates and the salt settles as a thick white crust on the surface.\nIt takes two to four months depending on the heat and the wind. It used to be hard, costly hand work; pumps and machinery have made it much lighter.",
+    images: MAMLAHA_VISITOR_IMAGES.slice(0, 2),
+  },
+  {
+    id: "salt_economy",
+    titleAr: "اقتصاد ملح القَصَب",
+    titleEn: "The Al-Qasab salt economy",
+    keywords: ["انتاج الملح", "كم ينتج", "كم تنتج", "اقتصاد", "مبيعات", "كم طن", "سوق الملح", "salt production", "how much salt", "economy", "sales"],
+    answerAr:
+      "ملح القَصَب ذهب أبيض صدق: المملكة تنتج تقريباً ٢٠٠ ألف طن ملح بالسنة، والقَصَب تغطي قرابة الثلث (٣٠٪) من احتياج السوق السعودي من ملح الطعام، ومبيعاتها تتعدى ٢٠٠ مليون ريال بالسنة (قرابة ٥٪ من قيمة إنتاج الملح الوطني اللي يقدّر بـ٣٫٧ مليار ريال، حسب واس ٢٠٢٥). ووزارة الصناعة والثروة المعدنية مخصصة مجمع تعديني لخام الملح في القَصَب مساحته ٣٣٫١٥ كيلو متر مربع.",
+    answerEn:
+      "Al-Qasab salt really is white gold: Saudi Arabia produces about 200,000 tonnes of salt a year, and Al-Qasab covers roughly a third (30%) of the Saudi market's table-salt needs, with sales above SAR 200 million a year (about 5% of the national salt output value of ~SAR 3.7 billion, per SPA 2025). The Ministry of Industry and Mineral Resources has set aside a 33.15 km² salt-ore mining complex in Al-Qasab.",
+  },
+  {
+    id: "salt_history",
+    titleAr: "تاريخ الملح",
+    titleEn: "The history of salt",
+    keywords: ["تاريخ الملح", "تاريخ ملح", "الملح عبر", "الحضارات", "الفراعنه", "الرومان", "الهمداني", "ياقوت", "history of salt", "salt history"],
+    answerAr:
+      "ملح القَصَب مذكور من قديم: الهمداني عدّ «ملح القُصَيبة» من أهم ممالح الجزيرة في «صفة جزيرة العرب»، وياقوت الحموي ذكر «سبخة القُصَيبة» اللي «يؤخذ منها الملح» وتنحدر لها الأودية. وعلى مستوى العالم، الإنسان عرف الملح من حوالي عشرة آلاف سنة يحفظ فيه السمك واللحم: في بلغاريا «بلدة الملح» من ٤٧٠٠ قبل الميلاد، والفراعنة أول من ملّحوا اللحم، والصينيون وثّقوه في الأكل ٢٦٧٠ قبل الميلاد، والرومان سوّوا له طرق خاصة. وفي أوروبا انفرضت عليه ضرايب مثل «الغابيل» الفرنسية، وكبر ميناء ليفربول بسبب تجارته.",
+    answerEn:
+      "Al-Qasab salt has old roots: al-Hamdani listed «the salt of Al-Qusaiba» among Arabia's main salt sources in «Sifat Jazirat al-Arab», and Yaqut al-Hamawi described «the sabkha of Al-Qusaiba» where «salt is taken» and valleys drain into it. Worldwide, people have used salt for about 10,000 years to preserve fish and meat: Bulgaria's «salt town» Solnitsata dates to 4700 BC, the ancient Egyptians were the first to cure meat with salt, China recorded salt in food in 2670 BC, and Rome built roads to carry it. Europe taxed it (France's famous «gabelle»), and salt trade turned Liverpool into an international port.",
+  },
+  {
+    id: "qasab_history",
+    titleAr: "تاريخ القَصَب",
+    titleEn: "The history of Al-Qasab",
+    keywords: ["تاريخ القصب", "تاريخ مدينه القصب", "حرب البسوس", "البسوس", "القصيبات", "قوافل الحجاج", "الحجاج", "الدوله السعوديه الاولي", "قصبات", "ذو الرمه", "history of al-qasab", "basus"],
+    answerAr:
+      "القَصَب تاريخها عريق يا بعد حيي: معروفة من العصر الجاهلي، وكانت عدة «قصبات» مثل قصبة الملح وقصبة الرمادة اللي ذكرها ذو الرُّمّة في شعره، وبعدين اجتمع الناس في البلدة الحالية وبنوا أبراج للمراقبة. ومن أقدم أحداثها «يوم القُصَيبات» في حرب البسوس، وجزم الهمداني إنه صار فيها. وكانت محطة لقوافل الحجاج الجايين من البصرة على «طريق المنكدر»، ووصفها الأصفهاني بأنها «قرية عظيمة». ودخلت تحت راية الدولة السعودية الأولى، وزارها الملك عبدالعزيز ١٣٢١هـ، والملك سعود ١٣٧٤هـ، والملك سلمان ١٣٩٢هـ لما كان أمير الرياض.",
+    answerEn:
+      "Al-Qasab is known since pre-Islamic times. It began as several «qasabat» (hamlets) such as Qasabat Al-Milh and Qasabat Al-Ramada, the latter named by the poet Dhu al-Rumma, before people gathered in today's town and built watchtowers. One of its oldest events is «the Day of Al-Qusaibat» in the War of Al-Basus, which al-Hamdani placed here. It was a stop for pilgrim caravans from Basra on the «Al-Munkadir road», described as «a great village». It joined the First Saudi State, and was visited by King Abdulaziz (1321 AH), King Saud (1374 AH) and King Salman (1392 AH, as Governor of Riyadh).",
+  },
+  {
+    id: "gates",
+    titleAr: "أبواب القَصَب وسورها",
+    titleEn: "Al-Qasab's gates and wall",
+    keywords: ["ابواب", "بوابات", "باب الحوطه", "المجيبيب", "النقبه", "ام طليحه", "اللطيفيه", "باب البرج", "العقده", "سور البلد", "سور القصب", "السور", "gates", "town wall"],
+    answerAr:
+      "القَصَب كان يحيط فيها سور طين يسمونه «العَقْدة»، وأبوابها القديمة ثلاث: «باب الحوطة» غرب يطلعون منه للمزارع الغربية، و«باب المُجَيبيب» شرق وسُمي كذا لأن داخله مِجباب، و«باب البرج» شمال جنب برج مراقبة. وبعد ما جا الملك عبدالعزيز وأمنت البلد انفتح «باب النَّقْبة» غرب (فتحة كبيرة في السور) و«باب أم طليحة» شرق (جنب شجرة طلح)، وبعد إنشاء البلدية ١٤٠١هـ انفتح «باب اللطيفية» جنوب والمدخل الغربي. وتلقى منطقة «أبواب القَصَب» التفاعلية في الموسم.",
+    answerEn:
+      "Al-Qasab was ringed by a mud wall called «Al-Aqda» with three old gates: «Bab Al-Hawta» to the west (out to the western farms), «Bab Al-Mujaibib» to the east, and «Bab Al-Burj» to the north beside a watchtower. After King Abdulaziz's arrival brought security, «Bab Al-Naqba» (a wide opening in the wall, west) and «Bab Umm Tulaiha» (by an acacia tree, east) were opened, and after the municipality was founded in 1401 AH came «Bab Al-Latifiya» (south) and the western entrance. The Salt Season has an interactive «Gates of Al-Qasab» area.",
+    images: [
+      { src: "/images/places/village-gate-season.jpg", captionAr: "بوابة القرية التراثية بأبراجها", captionEn: "The heritage village gate and towers", credit: GM },
+    ],
+  },
+  {
+    id: "qarraya",
+    titleAr: "القرّاية (الكتاتيب)",
+    titleEn: "The kuttab schools (Al-Qarraya)",
+    keywords: ["القرايه", "قرايه", "الكتاتيب", "كتاتيب", "التعليم", "المطوع", "المدرسه القديمه", "kuttab", "education"],
+    answerAr:
+      "قبل التعليم النظامي كان أهل القَصَب يتعلمون في «القرّاية» أو «الكتاتيب»: المعلّم يسمونه «المقرئ» أو «المطوّع»، يحفّظ الطلاب القرآن والأحاديث ويعلمهم القراية والكتابة، والبنات تعلّمهم «المطوّعة». واستمر كذا لين بدأ التعليم النظامي عام ١٣٧٤هـ (١٩٥٥م). وفي الموسم تنفتح غرفة الكتاتيب تكريماً للمعلمين اللي أناروا عقول أهل القَصَب.",
+    answerEn:
+      "Before formal schooling, Al-Qasab learned in «Al-Qarraya», the kuttab: a teacher called «Al-Muqri» or «Al-Mutawwa» taught the Quran, hadith, reading and writing, and girls were taught by «Al-Mutawwa'a». Formal education began in 1374 AH (1955). During the Salt Season the kuttab room opens to honour those teachers.",
+  },
+  {
+    id: "akrashiya",
+    titleAr: "روضة العكرشية",
+    titleEn: "Rawdat Al-Akrashiya",
+    keywords: ["العكرشيه", "عكرشيه", "روضه", "akrashiya", "rawdat"],
+    answerAr:
+      "روضة العكرشية شمال غرب القَصَب، ويشقها طريق المجمعة، وهي من أكبر رياض نجد وأهمها: أرضها منبسطة ما فيها مرتفعات، فإذا جا السيل ينتشر الماء في مساحة توصل ١٢ مليون متر مربع، وربيعها يجنن بعد المطر.",
+    answerEn:
+      "Rawdat Al-Akrashiya lies northwest of Al-Qasab, crossed by the road to Al-Majma'ah. It is one of Najd's largest and most important meadows: the land is flat, so after rain the water spreads over up to 12 million m², and it turns green and lush in spring.",
+  },
+  {
+    id: "poetry",
+    titleAr: "شعر القَصَب (ملح القصيد)",
+    titleEn: "Al-Qasab's poetry («Salt of Poetry»)",
+    keywords: ["شعر", "شاعر", "قصيد", "قصايد", "قصائد", "حميدان", "الشويعر", "العجيمي", "poet", "poetry", "poem"],
+    answerAr:
+      "القَصَب بلاد الملح والشعر! أشهر شعرائها حميدان الشويعر (توفي حوالي ١٢٠٠هـ)، صاحب البيت الخالد: «تموت الأفاعي وسمّها في نحورها … وكم من قريسٍ مات ما شاف قارسه»، ومن شعراها بعد «العجيمي» و«سهيل» اللي قال: «بلدنا تنتج الملح الذهب تشهد لنا الأجناب … كثيرٍ من الصناعة ما تتمّ إلا وهو فيها». وفي الموسم قسم «ملح القصيد» فيه أبيات على الجدران ورواة يرددون القصايد. وفيها شعراء كثير غيرهم.",
+    answerEn:
+      "Al-Qasab is the land of salt and poets! Its most famous poet is Humaidan Al-Shuwai'ir (d. c. 1200 AH), known for sharp wisdom and satire; others include «Al-Ujaimi» and «Suhail», who wrote that the town «produces salt, the gold others vouch for, and many industries can't do without it». The Salt Season's «Salt of Poetry» section puts verses on the walls with narrators reciting them.",
+  },
+  {
+    id: "proverbs",
+    titleAr: "أمثال القَصَب الشعبية",
+    titleEn: "Al-Qasab folk proverbs",
+    keywords: ["امثال", "مثل شعبي", "الامثال", "الامثله الشعبيه", "proverb"],
+    answerAr:
+      "من أمثال القَصَب الشعبية: «كمن أهدى الملح على أهل القَصَب» يعني اللي يجيب الشي لأهله وهم أغنى الناس فيه، و«انكبّ الملح»، و«حِطَّني تلقاني»، و«حَرِّك تَبْلَش»، و«سلِّفني وألاعبك»، و«حلوم ليل»، و«طِقّ ومات».",
+    answerEn:
+      "Among Al-Qasab's folk proverbs: «Like giving salt as a gift to the people of Al-Qasab», i.e. bringing something to those who have the most of it (like coals to Newcastle), as well as «The salt got spilled», «Put me down and you'll find me» and «Night dreams».",
   },
   {
     id: "season",
     titleAr: "موسم ملح القَصَب",
     titleEn: "Al-Qasab Salt Season",
-    keywords: ["موسم", "مهرجان", "فعاليات", "festival", "season"],
+    keywords: ["موسم", "مهرجان", "فعاليات", "festival", "season", "event grounds"],
     answerAr:
-      "موسم ملح القَصَب تنظمه أمانة منطقة الرياض عن طريق بلدية القَصَب، يحتفي بالذهب الأبيض وطرق استخراجه. النسخة الأولى كانت في مارس ٢٠٢٣، والثانية في فبراير ٢٠٢٤، والثالثة من ٢٠ إلى ٢٧ فبراير ٢٠٢٥ بأكثر من ٦٠ عارض. وفيه مَمْلَحَة نموذجية تشرح مراحل الاستخراج، ومسارات للملح، ومسرح ثقافي وكتاتيب، وركن للأطفال، والأسر المنتجة، وعروض خيل وإبل وسيارات كلاسيكية. وموعد الموسم الجاي ١٩ نوفمبر ٢٠٢٦ بإذن الله، والدخول مجاني.",
+      "موسم ملح القَصَب الرابع من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦ بإذن الله في مدينة القَصَب التراثية، يومياً من ٤ العصر إلى ١١ الليل، والدخول مجاني: سجّل زيارتك وخذ تذكرتك من qasab-tickets.pages.dev (تذكرة وحدة لك ولمرافقيك). الموسم يحتفي بإرث القَصَب في إنتاج الملح الطبيعي، وفيه المَمْلَحَة النموذجية وجناح ملح القَصَب ومحطة تاريخ الملح وأبواب القَصَب والقرّاية (الكتاتيب) و«ملح القصيد»، والأسر المنتجة والمطاعم والمقاهي، وبطولة فروسية وسيارات كلاسيكية وركن للطفل. نسخه السابقة: الأولى ٢–١١ مارس ٢٠٢٣ (٨٣ ألف زائر)، والثانية ٢–١٠ فبراير ٢٠٢٤ (٩٢ ألف)، والثالثة ٢٠–٢٧ فبراير ٢٠٢٥ (فوق ١٠٠ ألف)، والمتوقع هالسنة ١١٠ إلى ١٣٠ ألف زائر. وحسابه @qasabsaltseason.",
     answerEn:
-      "The Al-Qasab Salt Season is organised by the Riyadh Region Municipality through Al-Qasab Municipality to celebrate the town's 'white gold'. Editions ran in March 2023, February 2024 and 20–27 February 2025 (60+ exhibitors), with a model salt pan, salt trails, a cultural theatre, traditional kuttab schools, a kids' zone, family producers, and horse, camel and classic-car shows. The next season launches on 19 November 2026, with free entry.",
+      "The 4th Al-Qasab Salt Season runs 19–28 November 2026 in Al-Qasab's heritage town, daily 4:00–11:00 pm, with free entry: register and get your ticket at qasab-tickets.pages.dev (one ticket covers you and your companions). It celebrates the town's natural-salt heritage with the model salt pan, the Al-Qasab salt pavilion, the salt-history station, Al-Qasab's gates, the old kuttab school and «Salt of Poetry», plus family producers, restaurants and cafes, an equestrian championship, classic cars and a kids' corner. Past editions: 2–11 March 2023 (83,793 visitors), 2–10 February 2024 (92,000) and 20–27 February 2025 (100,000+); 110,000–130,000 visitors are expected this year. Instagram: @qasabsaltseason.",
     images: [
       { src: "/images/places/season-sign.jpg", captionAr: "لوحة «موسم ملح القصب» في أرض الموسم", captionEn: "The «Al-Qasab Salt Season» sign at the grounds", credit: GM },
       { src: "/images/places/village-gate-season.jpg", captionAr: "بوابة القرية التراثية بشعار ملح القصب وقت الموسم", captionEn: "The heritage village gate with the Malh Al-Qasab logo during the season", credit: GM },
@@ -221,11 +325,11 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "town",
     titleAr: "مدينة القَصَب",
     titleEn: "Al-Qasab town",
-    keywords: ["تاريخ القصب", "عن القصب", "مدينه القصب", "بلده القصب", "تعريف", "نبذه"],
+    keywords: ["عن القصب", "مدينه القصب", "بلده القصب", "وين القصب", "كم تبعد القصب", "تعريف", "نبذه"],
     answerAr:
-      "القَصَب من أقدم بلدات الوشم في نجد، تتبع محافظة شقراء بمنطقة الرياض، على بعد حوالي ١٥٠ كيلو شمال غرب الرياض. بلدة قديمة من العصر الجاهلي ذكرها ياقوت الحموي، واشتهرت قديم بالبر والملح، وتسمى «مدينة الذهب الأبيض» و«بلدة الملح والشعراء». فيها مَمَالح الجِفار والصْبَخَة، والبلدة القديمة بسوق العبيدي وقصورها التراثية، ومرقبها.",
+      "القَصَب من أقدم بلدات الوشم في نجد، تتبع محافظة شقراء بمنطقة الرياض، على بعد حوالي ١٦٠ كيلو شمال غرب الرياض، شرق ضلع طويق وغرب نفود عريق البلدان وجنوب روضة العكرشية، وترتفع ٦٧١ متر عن سطح البحر. معروفة من العصر الجاهلي وذكرها ياقوت الحموي، وكانت في الأصل عدة «قصبات» مثل قصبة الطرفاء وقصبة الملح وقصبة الرمادة، واشتهرت بالبر والملح، وتسمى «مدينة الذهب الأبيض» و«بلدة الملح والشعراء». فيها مَمَالح الجِفار والصْبَخَة، والبلدة القديمة بسوق العبيدي وقصورها التراثية، ومرقبها.",
     answerEn:
-      "Al-Qasab is one of the oldest towns of Al-Washm in Najd, part of Shaqra Governorate in the Riyadh Region, roughly 150 km northwest of Riyadh. Mentioned by Yaqut al-Hamawi and dating back to pre-Islamic times, it was known for wheat and salt and is called the 'City of White Gold' and the 'town of salt and poets'.",
+      "Al-Qasab is one of the oldest towns of Al-Washm in Najd, part of Shaqra Governorate in the Riyadh Region, about 160 km northwest of Riyadh, east of the Tuwaiq escarpment, west of the Uraiq Al-Buldan dunes and south of Rawdat Al-Akrashiya, 671 m above sea level. Known since pre-Islamic times and mentioned by Yaqut al-Hamawi, it began as several «qasabat» (hamlets) such as Qasabat Al-Milh and Qasabat Al-Ramada; it was known for wheat and salt and is called the 'City of White Gold' and the 'town of salt and poets'.",
   },
 ];
 

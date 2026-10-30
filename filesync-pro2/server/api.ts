@@ -414,6 +414,35 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
   }
 });
 
+/**
+ * Gemini TTS takes "director's notes" before the transcript. Only the notes for words that are
+ * in the text are added, so a short answer stays a short prompt. The notes are not read aloud.
+ */
+export function buildSpeechPrompt(transcript: string): string {
+  const plain = transcript.replace(/[ً-ٰٟ]/g, "");
+  const notes: string[] = [];
+  if (/قصب/.test(plain)) {
+    notes.push(
+      `«القَصَب» is "al-qasab": two short syllables qa·sab, like «ذَهَب» (dha·hab), with a deep Arabic ق. Never «القصّاب» / "al-qassab" / "al-qasaab".`
+    );
+  }
+  if (/صبخ/.test(plain)) {
+    notes.push(
+      `«الصْبَخَة» is "aṣ-ṣbakha" (iṣ·ba·kha): no vowel on ص, the vowel comes after ب. Never «الصَّبْخة» / "aṣ-ṣabkha".`
+    );
+  }
+  if (/جفار/.test(plain)) notes.push(`«الجِفار» is "al-jifar" with ج.`);
+  if (/مملح/.test(plain)) notes.push(`«المَمْلَحَة» is "al-mamlaha".`);
+  if (!notes.length) return transcript;
+  return [
+    "Read the transcript aloud in a warm, calm Saudi Najdi voice. Pronunciation of place names:",
+    ...notes.map((n) => `- ${n}`),
+    "",
+    "#### TRANSCRIPT",
+    transcript,
+  ].join("\n");
+}
+
 apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   const text = req.body?.text;
   if (!text) return res.status(400).json({ error: "Text is required" });
@@ -428,7 +457,7 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
       const response = await ai.models.generateContent({
         model: "gemini-3.1-flash-tts-preview",
         // Same Najdi corrections as the chat («القَصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
-        contents: [{ parts: [{ text: applyNajdiPhoneticDiacritics(String(text)).slice(0, 400) }] }],
+        contents: [{ parts: [{ text: buildSpeechPrompt(applyNajdiPhoneticDiacritics(String(text)).slice(0, 400)) }] }],
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } },

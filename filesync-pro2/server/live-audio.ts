@@ -67,7 +67,7 @@ Whenever the caller asks about one of these Al-Qasab places, or you start explai
 Places:
 ${placeList}
 
-FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab" with a real ق (never "al-gasab", never "al-qassab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha"; «المَمْلَحَة» = "al-mamlaha".`;
+FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab", two short syllables qa·sab like «ذَهَب», with a real ق (never "al-gasab", never «القصّاب» "al-qassab"/"al-qasaab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha" = iṣ·ba·kha (never «الصَّبْخة» "aṣ-ṣabkha"); «المَمْلَحَة» = "al-mamlaha".`;
 
     // Built once; sent on every connection attempt
     const setupMessage = {

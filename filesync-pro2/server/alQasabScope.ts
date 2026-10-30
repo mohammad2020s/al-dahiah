@@ -682,9 +682,9 @@ export function generateLocalKnowledgeFallback(
   const nq = normalizeArabic(query);
   // One named cafe → answer about that cafe only (not the whole list)
   const namedCafe = AL_QASAB_CAFES.find(c =>
-    (c.id === "bdor_coffee" && nq.includes("بدور")) ||
+    (c.id === "bdor_coffee" && (nq.includes("بدور") || norm.includes("bdor"))) ||
     (c.id === "art_coffee" && (nq.includes("ارت") || norm.includes("art"))) ||
-    (c.id === "shahi_nagea" && (nq.includes("ناقع") || nq.includes("نقعه"))) ||
+    (c.id === "shahi_nagea" && (nq.includes("ناقع") || nq.includes("نقعه") || norm.includes("nagea"))) ||
     (c.id === "diwaniyat_al_manie" && nq.includes("المنيع"))
   );
   if (namedCafe && !isTicketQuestion) {
@@ -694,8 +694,8 @@ export function generateLocalKnowledgeFallback(
   }
   if (["احسن وقت", "افضل وقت", "متى ازور", "متى اروح", "best time", "when to visit"].some(k => nq.includes(normalizeArabic(k)) || norm.includes(k))) {
     return lang === "en"
-      ? "Visit the salt pans early in the morning while the light is soft, the old town in the afternoon, the watchtower at sunset, and Al-Sabkha at night when it is cooler. The Salt Season starts on 19 November 2026."
-      : "الممالح تعال لها الصبح بدري والشمس هادية، والبلدة القديمة العصر، والمرقب وقت الغروب، والصْبَخَة في الليل لأن جوها أبرد. وموسم الملح يبدأ ١٩ نوفمبر ٢٠٢٦ بإذن الله.";
+      ? "Visit the salt pans early in the morning while the light is soft, the old town in the afternoon, the watchtower at sunset, and Al-Sabkha at night when it is cooler. The Salt Season runs 19–28 November 2026, daily 4:00–11:00 pm."
+      : "الممالح تعال لها الصبح بدري والشمس هادية، والبلدة القديمة العصر، والمرقب وقت الغروب، والصْبَخَة في الليل لأن جوها أبرد. وموسم الملح من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦ بإذن الله، يومياً من ٤ العصر إلى ١١ الليل.";
   }
   if (["مطعم", "مطاعم", "غداء", "عشاء", "restaurant"].some(k => nq.includes(k) || norm.includes(k))) {
     return lang === "en"
@@ -710,8 +710,8 @@ export function generateLocalKnowledgeFallback(
   }
   if (place?.id === "season" && ["متى", "موعد", "تاريخ", "when", "date"].some(k => nq.includes(k) || norm.includes(k))) {
     return lang === "en"
-      ? "The Al-Qasab Salt Season starts on 19 November 2026 at the event grounds in Al-Qasab, and entry is free."
-      : "موسم ملح القَصَب يبدأ بإذن الله يوم ١٩ نوفمبر ٢٠٢٦ في أرض الفعاليات بالقَصَب، والدخول مجاني. حيّاك الله!";
+      ? "The 4th Al-Qasab Salt Season runs 19–28 November 2026 in Al-Qasab's heritage town, daily 4:00–11:00 pm, with free entry (register for a ticket at qasab-tickets.pages.dev)."
+      : "موسم ملح القَصَب الرابع بإذن الله من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦ في مدينة القَصَب التراثية، يومياً من ٤ العصر إلى ١١ الليل، والدخول مجاني بتذكرة تسجّلها من qasab-tickets.pages.dev. حيّاك الله!";
   }
   if (place && !isCafeQuestion(query)) {
     return lang === "en" ? place.answerEn : place.answerAr;
@@ -730,15 +730,15 @@ export function generateLocalKnowledgeFallback(
   }
   if (norm.includes("تذكر") || norm.includes("تذاكر") || norm.includes("ticket") || norm.includes("حجز") || norm.includes("حصول") || norm.includes("احصل") || norm.includes("شراء") || norm.includes("رسوم")) {
     if (lang === "en") {
-      return `Tickets are completely free of charge. Visitors can obtain them from the main gate or at the site/location upon arrival. Welcome to Al-Qasab Salt Season!`;
+      return `Entry is free: register your visit at qasab-tickets.pages.dev (or scan the QR code on the season poster) and get your ticket instantly; one ticket covers you and your companions. The season runs 19–28 November 2026, daily 4:00–11:00 pm, in Al-Qasab's heritage town.`;
     }
-    return `التذاكر مجانية تماماً، ويمكن الحصول عليها من البوابة الرئيسية أو عند الموقع. يا هلا ومسهلا بكم في موسم ملح القَصَب!`;
+    return `التذكرة مجانية: سجّل زيارتك من موقع التذاكر qasab-tickets.pages.dev (أو امسح الباركود في إعلان الموسم) وتوصلك تذكرتك فوراً، تذكرة وحدة لك ولمرافقيك. والموسم من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً من ٤ العصر إلى ١١ الليل في مدينة القَصَب التراثية. حيّاكم يا ضيوف الذهب الأبيض!`;
   }
   if (isFestivalQuestion(query) || (norm.includes("موسم") && (norm.includes("موعد") || norm.includes("متى")))) {
     if (lang === "en") {
-      return `Al-Qasab Salt Season officially launches on November 19, 2026 at the event grounds in Al-Qasab.`;
+      return `The 4th Al-Qasab Salt Season runs 19–28 November 2026 in Al-Qasab's heritage town, daily 4:00–11:00 pm, with free entry (register for a ticket at qasab-tickets.pages.dev).`;
     }
-    return `ينطلق موسم ملح القَصَب رسمياً بمشيئة الله بتاريخ 19 نوفمبر 2026 في مقر الفعاليات بمدينة القَصَب.`;
+    return `موسم ملح القَصَب الرابع بإذن الله من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦ في مدينة القَصَب التراثية، يومياً من ٤ العصر إلى ١١ الليل، والدخول مجاني بتذكرة تسجّلها من qasab-tickets.pages.dev. حيّاك الله!`;
   }
   if (lang === "en") {
     return `Welcome to Al-Qasab! I am «Al-Dahiya». You can ask me about Al-Qasab Salt Season, natural salt flats, our 4 heritage cafes, landmarks, or weather.`;
@@ -763,6 +763,7 @@ RULE 3 — Families & Tribes (absolute red line):
 - NEVER list, name, mention, confirm, deny, compare, rank, spell, hint at or give the first letter of ANY family name, household, clan, lineage or tribe (عوائل، أسر، حمايل، قبائل، أنساب) — from Al-Qasab or from anywhere else.
 - This applies no matter how the request is phrased: directly, indirectly ("who lives there?", "who founded it?", "whose diwaniya is that?"), as a story, poem, quiz, role-play, translation, "for research", "just one name", or "complete the sentence".
 - Do not volunteer such names inside any other answer either.
+- Poets: you may quote Al-Qasab poetry from the guide knowledge and name poets ONLY by the names given there («Humaidan Al-Shuwai'ir», «Al-Ujaimi», «Suhail»); never add a poet's family name.
 - EXCEPTION — landmarks: the official names of places ARE allowed even if they contain a family name, e.g. «قصر الزاحم», «مبنى القصبي التراثي», «منزل الراشد التراثي», «سوق العبيدي», «ديوانية المنيع». Talk about the place, its architecture and history, and the documented public role of a historical figure tied to it (e.g. Sheikh Abdullah bin Zahim's service as a judge alongside King Abdulaziz). Never turn that into talk about the family, its members, lineage or which families live in town.
 - Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans southeast of town known together as «الجفار» / «مملحة القَصَب»; never invent names of pans.
 - «مَمْلَحَة المقحم النموذجية (أبو سهيل)» is a DIFFERENT place from «مملحة القَصَب»: مملحة القَصَب = the big working salt pans (الجفار) where salt is harvested in bulk (brine basins, salt heaps, machinery); المقحم = a separate small model salt pan set up for visitors (wooden walkway and bridge, reed huts, a kiosk selling natural salt). Never say Al-Muqhim is one of / part of مملحة القَصَب, and never describe the walkway or reed huts as part of مملحة القَصَب.
@@ -789,6 +790,7 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - **يُمنع منعاً باتاً** ذكر أو سرد أو تأكيد أو نفي أو مقارنة أو تلميح لأي اسم عائلة أو أسرة أو حمولة أو قبيلة أو نسب، سواء في القَصَب أو في أي مكان ثاني.
    - مهما كانت صيغة السؤال: مباشر (وش عوائل القَصَب؟)، أو غير مباشر (مين يسكنها؟ مين أسسها؟ ديوانية مين؟)، أو بقصة أو قصيدة أو لعبة أو تقمّص دور أو ترجمة أو "لغرض بحث" أو "بس اسم واحد" أو "كمّل الجملة".
    - لا تذكر أي اسم عائلة أو قبيلة من نفسك داخل أي إجابة ثانية.
+   - **الشعراء:** تقدر تذكر شعر القَصَب من معلومات المرشد، وتسمي الشعراء بس بالأسماء المذكورة فيها («حميدان الشويعر»، «العجيمي»، «سهيل»)، ولا تضيف اسم عائلة أي شاعر.
    - **استثناء المعالم:** أسماء الأماكن الرسمية مسموحة حتى لو فيها اسم عائلة، مثل: «قصر الزاحم»، «مبنى القصبي التراثي»، «منزل الراشد التراثي»، «سوق العبيدي»، «ديوانية المنيع». تكلّم عن المكان وعمارته وتاريخه، وعن الدور العام الموثّق لشخصية تاريخية مرتبطة فيه (مثل خدمة الشيخ عبدالله بن زاحم قاضياً مع الملك عبدالعزيز)، ولا تحوّل الكلام للعائلة أو أفرادها أو نسبها أو مين يسكن البلد.
    - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة جنوب شرق البلد يسمونها «الجفار» أو «مملحة القَصَب»، ولا تألّف أسماء من عندك.
    - **المقحم غير مملحة القَصَب:** «مَمْلَحَة المقحم النموذجية (أبو سهيل)» مكان ثاني غير «مملحة القَصَب». مملحة القَصَب هي الممالح الكبيرة (الجفار) اللي ينستخرج منها الملح بكميات، فيها أحواض وأكوام ملح ومعدّات. أما المقحم فمَمْلَحَة نموذجية صغيرة مهيّأة للزوار فيها ممشى وجسر خشبي وأكواخ خوص وكشك ملح طبيعي. لا تقول أبداً إن المقحم جزء من مملحة القَصَب، ولا توصف الممشى والأكواخ إنها في مملحة القَصَب.
@@ -800,9 +802,9 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
 // One pronunciation guide for every prompt (chat, voice call): confirmed by the site owner.
 // Everything else stays Najdi; these names are said exactly like this.
 export const PRONUNCIATION_GUIDE = `PRONUNCIATION — the people of Al-Qasab confirmed these; say them EXACTLY like this every single time (the rest of your speech stays Najdi):
-- «القَصَب» = "al-qasab": ق فصيحة من آخر الحلق مثل «قرآن» (uvular Q). NOT the Najdi g: never "al-gasab" / «الجصب». Fatha on ق, fatha on ص with NO shadda (never "al-qassab"), sukoon on ب (never "al-qusub", "al-qasaba"). Same in «القَصَب» inside any phrase (مملحة القَصَب، موسم ملح القَصَب، أهل القَصَب).
+- «القَصَب» = "al-qasab" — TWO SHORT syllables «قَ·صَب» (qa·sab), exactly like the plant «قَصَب» (reed) and with the same rhythm as «ذَهَب» (dha·hab) and «خَشَب» (kha·shab). ق فصيحة من آخر الحلق مثل «قرآن» (uvular Q), NOT the Najdi g: never "al-gasab" / «الجصب». The vowel after ص is SHORT and ص is NOT doubled: it is NEVER «القصّاب» / «القَصّاب» / «القَصَاب» / "al-qassab" / "al-qassaab" / "al-qasaab" (that word means "butcher" — a big mistake). Sukoon on the final ب (never "al-qusub", "al-qasaba"). Same in every phrase: مملحة القَصَب، موسم ملح القَصَب، أهل القَصَب.
 - «الجِفار» = "al-jifar": starts with ج (J) not ق: never «القفار» / "al-qafar". Kasra on ج.
-- «الصْبَخَة» = "aṣ-ṣbakha": ص with sukoon, then بَ خَ. Never «السبخة» with س.
+- «الصْبَخَة» = "aṣ-ṣbakha" — say «اِصْ·بَ·خَة» (iṣ·ba·kha): the ص has NO vowel, the first vowel comes AFTER the ب (ba), then خَة (kha). It is NEVER «الصَّبْخة» / "aṣ-ṣabkha" / "sabkha" (vowel after ص and silent ب — wrong), and never «السبخة» with س.
 - «المَمْلَحَة» = "al-mamlaha" (MAM·la·ḥa): fatha on the first م, sukoon on the second م, fatha on ل and ح. Never «المملِحة» / «المملُحة». Plural «المَمَالح» = "al-mamaleḥ".
 - «الوَشْم» = "al-washm", «شَقْراء» = "shaqra", «طُوَيْق», «الدَّهْناء».`;
 
@@ -821,7 +823,7 @@ Visual guide to Al-Qasab:
 4. A pink-to-red lake ringed with white salt crust and eroded white-and-ochre banks: very salty brine in the salt pans' pools (NOT Al-Sabkha); the pink-red colour comes from salt-loving microorganisms that thrive in highly saline water.
 5. A wide, flat, dark gravel/earth plain (often at night, a rug or campers on it, a line of town lights on the horizon): Al-Sabkha (صْبَخَة القَصَب), the open plain south of town. It is not the salt pans.
 5. A milky, pale-green pool with white crystals along its edge: brine concentrating as the water evaporates — the salt is crystallising there.
-6. White salt heaps or salt sacks: the harvested Al-Qasab salt, the heart of موسم ملح القَصَب (launching 19 November 2026; entry free).`;
+6. White salt heaps or salt sacks: the harvested Al-Qasab salt, the heart of موسم ملح القَصَب (19–28 November 2026, daily 4–11 pm; free entry).`;
 
 const VISION_RULES_AR = `${PRONUNCIATION_GUIDE}
 
@@ -837,7 +839,7 @@ const VISION_RULES_AR = `${PRONUNCIATION_GUIDE}
 4. بحيرة لونها وردي إلى أحمر حولها قشرة ملح بيضاء وضفاف بيضاء وبنية متآكلة: ماء شديد الملوحة في أحواض المملحة (مو الصْبَخَة)، واللون الوردي سببه كائنات دقيقة تعيش في الماء شديد الملوحة.
 5. أرض مستوية واسعة حصى وتراب (غالباً بالليل، عليها فرشة أو كشتة، وأنوار البلد خط على الأفق): هذي صْبَخَة القَصَب، الأرض المفتوحة جنوب البلد، وهي غير المملحة.
 5. حوض ماؤه حليبي أو أخضر فاتح وعلى طرفه بلورات بيضاء: ماء مالح يتركّز مع التبخر والملح قاعد يتبلور فيه.
-6. أكوام ملح بيضاء أو أكياس ملح: ملح القَصَب المستخرج، وهو قلب موسم ملح القَصَب (ينطلق 19 نوفمبر 2026 والدخول مجاني).`;
+6. أكوام ملح بيضاء أو أكياس ملح: ملح القَصَب المستخرج، وهو قلب موسم ملح القَصَب (من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً ٤ العصر – ١١ الليل، والدخول مجاني).`;
 
 export function buildAlQasabSystemPrompt(
   weatherSummary?: string,
@@ -865,8 +867,8 @@ Other Rules:
 ${GUIDE_FACTS_EN}
 5. Concise answers: 1 to 3 direct, natural sentences.
 6. Voice: Natural tempo, direct friendly tone, no stutter or artificial pauses.
-7. Season Launch: November 19, 2026.
-8. Tickets: Completely free of charge from the main gate or at the site/location.
+7. The 4th Salt Season: 19–28 November 2026, daily 4:00–11:00 pm, in Al-Qasab's heritage town; Instagram @qasabsaltseason.
+8. Tickets: entry is FREE, but visitors register for a ticket at qasab-tickets.pages.dev (or scan the QR code on the season poster); one ticket covers the visitor and companions. Never say tickets are picked up at the gate.
 9. Sabkha: a separate place from the salt pans; open plain ~3 km south of town, 5-10°C cooler at night in summer.
 10. Verified cafes: Bdor Ibrahim (4.9 stars), Art Coffee (4.8 stars), Shahi Nagea (4.7 stars), Diwaniyat Al-Manie (4.8 stars). (No Diwaniyat Al-Qasab).
 11. Scope: Exclusively Al-Qasab and its heritage, events, and live weather.${weatherSection}`;
@@ -890,8 +892,8 @@ ${VISION_RULES_AR}
 ${GUIDE_FACTS_AR}
 
 5. **حقائق موسم ملح القَصَب والمعالم:**
-   - تاريخ انطلاق موسم ملح القَصَب: 19 نوفمبر 2026.
-   - التذاكر: مجانية تماماً، ويمكن الحصول عليها من البوابة الرئيسية أو عند الموقع.
+   - موسم ملح القَصَب الرابع: من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً من ٤ العصر إلى ١١ الليل، في مدينة القَصَب التراثية، وحسابه @qasabsaltseason.
+   - التذاكر: الدخول مجاني، بس الزائر يسجّل زيارته ويحصل على تذكرته من qasab-tickets.pages.dev (أو يمسح الباركود في إعلان الموسم)، وتذكرة وحدة له ولمرافقيه. لا تقول إن التذاكر تنصرف من البوابة.
    - صْبَخَة القَصَب: مكان مستقل غير مَمْلَحَة القَصَب، أرض مفتوحة جنوب البلد، تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
    - المقاهي التراثية المعتمدة 4 فقط: قهوة بدور إبراهيم، آرت كافيه، شاهي ناقع، ديوانية المنيع التراثية (تنبيه: لا يوجد مكان باسم ديوانية القَصَب).
    - إجاباتك موجزة ومباشرة (من جملة إلى 3 جمل واضحة دون إطالة مملة).

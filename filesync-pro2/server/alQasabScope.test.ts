@@ -90,11 +90,24 @@ test("resolves correct locations and coordinates", () => {
   assert.equal(locFestival.type, "festival");
 });
 
-test("answers ticket inquiries with free tickets from gate or site", () => {
+test("answers ticket inquiries with the free online registration ticket", () => {
   const answerAr = generateLocalKnowledgeFallback("كم سعر التذكرة؟", "ar");
-  assert.match(answerAr, /التذاكر مجانية تماماً/);
-  assert.match(answerAr, /البوابة الرئيسية/);
-  assert.match(answerAr, /عند الموقع/);
+  assert.match(answerAr, /مجانية/);
+  assert.match(answerAr, /qasab-tickets\.pages\.dev/);
+  assert.match(answerAr, /١٩ إلى ٢٨ نوفمبر/);
+  assert.doesNotMatch(answerAr, /البوابة الرئيسية/);
+  const answerEn = generateLocalKnowledgeFallback("How do I get a ticket?", "en");
+  assert.match(answerEn, /qasab-tickets\.pages\.dev/);
+});
+
+test("speech prompt carries pronunciation notes only for words in the text", async () => {
+  const { buildSpeechPrompt } = await import("./api.ts").catch(() => ({ buildSpeechPrompt: null as any }));
+  if (!buildSpeechPrompt) return; // api.ts needs server deps that may be missing locally
+  const p = buildSpeechPrompt("حيّاك الله في القَصَب والصْبَخَة");
+  assert.match(p, /never «القصّاب»|Never «القصّاب»/);
+  assert.match(p, /«الصَّبْخة»/);
+  assert.match(p, /#### TRANSCRIPT\nحيّاك الله في القَصَب والصْبَخَة$/);
+  assert.equal(buildSpeechPrompt("hello"), "hello");
 });
 
 test("strictly blocks questions about families, lineages, and tribes with polite Najdi refusal", () => {

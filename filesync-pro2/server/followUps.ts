@@ -4,10 +4,10 @@ import { matchPlaceTopic } from "./alQasabKnowledge.ts";
 
 type Pair = [ar: string, en: string];
 
-const BY_TOPIC: Record<string, Pair[]> = {
+export const BY_TOPIC: Record<string, Pair[]> = {
   salt_pans: [
+    ["كيف يستخرجون الملح؟", "How is the salt made?"],
     ["وش الفرق بين مملحة القصب ومملحة المقحم؟", "How is Al-Muqhim different from the Al-Qasab salt pans?"],
-    ["وش الفرق بين المملحة والصبخة؟", "How is Al-Sabkha different from the salt pans?"],
     ["وش أحسن وقت أزور فيه المملحة؟", "When is the best time to visit the salt pans?"],
     ["كيف أوصل للممالح؟", "How do I get to the salt pans?"],
   ],
@@ -48,7 +48,7 @@ const BY_TOPIC: Record<string, Pair[]> = {
   ],
   rashid_house: [
     ["وش قصة المرقب؟", "What's the story of the watchtower?"],
-    ["علمني عن البلدة القديمة", "Tell me about the old town"],
+    ["وش قصة أبواب القصب؟", "What's the story of Al-Qasab's gates?"],
     ["وش سوق العبيدي؟", "What is Souq Al-Obaidi?"],
   ],
   old_town: [
@@ -62,14 +62,64 @@ const BY_TOPIC: Record<string, Pair[]> = {
     ["وش قصة الصبخة؟", "What is Al-Sabkha?"],
   ],
   season: [
-    ["متى يبدأ موسم الملح؟", "When does the Salt Season start?"],
-    ["كم سعر التذاكر؟", "How much are the tickets?"],
+    ["وش محطات الموسم؟", "What are the season's stations?"],
+    ["كيف أحصل على تذكرة؟", "How do I get a ticket?"],
     ["وين أرض الفعاليات على الخريطة؟", "Where are the event grounds on the map?"],
     ["حدثني عن ممالح القصب", "Tell me about the Al-Qasab salt pans"],
   ],
-  town: [
+  season_map: [
+    ["كيف أحصل على تذكرة؟", "How do I get a ticket?"],
+    ["وش قصة أبواب القصب؟", "What's the story of Al-Qasab's gates?"],
+    ["حدثني عن شعر القصب", "Tell me about Al-Qasab's poetry"],
+  ],
+  salt_extraction: [
+    ["كم تنتج القصب من الملح؟", "How much salt does Al-Qasab produce?"],
     ["حدثني عن ممالح القصب", "Tell me about the Al-Qasab salt pans"],
-    ["علمني عن قصر الزاحم", "Tell me about Al-Zahim palace"],
+    ["وش تاريخ الملح؟", "What's the history of salt?"],
+  ],
+  salt_economy: [
+    ["كيف يستخرجون الملح؟", "How is the salt made?"],
+    ["وش تاريخ الملح؟", "What's the history of salt?"],
+    ["متى موسم الملح؟", "When is the Salt Season?"],
+  ],
+  salt_history: [
+    ["كيف يستخرجون الملح؟", "How is the salt made?"],
+    ["وش تاريخ القصب؟", "What's the history of Al-Qasab?"],
+    ["كم تنتج القصب من الملح؟", "How much salt does Al-Qasab produce?"],
+  ],
+  qasab_history: [
+    ["وش قصة أبواب القصب؟", "What's the story of Al-Qasab's gates?"],
+    ["حدثني عن شعر القصب", "Tell me about Al-Qasab's poetry"],
+    ["وش قصة المرقب؟", "What's the story of the watchtower?"],
+  ],
+  gates: [
+    ["وش قصة المرقب؟", "What's the story of the watchtower?"],
+    ["وش تاريخ القصب؟", "What's the history of Al-Qasab?"],
+    ["علمني عن البلدة القديمة", "Tell me about the old town"],
+  ],
+  qarraya: [
+    ["وش تاريخ القصب؟", "What's the history of Al-Qasab?"],
+    ["وش محطات الموسم؟", "What are the season's stations?"],
+    ["حدثني عن شعر القصب", "Tell me about Al-Qasab's poetry"],
+  ],
+  akrashiya: [
+    ["وش قصة الصبخة؟", "What is Al-Sabkha?"],
+    ["كيف الطقس الحين؟", "What's the weather now?"],
+    ["حدثني عن ممالح القصب", "Tell me about the Al-Qasab salt pans"],
+  ],
+  poetry: [
+    ["وش أمثال القصب الشعبية؟", "What are Al-Qasab's folk proverbs?"],
+    ["وش تاريخ القصب؟", "What's the history of Al-Qasab?"],
+    ["وش محطات الموسم؟", "What are the season's stations?"],
+  ],
+  proverbs: [
+    ["حدثني عن شعر القصب", "Tell me about Al-Qasab's poetry"],
+    ["وش تاريخ الملح؟", "What's the history of salt?"],
+    ["وش قصة أبواب القصب؟", "What's the story of Al-Qasab's gates?"],
+  ],
+  town: [
+    ["وش تاريخ القصب؟", "What's the history of Al-Qasab?"],
+    ["حدثني عن ممالح القصب", "Tell me about the Al-Qasab salt pans"],
     ["متى موسم الملح؟", "When is the Salt Season?"],
   ],
   cafes: [
@@ -83,7 +133,7 @@ const BY_TOPIC: Record<string, Pair[]> = {
     ["متى موسم الملح؟", "When is the Salt Season?"],
   ],
   tickets: [
-    ["متى يبدأ موسم الملح؟", "When does the Salt Season start?"],
+    ["وش محطات الموسم؟", "What are the season's stations?"],
     ["وين أرض الفعاليات على الخريطة؟", "Where are the event grounds on the map?"],
     ["أبرز المقاهي في القصب؟", "What are the cafes in Al-Qasab?"],
   ],
