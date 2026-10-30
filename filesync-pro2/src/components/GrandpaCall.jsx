@@ -22,8 +22,16 @@ const fragmentShader = `
   uniform sampler2D uBase;
   uniform sampler2D uMouth;
   uniform sampler2D uEyes;
+  uniform sampler2D uMask;   // 1 = the man, 0 = the wall behind him
+  uniform sampler2D uWall;   // the wall with the man painted out (already soft-focus)
   uniform float uOpen;
   uniform float uBlink;
+  uniform float uHeadAngle;  // radians, head tilt around the neck
+  uniform vec2 uHeadShift;   // px, head drift / nod
+  uniform float uBrow;       // px, eyebrows raised on emphasis
+  uniform float uBreath;     // px, shoulders rising with each breath
+  uniform vec2 uBgShift;     // px, the wall drifts the other way (depth)
+  uniform float uLight;      // -1..1, slow warm light moving across him
 
   const float SIZE = 768.0;
   // Mouth + beard region that moves when he talks
@@ -42,6 +50,12 @@ const fragmentShader = `
   const vec2 EYE_R = vec2(450.8, 248.2);
   const vec2 EYE_RAD = vec2(42.0, 27.0);
 
+  const vec2 NECK = vec2(384.0, 520.0);   // the head turns around this point
+  const vec2 HEAD_C = vec2(384.0, 250.0);
+  const vec2 HEAD_R = vec2(250.0, 300.0);
+  const vec2 BROW_C = vec2(384.0, 212.0);
+  const vec2 BROW_R = vec2(150.0, 42.0);
+
   float ell(vec2 px, vec2 c, vec2 r) {
     float d = length((px - c) / r);
     return 1.0 - smoothstep(0.75, 1.25, d);
@@ -55,24 +69,52 @@ const fragmentShader = `
     return v * h;
   }
 
+  float mask(vec2 px) { return texture2D(uMask, vec2(px.x / SIZE, 1.0 - px.y / SIZE)).r; }
+
+  // Where to read the painting for this screen pixel once the head and body have moved
+  vec2 figure(vec2 px) {
+    // Breathing: shoulders and chest rise a little, fading out towards the face
+    vec2 q = px + vec2(0.0, uBreath * smoothstep(380.0, 600.0, px.y));
+    // Head (shemagh, face, beard) tilts and drifts around the neck; the body stays
+    float wHead = (1.0 - smoothstep(430.0, 560.0, px.y)) * (1.0 - smoothstep(0.85, 1.15, length((px - HEAD_C) / HEAD_R)));
+    vec2 d = q - NECK - uHeadShift;
+    float c = cos(-uHeadAngle), s = sin(-uHeadAngle);
+    vec2 turned = vec2(c * d.x - s * d.y, s * d.x + c * d.y) + NECK;
+    q = mix(q, turned, wHead);
+    // Eyebrows lift on emphasis
+    q.y += uBrow * (1.0 - smoothstep(0.6, 1.2, length((q - BROW_C) / BROW_R)));
+    return q;
+  }
+
   void main() {
     vec2 px = vec2(vUv.x, 1.0 - vUv.y) * SIZE;
-    vec3 col = tex(uBase, px);
+    vec2 q = figure(px);
 
-    float area = ell(px, MOUTH_C, MOUTH_R);
+    // ----- the man -----
+    vec3 man = tex(uBase, q);
+    float area = ell(q, MOUTH_C, MOUTH_R);
     if (uOpen > 0.001 && area > 0.001) {
-      float w = jaw(px);
-      // Closed painting with its jaw pulled down to the current opening…
-      vec3 closedNow = tex(uBase, px - vec2(0.0, uOpen * JAW_DROP * w));
-      // …and the open painting with its jaw pushed up to the same opening
-      vec3 openNow = tex(uMouth, px + vec2(0.0, (1.0 - uOpen) * JAW_DROP * w));
-      // Both now line up, so blending them never shows two mouths
-      vec3 talking = mix(closedNow, openNow, smoothstep(0.15, 0.85, uOpen));
-      col = mix(col, talking, area);
+      float w = jaw(q);
+      // Closed painting with its jaw pulled down to the current opening, and the open painting
+      // with its jaw pushed up to the same opening: they line up, so the blend is one mouth
+      vec3 closedNow = tex(uBase, q - vec2(0.0, uOpen * JAW_DROP * w));
+      vec3 openNow = tex(uMouth, q + vec2(0.0, (1.0 - uOpen) * JAW_DROP * w));
+      man = mix(man, mix(closedNow, openNow, smoothstep(0.15, 0.85, uOpen)), area);
     }
+    float e = max(ell(q, EYE_L, EYE_RAD), ell(q, EYE_R, EYE_RAD)) * uBlink;
+    if (e > 0.001) man = mix(man, tex(uEyes, q), e);
+    // Soft warm key light drifting slowly across the face
+    float side = (q.x - 384.0) / 384.0;
+    man *= 1.0 + 0.045 * uLight * side + 0.02;
 
-    float e = max(ell(px, EYE_L, EYE_RAD), ell(px, EYE_R, EYE_RAD)) * uBlink;
-    if (e > 0.001) col = mix(col, tex(uEyes, px), e);
+    // ----- the wall: out of focus, a touch darker, drifting the other way -----
+    vec2 b = px + uBgShift;
+    vec3 wall = tex(uWall, b) * 0.94;
+
+    vec3 col = mix(wall, man, mask(q));
+    // Gentle vignette pulls the eye to the face
+    float v = length((px - vec2(384.0, 330.0)) / vec2(520.0, 560.0));
+    col *= 1.0 - 0.22 * smoothstep(0.55, 1.1, v);
     gl_FragColor = vec4(col, 1.0);
   }
 `;
@@ -94,14 +136,16 @@ function GrandpaScene({ audioLevel = 0, isSpeaking = false, analyserNode = null 
   const nextBlinkRef = useRef(2.5);
   const blinkStartRef = useRef(-10);
 
-  const [base, mouth, eyes] = useLoader(THREE.TextureLoader, FRAMES);
+  const [base, mouth, eyes, personMask, wallTex] = useLoader(THREE.TextureLoader, [...FRAMES, '/images/shayeb/person-mask.png', '/images/shayeb/wall.jpg']);
   useMemo(() => {
-    for (const t of [base, mouth, eyes]) {
+    for (const t of [base, mouth, eyes, personMask, wallTex]) {
       // Raw ShaderMaterial writes the colour straight out: keep the textures untagged
       t.colorSpace = THREE.NoColorSpace;
       t.anisotropy = 4;
     }
-  }, [base, mouth, eyes]);
+  }, [base, mouth, eyes, personMask, wallTex]);
+  const slowAudioRef = useRef(0);
+  const motionRef = useRef({ angle: 0, sx: 0, sy: 0, brow: 0 });
   const dataArray = useMemo(() => new Uint8Array(analyserNode?.fftSize || 256), [analyserNode]);
 
   const uniforms = useMemo(
@@ -109,10 +153,18 @@ function GrandpaScene({ audioLevel = 0, isSpeaking = false, analyserNode = null 
       uBase: { value: base },
       uMouth: { value: mouth },
       uEyes: { value: eyes },
+      uMask: { value: personMask },
+      uWall: { value: wallTex },
       uOpen: { value: 0 },
       uBlink: { value: 0 },
+      uHeadAngle: { value: 0 },
+      uHeadShift: { value: new THREE.Vector2() },
+      uBrow: { value: 0 },
+      uBreath: { value: 0 },
+      uBgShift: { value: new THREE.Vector2() },
+      uLight: { value: 0 },
     }),
-    [base, mouth, eyes]
+    [base, mouth, eyes, personMask, wallTex]
   );
 
   useFrame((state, delta) => {
@@ -163,19 +215,33 @@ function GrandpaScene({ audioLevel = 0, isSpeaking = false, analyserNode = null 
     // Eyelids close quickly and open a little slower, like a real blink
     const blink = bt >= 0 && bt <= 1 ? (bt < 0.4 ? THREE.MathUtils.smoothstep(bt, 0, 0.4) : 1 - THREE.MathUtils.smoothstep(bt, 0.4, 1)) : 0;
 
-    if (materialRef.current) {
-      materialRef.current.uniforms.uOpen.value = open;
-      materialRef.current.uniforms.uBlink.value = blink;
-    }
+    // Body language. Idle: slow drifting head, breathing. Talking: livelier tilts, small nods
+    // on stressed syllables and eyebrows that lift on emphasis.
+    const vol = smoothAudioRef.current;
+    slowAudioRef.current = THREE.MathUtils.lerp(slowAudioRef.current, vol, 1 - Math.exp(-delta / 0.6));
+    const emphasis = Math.max(0, vol - slowAudioRef.current - 0.04);
+    const talk = Math.min(1, slowAudioRef.current * 2.5);
+    const mo = motionRef.current;
+    const ease = 1 - Math.exp(-delta / 0.18);
+    const targetAngle =
+      0.012 * Math.sin(t * 0.43) + 0.006 * Math.sin(t * 1.07 + 1.3) + talk * 0.014 * Math.sin(t * 2.1 + 0.5);
+    const targetSx = 3.0 * Math.sin(t * 0.31) + talk * 2.0 * Math.sin(t * 1.7);
+    const targetSy = 1.2 * Math.sin(t * 0.52 + 2.0) + emphasis * 22 + talk * 1.5;
+    mo.angle += (targetAngle - mo.angle) * ease;
+    mo.sx += (targetSx - mo.sx) * ease;
+    mo.sy += (targetSy - mo.sy) * ease;
+    mo.brow += (Math.min(4, emphasis * 30) - mo.brow) * (1 - Math.exp(-delta / 0.12));
 
-    if (meshRef.current) {
-      // Gentle breathing, a slight nod while talking, a very small sway
-      const breathe = Math.sin(t * 1.4) * 0.006;
-      const s = 1 + breathe + open * 0.006;
-      meshRef.current.scale.x = THREE.MathUtils.lerp(meshRef.current.scale.x, s, 0.2);
-      meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, s, 0.2);
-      meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, PLANE_Y - open * 0.01, 0.2);
-      meshRef.current.rotation.z = THREE.MathUtils.lerp(meshRef.current.rotation.z, Math.sin(t * 0.7) * 0.008, 0.08);
+    if (materialRef.current) {
+      const u = materialRef.current.uniforms;
+      u.uOpen.value = open;
+      u.uBlink.value = blink;
+      u.uHeadAngle.value = mo.angle;
+      u.uHeadShift.value.set(mo.sx, mo.sy);
+      u.uBrow.value = mo.brow;
+      u.uBreath.value = 2.2 * Math.sin(t * 1.25);
+      u.uBgShift.value.set(-mo.sx * 0.6, -mo.sy * 0.3);
+      u.uLight.value = Math.sin(t * 0.21);
     }
   });
 

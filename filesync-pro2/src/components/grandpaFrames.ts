@@ -4,7 +4,7 @@ export const GRANDPA_FRAMES = ["/images/shayeb/base.jpg", "/images/shayeb/mouth.
 
 /** Starts downloading the paintings, called before the call screen opens. */
 export function preloadGrandpa() {
-  for (const src of GRANDPA_FRAMES) {
+  for (const src of [...GRANDPA_FRAMES, "/images/shayeb/person-mask.png", "/images/shayeb/wall.jpg"]) {
     const img = new Image();
     img.src = src;
   }
