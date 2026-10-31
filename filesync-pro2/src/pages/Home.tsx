@@ -917,8 +917,8 @@ export default function Home() {
               {messages.length === 0 ? (
                 /* Welcome screen: the photo behind the visitor right now, then questions with icons */
                 <div className="mx-auto flex min-h-[400px] max-w-xl flex-col items-center justify-center text-center">
-                  <div className="mb-3 size-20 overflow-hidden rounded-3xl border border-[#e6d5bd] bg-white p-1 shadow-md">
-                    <MalhAlQasabLogo size="xl" className="h-full w-full rounded-2xl" />
+                  <div className="mb-3 rounded-[1.7rem] border border-[#e6d5bd] bg-white p-1 shadow-md">
+                    <MalhAlQasabLogo size="lg" />
                   </div>
                   <h2 className="font-kufi text-2xl font-bold text-[#3a2a1c] sm:text-3xl">{t.welcomeTitle}</h2>
                   <p className="mt-2 max-w-md text-sm leading-6 text-[#685140]">{t.welcomeDesc}</p>

@@ -344,7 +344,7 @@ body {
 }
 
 /* ---------- Heritage touches ---------- */
-.font-kufi { font-family: "Reem Kufi", "Alexandria", system-ui, sans-serif; letter-spacing: 0; }
+.font-kufi { font-family: "Reem Kufi", "Alexandria", system-ui, sans-serif; letter-spacing: 0; word-spacing: 0.28em; }
 
 /* Sadu weave ribbon (Najdi tent-weaving pattern) */
 .sadu-strip {
