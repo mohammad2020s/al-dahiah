@@ -6,7 +6,11 @@ import React from "react";
 // left-to-right, so they don't break apart inside Arabic text
 const LINK_RE = /((?:https?:\/\/)?(?:[a-z0-9-]+\.)+(?:com|dev|sa|org|net|app|gov\.sa)(?:\/[^\s)»،]*[^\s)»،.,!?؟])?)/gi;
 function links(text: string, keyBase: string) {
-  const parts = text.split(LINK_RE);
+  // Markdown links «[label](url)»: keep the address only (or «label url» when the label is words)
+  const flat = text.replace(/\[([^\]\n]+)\]\(([^)\s]+)\)/g, (_m, label: string, url: string) =>
+    /^(?:https?:\/\/)?[a-z0-9.-]+\.[a-z]{2,}(?:\/\S*)?$/i.test(label.trim()) ? url : `${label} ${url}`
+  );
+  const parts = flat.split(LINK_RE);
   return parts.map((p, i) =>
     i % 2 === 1 ? (
       <a
