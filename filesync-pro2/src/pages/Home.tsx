@@ -70,6 +70,7 @@ type ChatMessage = {
   images?: PlaceImage[];
   mapsUrl?: string;
   ticketUrl?: string;
+  link?: { url: string; label: string };
   audio?: string;
   /** Next questions to tap under an answer */
   followUps?: string[];
@@ -163,7 +164,14 @@ const ALL_MAP_POINTS: MapPoint[] = [
     title: l.name,
     kind: l.id === "salt_flat" || l.id === "sabkha" ? ("nature" as const) : undefined,
   })),
-  ...PLACE_TOPICS.filter((t) => t.coordinates && !AL_QASAB_LANDMARKS.some((l) => l.id === t.id)).map((t) => ({
+  // Only places in and around town: far ones (Burdan lake, the Nafud, Al-Shafei…) get their own map
+  ...PLACE_TOPICS.filter(
+    (t) =>
+      t.coordinates &&
+      !AL_QASAB_LANDMARKS.some((l) => l.id === t.id) &&
+      Math.abs(t.coordinates.lat - 25.2987) < 0.03 &&
+      Math.abs(t.coordinates.lng - 45.505) < 0.05
+  ).map((t) => ({
     id: t.id,
     lat: t.coordinates!.lat,
     lng: t.coordinates!.lng,
@@ -192,7 +200,15 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
     : location.name || (language === "en" ? "Al-Qasab Salt Season - Event Grounds" : "موسم ملح القصب - أرض الفعاليات");
   // Several cafes → frame the 4 cafes; otherwise focus the place being asked about
   const multiPin = isCafes && Array.isArray(location.places) && location.places.length > 1;
+  const servicePins: { id: string; name: string; nameEn?: string; lat: number; lng: number; kind: "mosque" | "wc" }[] | null =
+    Array.isArray(location.pins) ? location.pins : null;
   const { mapPoints, activeId } = useMemo(() => {
+    if (servicePins) {
+      return {
+        mapPoints: servicePins.map((p) => ({ id: p.id, lat: p.lat, lng: p.lng, title: language === "en" && p.nameEn ? p.nameEn : p.name, kind: p.kind })),
+        activeId: undefined,
+      };
+    }
     const points: MapPoint[] = [...ALL_MAP_POINTS];
     if (multiPin || allPlaces) return { mapPoints: points, activeId: undefined };
     const byId = location.id && points.find((p) => p.id === location.id);
@@ -200,7 +216,7 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
     if (near) return { mapPoints: points, activeId: near.id };
     points.push({ id: "here", lat: activeCoordinates.lat, lng: activeCoordinates.lng, title: locationTitle });
     return { mapPoints: points, activeId: "here" };
-  }, [multiPin, allPlaces, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]);
+  }, [servicePins, language, multiPin, allPlaces, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]);
 
   return (
     <div className="my-4 overflow-hidden rounded-3xl border border-[#f2d4d1] bg-white shadow-lg shadow-gray-200/50 w-full">
@@ -208,12 +224,14 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
         className="h-64 sm:h-72"
         points={mapPoints}
         activeId={activeId}
-        fitIds={multiPin ? CAFE_PIN_IDS : undefined}
+        fitIds={servicePins ? servicePins.map((p) => p.id) : multiPin ? CAFE_PIN_IDS : undefined}
         zoom={17}
       />
       <div className="flex items-center justify-between gap-2 border-t border-[#f4dedd] px-3 py-2.5">
-        <span className="min-w-0 truncate text-xs font-bold text-[#321210]">{locationTitle}</span>
-        {allPlaces ? (
+        <span className="min-w-0 truncate text-xs font-bold text-[#321210]">
+          {servicePins ? (language === "en" && location.nameEn ? location.nameEn : location.name) : locationTitle}
+        </span>
+        {allPlaces || servicePins ? (
           <span className="shrink-0 text-[11px] text-[#7d6564]">{language === "en" ? "Tap a pin to see its name" : "اضغط على أي دبوس يطلع اسمه"}</span>
         ) : (
         <a
@@ -227,6 +245,28 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
         </a>
         )}
       </div>
+
+      {servicePins && (
+        <div className="border-t border-[#f4dedd] bg-[#fffaf9] p-3 sm:p-4 space-y-1.5">
+          {servicePins.map((p) => (
+            <div key={p.id} className="flex items-center justify-between gap-2 rounded-xl border border-[#f2d8d6] bg-white px-2.5 py-2">
+              <span className="flex min-w-0 items-center gap-2 text-xs font-bold text-[#321210]">
+                <span className={`size-2.5 shrink-0 rounded-full ${p.kind === "wc" ? "bg-[#2563a8]" : "bg-[#2f7d4f]"}`} />
+                <span className="truncate">{language === "en" && p.nameEn ? p.nameEn : p.name}</span>
+              </span>
+              <a
+                href={directionsUrl(p.lat, p.lng)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#b82e24] px-2 py-1 text-[10px] font-bold text-white hover:bg-[#992017]"
+              >
+                <ExternalLink className="size-3" />
+                {language === "en" ? "Take me there" : "خذني له"}
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
 
       {isCafes && location.places && (
         <div className="border-t border-[#f4dedd] bg-[#fffaf9] p-3 sm:p-4">
@@ -562,6 +602,7 @@ export default function Home() {
                         images: Array.isArray(data.images) ? data.images : undefined,
                         mapsUrl: typeof data.mapsUrl === "string" ? data.mapsUrl : undefined,
                         ticketUrl: typeof data.ticketUrl === "string" ? data.ticketUrl : undefined,
+                        link: data.link && typeof data.link.url === "string" ? data.link : undefined,
                         followUps: Array.isArray(data.followUps) ? data.followUps.slice(0, 3) : undefined,
                       }
                     : m
@@ -814,6 +855,17 @@ export default function Home() {
                         >
                           <Ticket className="size-3.5" />
                           {language === "en" ? "Book your free ticket" : "احجز تذكرتك المجانية"}
+                        </a>
+                      )}
+                      {m.role === "assistant" && m.link && (
+                        <a
+                          href={m.link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="pg-enter mt-2 ms-2 inline-flex items-center gap-1.5 rounded-xl border border-[#EAD0CB] bg-white px-3 py-2 text-xs font-bold text-[#B2512F] shadow-sm hover:bg-[#F1E7E7]"
+                        >
+                          <ExternalLink className="size-3.5" />
+                          {m.link.label}
                         </a>
                       )}
                       {m.role === "assistant" && m.showMap && m.locationData && (

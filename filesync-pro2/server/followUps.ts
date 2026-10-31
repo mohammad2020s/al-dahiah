@@ -67,6 +67,56 @@ export const BY_TOPIC: Record<string, Pair[]> = {
     ["وين أرض الفعاليات على الخريطة؟", "Where are the event grounds on the map?"],
     ["حدثني عن ممالح القصب", "Tell me about the Al-Qasab salt pans"],
   ],
+  mosques: [
+    ["وين أقرب دورات مياه؟", "Where are the nearest restrooms?"],
+    ["علمني عن القرية التراثية", "Tell me about the heritage village"],
+    ["وش الموقع الرسمي للقصب؟", "What is Al-Qasab's official website?"],
+  ],
+  restrooms: [
+    ["وين المساجد في القصب؟", "Where are the mosques in Al-Qasab?"],
+    ["وش محطات الموسم؟", "What are the season's stations?"],
+    ["علمني عن روضة العكرشية", "Tell me about Rawdat Al-Akrashiya"],
+  ],
+  official_site: [
+    ["وش الأماكن السياحية في القصب؟", "What are the tourist places in Al-Qasab?"],
+    ["وش فعاليات القصب على مدار السنة؟", "What events does Al-Qasab hold through the year?"],
+    ["كيف أحصل على تذكرة؟", "How do I get a ticket?"],
+  ],
+  events: [
+    ["علمني عن حديقة الملك سلمان", "Tell me about King Salman Park"],
+    ["متى موسم الملح؟", "When is the Salt Season?"],
+    ["وش الموقع الرسمي للقصب؟", "What is Al-Qasab's official website?"],
+  ],
+  king_salman_park: [
+    ["وش فعاليات القصب على مدار السنة؟", "What events does Al-Qasab hold through the year?"],
+    ["وين المساجد في القصب؟", "Where are the mosques in Al-Qasab?"],
+    ["علمني عن القرية التراثية", "Tell me about the heritage village"],
+  ],
+  art_club: [
+    ["وش سوق العبيدي؟", "What is Souq Al-Obaidi?"],
+    ["علمني عن القرية التراثية", "Tell me about the heritage village"],
+    ["وين أقرب دورات مياه؟", "Where are the nearest restrooms?"],
+  ],
+  burdan_lake: [
+    ["علمني عن روضة العكرشية", "Tell me about Rawdat Al-Akrashiya"],
+    ["وش النفود وجبل الفهدة؟", "What are the Nafud and Jabal Al-Fahda?"],
+    ["كيف الطقس الحين؟", "What's the weather now?"],
+  ],
+  nafud: [
+    ["وين الواحة الخضراء؟", "Where is the Green Oasis?"],
+    ["علمني عن منتزه الشفيعي", "Tell me about Al-Shafei park"],
+    ["كيف الطقس الحين؟", "What's the weather now?"],
+  ],
+  shafei_park: [
+    ["وش النفود وجبل الفهدة؟", "What are the Nafud and Jabal Al-Fahda?"],
+    ["علمني عن روضة العكرشية", "Tell me about Rawdat Al-Akrashiya"],
+    ["كيف الطقس الحين؟", "What's the weather now?"],
+  ],
+  birds_museum: [
+    ["علمني عن روضة العكرشية", "Tell me about Rawdat Al-Akrashiya"],
+    ["وش الأماكن السياحية في القصب؟", "What are the tourist places in Al-Qasab?"],
+    ["وش الموقع الرسمي للقصب؟", "What is Al-Qasab's official website?"],
+  ],
   season_map: [
     ["كيف أحصل على تذكرة؟", "How do I get a ticket?"],
     ["وش قصة أبواب القصب؟", "What's the story of Al-Qasab's gates?"],
@@ -103,7 +153,7 @@ export const BY_TOPIC: Record<string, Pair[]> = {
     ["حدثني عن شعر القصب", "Tell me about Al-Qasab's poetry"],
   ],
   akrashiya: [
-    ["وش قصة الصبخة؟", "What is Al-Sabkha?"],
+    ["وين الواحة الخضراء؟", "Where is the Green Oasis?"],
     ["كيف الطقس الحين؟", "What's the weather now?"],
     ["حدثني عن ممالح القصب", "Tell me about the Al-Qasab salt pans"],
   ],

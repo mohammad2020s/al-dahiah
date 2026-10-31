@@ -51,7 +51,11 @@ export interface PlaceTopic {
   mapsUrl?: string;
   /** Exact spot, for the map under chat answers */
   coordinates?: { lat: number; lng: number };
+  /** A button under the answer (e.g. the official city site) */
+  link?: { url: string; labelAr: string; labelEn: string };
 }
+
+const OFFICIAL_SITE = { url: "https://qasabcity.com", labelAr: "الموقع الرسمي لمدينة القصب", labelEn: "Al-Qasab official city guide" };
 
 const MUQHIM_PAN_MAPS_URL = "https://maps.app.goo.gl/DsMP4ruDfFH2wwZh9";
 // «مملحة مركز القصب» on Google Maps (the big working salt pans, not Al-Muqhim)
@@ -117,9 +121,10 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Tourist places in Al-Qasab",
     keywords: ["الاماكن السياحيه", "اماكن سياحيه", "المعالم السياحيه", "معالم سياحيه", "اماكن القصب", "معالم القصب", "tourist places", "attractions", "places to visit", "sights"],
     answerAr:
-      "أبشر! هذي أماكن القَصَب السياحية، وتلقاها كلها على الخريطة التفاعلية تحت، اضغط على أي دبوس يطلع لك اسمه:\n• مَمْلَحَة القَصَب (الجِفار): الممالح الكبيرة وأكوام الملح الأبيض.\n• مَمْلَحَة المقحم النموذجية: ممشى خشبي وأكواخ خوص وكشك ملح.\n• الصْبَخَة: جلسات الليل جنوب البلد.\n• أرض موسم ملح القَصَب.\n• القرية التراثية وقصر ابن زاحم.\n• مرقب القَصَب.\n• والمقاهي التراثية الأربع.\nوش تبي أعلّمك عنه أكثر؟",
+      "أبشر! هذي أماكن القَصَب السياحية، وتلقاها كلها على الخريطة التفاعلية تحت، اضغط على أي دبوس يطلع لك اسمه:\n• مَمْلَحَة القَصَب (الجِفار): الممالح الكبيرة وأكوام الملح الأبيض.\n• مَمْلَحَة المقحم النموذجية: ممشى خشبي وأكواخ خوص وكشك ملح.\n• الصْبَخَة: جلسات الليل جنوب البلد.\n• أرض موسم ملح القَصَب.\n• القرية التراثية وقصر ابن زاحم.\n• مرقب القَصَب على تل الثويليل.\n• حديقة الملك سلمان، والنادي التشكيلي (السريالي).\n• وبرّا البلد: روضة العكرشية، والواحة الخضراء (بحيرة برودان)، والنفود وجبل الفهدة، ومنتزه الشفيعي، ومتحف ومحمية طيور الوشم.\n• والمقاهي التراثية الأربع.\nوتلقى كل التفاصيل في الموقع الرسمي للمدينة.\nوش تبي أعلّمك عنه أكثر؟",
     answerEn:
-      "Here are Al-Qasab's tourist places, all pinned on the interactive map below (tap a pin to see its name):\n• The Al-Qasab salt pans (Al-Jifar): the big pans and hills of white salt.\n• The Al-Muqhim model salt pan: wooden walkway, reed huts and a salt kiosk.\n• Al-Sabkha: night gatherings south of town.\n• The Salt Season grounds.\n• The heritage village and Ibn Zahim's palace.\n• The Al-Qasab watchtower.\n• The four heritage cafes.\nWhat would you like to know more about?",
+      "Here are Al-Qasab's tourist places, all pinned on the interactive map below (tap a pin to see its name):\n• The Al-Qasab salt pans (Al-Jifar): the big pans and hills of white salt.\n• The Al-Muqhim model salt pan: wooden walkway, reed huts and a salt kiosk.\n• Al-Sabkha: night gatherings south of town.\n• The Salt Season grounds.\n• The heritage village and Ibn Zahim's palace.\n• The Al-Qasab watchtower on Al-Thuwaylil hill.\n• King Salman Park and the Surrealist art club.\n• Out of town: Rawdat Al-Akrashiya, the Green Oasis (Burdan lake), the Nafud dunes and Jabal Al-Fahda, Al-Shafei park, and the Al-Washm bird museum and reserve.\n• The four heritage cafes.\nFull details are on the official city guide.\nWhat would you like to know more about?",
+    link: OFFICIAL_SITE,
   },
   {
     id: "zahim_palace",
@@ -127,9 +132,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Al-Zahim historic palace",
     keywords: ["زاحم", "الزاحم", "zahim"],
     answerAr:
-      "قصر الزاحم من أبرز معالم القَصَب، جنب الجامع في البلدة القديمة، وعمره فوق المية سنة، وهو بيت الشيخ عبدالله بن عبدالوهاب بن زاحم رحمه الله، اللي ولد في القَصَب وصار قاضي ورافق الملك عبدالعزيز في توحيد البلاد، منها ضم حائل والحجاز، وآخر عمله رئاسة المحاكم الشرعية في المدينة المنورة وتوفي فيها عام ١٣٧٤هـ. البيت صار محكمة البلد عام ١٣٨٠هـ، وانرمم عام ١٤٣٦هـ، وفيه اليوم وثائق وصور من تاريخ الدولة، وأبوابه مفتوحة للزوار مع مرشدين وضيافة.",
+      "قصر الزاحم من أبرز معالم القَصَب، جنب الجامع في البلدة القديمة، وعمره فوق المية سنة، وهو بيت الشيخ عبدالله بن عبدالوهاب بن زاحم رحمه الله، اللي ولد في القَصَب وصار قاضي ورافق الملك عبدالعزيز في توحيد البلاد، منها ضم حائل والحجاز، وآخر عمله رئاسة المحاكم الشرعية في المدينة المنورة وتوفي فيها عام ١٣٧٤هـ. البيت صار محكمة البلد عام ١٣٨٠هـ، وانرمم عام ١٤٣٦هـ، وفيه اليوم وثائق وصور من تاريخ الدولة، وأبوابه مفتوحة للزوار من ٤:٣٠ العصر إلى ٩:٣٠ الليل ببلاش (والأفضل تنسّق قبل)، مع مرشدين وضيافة.",
     answerEn:
-      "Al-Zahim Palace stands beside the old town's main mosque and is over a century old. It was the home of Sheikh Abdullah bin Abdulwahhab bin Zahim, born in Al-Qasab, a judge who accompanied King Abdulaziz during the unification (including Hail and the Hijaz) and later headed the Sharia courts in Madinah, where he died in 1374 AH. The house served as the town court from 1380 AH, was restored in 1436 AH, and now displays documents and photos from the history of the Saudi state, open to visitors with guides and hospitality.",
+      "Al-Zahim Palace stands beside the old town's main mosque and is over a century old. It was the home of Sheikh Abdullah bin Abdulwahhab bin Zahim, born in Al-Qasab, a judge who accompanied King Abdulaziz during the unification (including Hail and the Hijaz) and later headed the Sharia courts in Madinah, where he died in 1374 AH. The house served as the town court from 1380 AH, was restored in 1436 AH, and now displays documents and photos from the history of the Saudi state, open to visitors 4:30–9:30 pm, free (coordinating ahead is preferred), with guides and hospitality.",
     images: ZAHIM_IMAGES,
     mapsUrl: "https://maps.app.goo.gl/LG8vwuh1cFSnZYAC7",
   },
@@ -166,9 +171,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Al-Rashid heritage house",
     keywords: ["الراشد", "راشد", "rashid"],
     answerAr:
-      "منزل (قصر) الراشد التراثي في الجهة الجنوبية الغربية من البلدة، مبني على السور القديم ويضم أحد أبراجه، دورين فيها ١٤ غرفة و٢١ عمود حجري. استلمته هيئة السياحة والتراث عام ١٤٣٣هـ ورممته، وتشغّله بلدية القَصَب، ومجلسه مؤثث بأثاث شعبي.",
+      "منزل (قصر) الراشد التراثي في الجهة الجنوبية الغربية من البلدة، مبني على السور القديم ويضم أحد أبراجه، دورين فيها ١٤ غرفة و٢١ عمود حجري. استلمته هيئة السياحة والتراث عام ١٤٣٣هـ ورممته، وتشغّله بلدية القَصَب، ومجلسه مؤثث بأثاث شعبي. تشوفه من برا أي وقت، والدخول له بالمناسبات أو بدعوة رسمية.",
     answerEn:
-      "The Al-Rashid heritage house sits on the southwestern edge of town, built into the old wall and including one of its towers: two floors, 14 rooms and 21 stone pillars. The heritage authority took it over and restored it from 1433 AH, and the municipality runs it with a traditionally furnished majlis.",
+      "The Al-Rashid heritage house sits on the southwestern edge of town, built into the old wall and including one of its towers: two floors, 14 rooms and 21 stone pillars. The heritage authority took it over and restored it from 1433 AH, and the municipality runs it with a traditionally furnished majlis. You can see it from outside any time; entry is for occasions or by official invitation.",
     images: [
       { src: "/images/places/rashid-sign.jpg", captionAr: "لوحة «بيت الراشد للتراث» على جداره الطيني", captionEn: "The «Al-Rashed House for Heritage» sign on its mud wall", credit: GM },
       { src: "/images/places/rashid-wall-towers.jpg", captionAr: "السور الطيني وأبراجه عند بيت الراشد", captionEn: "The mud wall and its towers by the Al-Rashid house", credit: GM },
@@ -182,9 +187,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "The old town",
     keywords: ["البلده القديمه", "الديره القديمه", "القريه التراثيه", "الديره التراثيه", "مدينه القصب التراثيه", "الطين", "طينيه", "heritage village", "old town"],
     answerAr:
-      "البلدة القديمة (مدينة القَصَب التراثية) كلها بيوت طين نجدية وأزقة، وكان يحيط فيها سور «العَقْدة» وفي أركانها أبراج مراقبة. وفيها سوق العبيدي وقصر الزاحم ومنزل الراشد ومبنى القصبي، وفيها يقام موسم ملح القَصَب، مشوار يومك كله تراث!",
+      "البلدة القديمة (مدينة القَصَب التراثية) كلها بيوت طين نجدية وأزقة، وكان يحيط فيها سور «العَقْدة» وفي أركانها أبراج مراقبة. وفيها سوق العبيدي وقصر الزاحم ومنزل الراشد ومبنى القصبي، وفيها يقام موسم ملح القَصَب. تفتح من ٤ العصر إلى ١٠ الليل والدخول مجاني، وفيها ممشى حجري مضاء طوله ٧٠٠ متر، مشوار يومك كله تراث!",
     answerEn:
-      "Al-Qasab's old town (the heritage town) is a maze of Najdi mud-brick houses and lanes, once ringed by the «Al-Aqda» wall with watchtowers at its corners. Souq Al-Obaidi, Al-Zahim Palace, the Al-Rashid house and the Al-Qusaibi building are here, and the Salt Season is held here.",
+      "Al-Qasab's old town (the heritage town) is a maze of Najdi mud-brick houses and lanes, once ringed by the «Al-Aqda» wall with watchtowers at its corners. Souq Al-Obaidi, Al-Zahim Palace, the Al-Rashid house and the Al-Qusaibi building are here, and the Salt Season is held here. Open 4:00–10:00 pm, free, with a lit 700 m stone walkway.",
     images: [
       { src: "/images/places/village-gate-season.jpg", captionAr: "بوابة القرية التراثية بأبراجها أيام موسم ملح القَصَب", captionEn: "The heritage village gate and towers during the Salt Season", credit: GM },
       { src: "/images/places/village-corridor.jpg", captionAr: "ممر مسقوف بالخشب والجريد وأبوابه الخشبية في القرية التراثية", captionEn: "A wood-and-palm-roofed passage with wooden doors in the heritage village", credit: GM },
@@ -196,11 +201,13 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "marqab",
     titleAr: "مرقب القَصَب",
     titleEn: "Al-Qasab watchtower",
-    keywords: ["مرقب", "المرقب", "برج", "watchtower", "marqab"],
+    keywords: ["مرقب", "المرقب", "برج", "الثويليل", "watchtower", "marqab"],
     answerAr:
-      "مرقب القَصَب برج طيني مخروطي يوصل طوله لحوالي ١٠ أمتار، بنوه أهل القَصَب يراقبون منه المنطقة ومواشيهم اللي ترعى قريب. يطلعه رجل يسمونه «الرقيب» من الصبح لين مغيب الشمس ومعه ماء وتمر، وإذا شاف شي يريبه نبّه أهل البلد وطلعوا للمكان اللي أشّر عليه.",
+      "مرقب القَصَب برج طيني مخروطي على تل الثويليل شمال البلدة القديمة، يوصل طوله لحوالي ١٠ أمتار، وتشوفه من برا أي وقت ببلاش، بنوه أهل القَصَب يراقبون منه المنطقة ومواشيهم اللي ترعى قريب. يطلعه رجل يسمونه «الرقيب» من الصبح لين مغيب الشمس ومعه ماء وتمر، وإذا شاف شي يريبه نبّه أهل البلد وطلعوا للمكان اللي أشّر عليه.",
     answerEn:
-      "The Al-Qasab marqab is a conical mud-brick watchtower about 10 m tall. A lookout called «Al-Raqib» climbed it from morning to sunset with water and dates to watch over the town and its grazing herds, and alerted the people if he saw danger.",
+      "The Al-Qasab marqab is a conical mud-brick watchtower about 10 m tall on Al-Thuwaylil hill north of the old town, free to view from outside at any time. A lookout called «Al-Raqib» climbed it from morning to sunset with water and dates to watch over the town and its grazing herds, and alerted the people if he saw danger.",
+    mapsUrl: "https://maps.app.goo.gl/uvgxhJ1GbfRSQRr66",
+    coordinates: { lat: 25.303187, lng: 45.509456 },
   },
   {
     id: "season_map",
@@ -285,9 +292,11 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Rawdat Al-Akrashiya",
     keywords: ["العكرشيه", "عكرشيه", "روضه", "akrashiya", "rawdat"],
     answerAr:
-      "روضة العكرشية شمال غرب القَصَب، ويشقها طريق المجمعة، وهي من أكبر رياض نجد وأهمها: أرضها منبسطة ما فيها مرتفعات، فإذا جا السيل ينتشر الماء في مساحة توصل ١٢ مليون متر مربع، وربيعها يجنن بعد المطر.",
+      "روضة العكرشية شمال غرب القَصَب، ويشقها طريق المجمعة، وهي من أكبر رياض نجد وأهمها: أرضها منبسطة ما فيها مرتفعات، فإذا جا السيل ينتشر الماء في مساحة توصل ١٢ مليون متر مربع، وربيعها يجنن بعد المطر، وأحلى وقت لها الشروق والغروب. فيها مواقف ومسجد ودورات مياه للرجال والنساء وجلسات مظللة، ومفتوحة ٢٤ ساعة ببلاش.",
     answerEn:
-      "Rawdat Al-Akrashiya lies northwest of Al-Qasab, crossed by the road to Al-Majma'ah. It is one of Najd's largest and most important meadows: the land is flat, so after rain the water spreads over up to 12 million m², and it turns green and lush in spring.",
+      "Rawdat Al-Akrashiya lies northwest of Al-Qasab, crossed by the road to Al-Majma'ah. It is one of Najd's largest and most important meadows: the land is flat, so after rain the water spreads over up to 12 million m², and it turns green and lush in spring (best at sunrise or sunset). It has parking, a mosque, men's and women's restrooms and shaded seating; open 24 hours, free.",
+    mapsUrl: "https://maps.app.goo.gl/Dn6f7fPwpC25hhBz7",
+    coordinates: { lat: 25.3407898, lng: 45.3647892 },
   },
   {
     id: "poetry",
@@ -308,6 +317,120 @@ export const PLACE_TOPICS: PlaceTopic[] = [
       "من أمثال القَصَب الشعبية: «كمن أهدى الملح على أهل القَصَب» يعني اللي يجيب الشي لأهله وهم أغنى الناس فيه، و«انكبّ الملح»، و«حِطَّني تلقاني»، و«حَرِّك تَبْلَش»، و«سلِّفني وألاعبك»، و«حلوم ليل»، و«طِقّ ومات».",
     answerEn:
       "Among Al-Qasab's folk proverbs: «Like giving salt as a gift to the people of Al-Qasab», i.e. bringing something to those who have the most of it (like coals to Newcastle), as well as «The salt got spilled», «Put me down and you'll find me» and «Night dreams».",
+  },
+  {
+    id: "mosques",
+    titleAr: "المساجد في القَصَب",
+    titleEn: "Mosques in Al-Qasab",
+    keywords: ["مسجد", "مساجد", "جامع", "اصلي", "صلاه", "مصلي العيد", "mosque", "pray"],
+    answerAr:
+      "أبشر، هذي أبرز مساجد القَصَب على الخريطة تحت (الدبابيس الخضراء):\n• مسجد الشعبة، جنب القرية التراثية وأرض الموسم، أقربها لك وأنت تتجول.\n• جامع الملك عبدالعزيز.\n• مسجد البلدية، ومسجد أبو بكر الصديق، ومسجد ابن باز، ومسجد الشيخ محمد بن عبدالوهاب، ومسجد الإحسان.\n• ومصلى العيد بمركز القَصَب.\nوإذا رحت روضة العكرشية فيها مسجد بعد. اضغط «خذني له» جنب أي مسجد.",
+    answerEn:
+      "Here are Al-Qasab's main mosques, pinned in green on the map below:\n• Al-Shu'ba Mosque, next to the heritage village and the season grounds, the nearest while you walk around.\n• King Abdulaziz Mosque.\n• The Municipality Mosque, Abu Bakr Al-Siddiq Mosque, Ibn Baz Mosque, Sheikh Muhammad bin Abdulwahhab Mosque and Al-Ihsan Mosque.\n• The Eid prayer ground.\nRawdat Al-Akrashiya also has a mosque. Tap «Take me there» next to any of them.",
+  },
+  {
+    id: "restrooms",
+    titleAr: "دورات المياه",
+    titleEn: "Restrooms",
+    keywords: ["دوره مياه", "دورات مياه", "دورات المياه", "دوره المياه", "حمامات", "وين الحمام", "تواليت", "مرحاض", "toilet", "restroom", "bathroom", "wc"],
+    answerAr:
+      "ما فيه دورات مياه عامة مسجّلة داخل البلد، بس أقرب شي لك دورات مياه المساجد: مسجد الشعبة جنب القرية التراثية وأرض الموسم، ومسجد البلدية. وفي روضة العكرشية دورات مياه للرجال والنساء. وأيام الموسم اسأل في منطقة التسجيل أو خيمة الضيافة عن أقرب دورات مياه. تلقاها على الخريطة تحت (الدبابيس الزرقاء).",
+    answerEn:
+      "There are no public toilets listed inside the town; the nearest are the mosque facilities: Al-Shu'ba Mosque next to the heritage village and the season grounds, and the Municipality Mosque. Rawdat Al-Akrashiya has men's and women's restrooms. During the Salt Season, ask at the registration area or the hospitality tent for the nearest ones. They're pinned in blue on the map below.",
+  },
+  {
+    id: "official_site",
+    titleAr: "الموقع الرسمي لمدينة القَصَب",
+    titleEn: "Al-Qasab official city guide",
+    keywords: ["الموقع الرسمي", "موقع رسمي", "القصب الرسمي", "الرسمي للقصب", "qasabcity", "دليل مدينه القصب", "موقع المدينه", "official site", "official website", "website"],
+    answerAr:
+      "الموقع الرسمي لمدينة القَصَب هو qasabcity.com (دليل مدينة القَصَب): فيه نبذة عن البلد، والأماكن اللي تستاهل الزيارة بأوقاتها ومواقعها، وموسم ملح القَصَب وتسجيل التذاكر والعارضين، ومعلومات عن ملح القَصَب، والفعاليات على مدار السنة. وللتواصل: info@qasabsaltseason.com.",
+    answerEn:
+      "Al-Qasab's official city guide is qasabcity.com: an overview of the town, places to visit with opening hours and map links, the Salt Season with ticket and exhibitor registration, Al-Qasab salt, and events through the year. Contact: info@qasabsaltseason.com.",
+    link: OFFICIAL_SITE,
+  },
+  {
+    id: "king_salman_park",
+    titleAr: "حديقة الملك سلمان",
+    titleEn: "King Salman Park",
+    keywords: ["حديقه الملك سلمان", "حديقه", "حدائق", "منتزه عائلي", "park"],
+    answerAr:
+      "حديقة الملك سلمان على طريق الملك عبدالله في القَصَب، مفتوحة ٢٤ ساعة ببلاش: جلسات عائلية وممرات مشي وملاعب. وفي الشتاء (ديسمبر إلى فبراير) تقام فيها «كشتة» الخميس والجمعة بمسابقات طبخ وتصوير وأزياء وبلوت.",
+    answerEn:
+      "King Salman Park on King Abdullah Road is open 24 hours and free, with family seating, walking paths and sports areas. In winter (December–February) it hosts the «Kashta» on Thursdays and Fridays, with cooking, photo, costume and Baloot contests.",
+    mapsUrl: "https://maps.app.goo.gl/3CFisYaoQX57m66g8",
+    coordinates: { lat: 25.3037518, lng: 45.5331749 },
+  },
+  {
+    id: "art_club",
+    titleAr: "النادي التشكيلي بالقَصَب (السريالي)",
+    titleEn: "Al-Qasab art club (Surrealist)",
+    keywords: ["السريالي", "النادي التشكيلي", "معرض فني", "فن تشكيلي", "art club", "gallery"],
+    answerAr:
+      "النادي التشكيلي بالقَصَب (السريالي) معرض فني في سوق القرية التراثية، يفتح من ٧ الصبح إلى ٨ الليل والدخول مجاني، والأفضل تنسّق قبل زيارتك.",
+    answerEn:
+      "The Al-Qasab art club («Surrealist») is a gallery in the heritage village market, open 7:00 am–8:00 pm, free; coordinating ahead is preferred.",
+    mapsUrl: "https://maps.app.goo.gl/vDMpXwH5WwAegzcS9",
+    coordinates: { lat: 25.2989471, lng: 45.5053567 },
+  },
+  {
+    id: "burdan_lake",
+    titleAr: "الواحة الخضراء (بحيرة برودان)",
+    titleEn: "The Green Oasis (Burdan lake)",
+    keywords: ["برودان", "الواحه الخضراء", "بحيره", "lake", "oasis"],
+    answerAr:
+      "الواحة الخضراء (بحيرة برودان) واحة فيها ماء دايم، مفتوحة ٢٤ ساعة ببلاش. انتبه: آخر ٤ كيلو تقريباً طريق ترابي وعر.",
+    answerEn:
+      "The Green Oasis (Burdan lake) has water all year round, open 24 hours, free. Note: the last ~4 km is a rough unpaved track.",
+    mapsUrl: "https://maps.app.goo.gl/QvKobNXXtFv2QZVXA",
+    coordinates: { lat: 25.189667, lng: 45.62025 },
+  },
+  {
+    id: "nafud",
+    titleAr: "نفود القَصَب وجبل الفهدة",
+    titleEn: "The Nafud dunes and Jabal Al-Fahda",
+    keywords: ["النفود", "نفود", "الطعوس", "رمال", "جبل الفهده", "الفهده", "dunes", "nafud"],
+    answerAr:
+      "النفود كثبان رملية غرب القَصَب، وجبل الفهدة جبل وسط رمال الرغام، والاثنين مفتوحين ٢٤ ساعة ببلاش، ويُنصح بسيارة دفع رباعي.",
+    answerEn:
+      "The Nafud are sand dunes west of Al-Qasab, and Jabal Al-Fahda is a mountain amid the Al-Raghaam sands; both open 24 hours, free, and a 4x4 is recommended.",
+    mapsUrl: "https://maps.app.goo.gl/iDJcPezDivs5koR3A",
+    coordinates: { lat: 25.191118, lng: 45.520565 },
+  },
+  {
+    id: "shafei_park",
+    titleAr: "منتزه الشفيعي",
+    titleEn: "Al-Shafei park",
+    keywords: ["الشفيعي", "شفيعي", "طويق", "shafei"],
+    answerAr:
+      "منتزه الشفيعي في جبال طويق، جزء من منتزه القَصَب الوطني، على بعد حوالي ٢٤ كيلو بطريق ترابي، مفتوح ٢٤ ساعة ببلاش. وفيه غار الشفيعي اللي تغنّى فيه الشعراء.",
+    answerEn:
+      "Al-Shafei park lies in the Tuwaiq mountains, part of Al-Qasab National Park, about 24 km away on an unpaved road; open 24 hours, free.",
+    mapsUrl: "https://maps.app.goo.gl/DJZuMn5QfV5ZwbRE6",
+    coordinates: { lat: 25.4049078, lng: 45.5720615 },
+  },
+  {
+    id: "birds_museum",
+    titleAr: "متحف ومحمية طيور الوشم",
+    titleEn: "Al-Washm bird museum and reserve",
+    keywords: ["طيور الوشم", "محميه الطيور", "محميه طيور", "متحف الطيور", "متحف", "محميه", "bird museum", "bird reserve", "museum"],
+    answerAr:
+      "متحف ومحمية طيور الوشم يفتح من ٧ الصبح إلى ٨ الليل برسوم رمزية، ولازم تحجز قبل ٢٤ ساعة.",
+    answerEn:
+      "The Al-Washm bird museum and reserve opens 7:00 am–8:00 pm for a nominal fee; book 24 hours ahead.",
+    mapsUrl: "https://maps.app.goo.gl/TAgSiBvds2RoSUsM6",
+    coordinates: { lat: 25.2546554, lng: 45.4738085 },
+  },
+  {
+    id: "events",
+    titleAr: "فعاليات القَصَب على مدار السنة",
+    titleEn: "Al-Qasab events through the year",
+    keywords: ["شتويه القصب", "شتويه", "كشته", "يوم التاسيس", "اليوم الوطني", "اسبوع البيئه", "عيد الفطر", "فعاليات السنه", "مدار السنه", "طول السنه", "events"],
+    answerAr:
+      "غير موسم الملح، القَصَب فيها فعاليات طول السنة:\n• شتوية القَصَب من ١ يناير إلى ١ مارس، والدخول مجاني.\n• الكشتة في حديقة الملك سلمان الخميس والجمعة من ديسمبر إلى فبراير.\n• يوم التأسيس ٢٢–٢٣ فبراير.\n• فعاليات عيد الفطر.\n• أسبوع البيئة كل سنة بين أبريل ومايو.\n• اليوم الوطني ٢٣ سبتمبر، تبدأ الفعاليات بعد العصر في القرية التراثية.\nوكلها ببلاش.",
+    answerEn:
+      "Besides the Salt Season, Al-Qasab has events all year:\n• Qasab Winter, 1 January–1 March, free.\n• The Kashta in King Salman Park, Thursdays and Fridays, December–February.\n• Founding Day, 22–23 February.\n• Eid Al-Fitr celebrations.\n• Environment Week, yearly in April–May.\n• National Day, 23 September, from after Asr in the heritage village.\nAll free.",
+    link: OFFICIAL_SITE,
   },
   {
     id: "season",

@@ -14,6 +14,8 @@ import {
   getLocationForQuery,
   FESTIVAL_LOCATION,
   ALL_PLACES_LOCATION,
+  MOSQUES_LOCATION,
+  RESTROOMS_LOCATION,
   SALT_FLAT_LOCATION,
   SABKHA_LOCATION,
   HERITAGE_VILLAGE_LOCATION,
@@ -383,7 +385,8 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     const topicId = photo ? null : matchPlaceTopic(userPrompt)?.id;
     const allPlacesMap =
       topicId === "tourist_places" || (topicId === "heritage_places" && isLocationQuestion(userPrompt));
-    const showMap = allPlacesMap || !photo && (
+    const serviceMap = topicId === "mosques" ? MOSQUES_LOCATION : topicId === "restrooms" ? RESTROOMS_LOCATION : null;
+    const showMap = allPlacesMap || !!serviceMap || !photo && (
       isLocationQuestion(userPrompt) ||
       isCafeQuestion(userPrompt) ||
       isDirectionsQuestion(userPrompt) ||
@@ -392,7 +395,9 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       (!usedFallback && topicId !== "season" && topicId !== "season_map" &&
         (isLocationQuestion(finalAnswer) || isCafeQuestion(finalAnswer))));
 
-    const locationData = allPlacesMap
+    const locationData = serviceMap
+      ? serviceMap
+      : allPlacesMap
       ? ALL_PLACES_LOCATION
       : showMap
         ? getPlaceLocation(userPrompt, lang) || getLocationForQuery(userPrompt, finalAnswer)
@@ -410,6 +415,11 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         images,
         mapsUrl,
         ticketUrl,
+        // A button such as the official city guide, for topics that carry one
+        link: (() => {
+          const l = photo ? null : matchPlaceTopic(userPrompt)?.link;
+          return l ? { url: l.url, label: lang === "en" ? l.labelEn : l.labelAr } : undefined;
+        })(),
         followUps: getFollowUps(
           userPrompt,
           lang,

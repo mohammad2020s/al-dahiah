@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-export type MapPoint = { id: string; lat: number; lng: number; title: string; label?: string; kind?: "cafe" | "nature" };
+export type MapPoint = { id: string; lat: number; lng: number; title: string; label?: string; kind?: "cafe" | "nature" | "mosque" | "wc" };
 
 // Free OpenStreetMap map (no API key, no billing). Pins are drawn with CSS
 // (L.divIcon) so no marker images have to be bundled.

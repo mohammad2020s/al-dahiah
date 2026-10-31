@@ -187,14 +187,14 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     id: "al_marqab",
     name: "برج المرقب الأثري بالقصب",
     category: "أبراج مراقبة تاريخية",
-    address: "مطل القصب الشرقي",
-    description: "برج مراقبة طيني تاريخي شهير كان يُستخدم لحماية البلدة وتأمين القوافل التجارية قديماً.",
-    geocodingQuery: "25.29950, 45.51220",
-    directionsUrl:
-      "https://www.google.com/maps/dir/?api=1&destination=25.29950,45.51220",
+    address: "تل الثويليل شمال البلدة القديمة",
+    description: "برج مراقبة طيني مخروطي على تل الثويليل، كان الرقيب يراقب منه البلدة ومواشيها.",
+    geocodingQuery: "25.303187, 45.509456",
+    // From the official city guide (qasabcity.com)
+    directionsUrl: "https://maps.app.goo.gl/uvgxhJ1GbfRSQRr66",
     coordinates: {
-      lat: 25.2995,
-      lng: 45.5122,
+      lat: 25.303187,
+      lng: 45.509456,
     },
   },
   {
@@ -287,6 +287,43 @@ export const AL_QASAB_CAFES: CafePlace[] = [
 ];
 
 /** «الأماكن السياحية على الخريطة»: every place pinned, none highlighted */
+// Mosques from Google Maps whose names carry no family name (Rule 3); the main Friday mosque first
+export const AL_QASAB_MOSQUES = [
+  { id: "mosque_shuba", name: "مسجد الشعبة (جنب القرية التراثية)", nameEn: "Al-Shu'ba Mosque (by the heritage village)", lat: 25.2998375, lng: 45.5053516 },
+  { id: "mosque_king_abdulaziz", name: "جامع الملك عبدالعزيز", nameEn: "King Abdulaziz Mosque", lat: 25.2914614, lng: 45.5279583 },
+  { id: "mosque_baladiya", name: "مسجد البلدية", nameEn: "Municipality Mosque", lat: 25.2986898, lng: 45.5161801 },
+  { id: "mosque_abubakr", name: "مسجد أبو بكر الصديق", nameEn: "Abu Bakr Al-Siddiq Mosque", lat: 25.2927012, lng: 45.5195959 },
+  { id: "mosque_ibnbaz", name: "مسجد ابن باز", nameEn: "Ibn Baz Mosque", lat: 25.2994315, lng: 45.5248319 },
+  { id: "mosque_mwahhab", name: "مسجد الشيخ محمد بن عبدالوهاب", nameEn: "Sheikh Muhammad bin Abdulwahhab Mosque", lat: 25.3019929, lng: 45.5201178 },
+  { id: "mosque_ihsan", name: "مسجد الإحسان", nameEn: "Al-Ihsan Mosque", lat: 25.2963888, lng: 45.537691 },
+  { id: "eid_musalla", name: "مصلى العيد بمركز القصب", nameEn: "Eid prayer ground", lat: 25.2917715, lng: 45.5179238 },
+];
+export const AKRASHIYA_FACILITIES = { lat: 25.3407898, lng: 45.3647892 };
+
+export const MOSQUES_LOCATION = {
+  id: "mosques",
+  type: "mosques" as const,
+  name: "المساجد في القصب",
+  nameEn: "Mosques in Al-Qasab",
+  coordinates: { lat: AL_QASAB_MOSQUES[0].lat, lng: AL_QASAB_MOSQUES[0].lng },
+  pins: AL_QASAB_MOSQUES.map((m) => ({ ...m, kind: "mosque" as const })),
+};
+
+// No public toilets are listed inside the town: the mosques' facilities nearest the heritage
+// village and the season grounds, plus the men's and women's toilets at Rawdat Al-Akrashiya
+export const RESTROOMS_LOCATION = {
+  id: "restrooms",
+  type: "restrooms" as const,
+  name: "أقرب دورات مياه",
+  nameEn: "Nearest restrooms",
+  coordinates: { lat: AL_QASAB_MOSQUES[0].lat, lng: AL_QASAB_MOSQUES[0].lng },
+  pins: [
+    { id: "wc_shuba", name: "دورات مياه مسجد الشعبة (جنب القرية التراثية)", nameEn: "Al-Shu'ba Mosque facilities (by the heritage village)", lat: 25.2998375, lng: 45.5053516, kind: "wc" as const },
+    { id: "wc_baladiya", name: "دورات مياه مسجد البلدية", nameEn: "Municipality Mosque facilities", lat: 25.2986898, lng: 45.5161801, kind: "wc" as const },
+    { id: "wc_akrashiya", name: "دورات مياه روضة العكرشية (رجال ونساء)", nameEn: "Rawdat Al-Akrashiya restrooms (men & women)", lat: AKRASHIYA_FACILITIES.lat, lng: AKRASHIYA_FACILITIES.lng, kind: "wc" as const },
+  ],
+};
+
 export const ALL_PLACES_LOCATION = {
   ...AL_QASAB_LANDMARKS[0],
   id: "all_places",
