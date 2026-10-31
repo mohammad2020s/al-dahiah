@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Award, Check, Loader2, MapPin, Navigation, Share2, Stamp, X } from "lucide-react";
 import { PASSPORT_STOPS, isNearStop, type PassportStop } from "../../server/saltPassport.ts";
-import { directionsUrl } from "./LeafletMap";
+import { openNavigation } from "./NavigateSheet";
 import { drawShareCard, shareOrDownload } from "./shareCard";
 import type { Language } from "../i18n";
 
@@ -165,7 +165,7 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
         <span
           key={s.id}
           className={`grid size-6 place-items-center rounded-full border-2 ${
-            saved.stamps[s.id] ? "border-[#b82e24] bg-[#b82e24] text-white" : "border-dashed border-[#e3c9c5] bg-white"
+            saved.stamps[s.id] ? "border-[#94532d] bg-[#94532d] text-white" : "border-dashed border-[#dcc8ad] bg-white"
           }`}
         >
           {saved.stamps[s.id] && <Check className="size-3.5" strokeWidth={3} />}
@@ -176,17 +176,17 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
 
   return (
     <>
-      <div className="rounded-[1.7rem] border border-[#f2d6d3] bg-white p-4 shadow-sm">
+      <div className="rounded-[1.7rem] border border-[#e6d5bd] bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between">
-          <span className="rounded-full bg-[#fff5f4] border border-[#f5dfdc] px-2 py-0.5 text-[10px] font-bold text-[#a82319]">
+          <span className="rounded-full bg-[#faf4ea] border border-[#ede0cb] px-2 py-0.5 text-[10px] font-bold text-[#844826]">
             {fmtNum(count, en)} / {fmtNum(total, en)}
           </span>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a1210]">
-            <Stamp className="size-4 text-[#b82e24]" />
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
+            <Stamp className="size-4 text-[#94532d]" />
             <span>{en ? "Salt Passport" : "جواز الملح"}</span>
           </div>
         </div>
-        <p className="mt-2 text-[11px] leading-5 text-[#7d6564]">
+        <p className="mt-2 text-[11px] leading-5 text-[#786450]">
           {complete
             ? en ? "You're an Al-Qasab Explorer! Share your certificate." : "صرت مستكشف القَصَب! شارك شهادتك."
             : en ? "Collect a stamp at each landmark and get the Al-Qasab Explorer certificate." : "اجمع ختم من كل معلم، وخذ شهادة «مستكشف القَصَب» في الأخير."}
@@ -194,7 +194,7 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
         <div className="mt-3">{dots}</div>
         <button
           onClick={() => setOpen(true)}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#b82e24] px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#992017] transition"
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#94532d] px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#78411f] transition"
         >
           {complete ? <Award className="size-4" /> : <Stamp className="size-4" />}
           {complete ? (en ? "Open my certificate" : "افتح شهادتي") : en ? "Open the passport" : "افتح الجواز"}
@@ -212,29 +212,29 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
               onClick={(e) => e.stopPropagation()}
               className="tr-sheet flex max-h-[92vh] w-full max-w-xl flex-col overflow-hidden rounded-t-[1.8rem] sm:rounded-[1.8rem] bg-white shadow-2xl"
             >
-              <div className="flex items-center justify-between border-b border-[#f6dedc] px-5 py-3.5">
+              <div className="flex items-center justify-between border-b border-[#ede1cd] px-5 py-3.5">
                 <div>
-                  <p className="text-sm font-bold text-[#3a1210]">{en ? "Salt Passport" : "جواز الملح"}</p>
-                  <p className="text-[11px] text-[#7d6564]">
+                  <p className="text-sm font-bold text-[#3a2a1c]">{en ? "Salt Passport" : "جواز الملح"}</p>
+                  <p className="text-[11px] text-[#786450]">
                     {en ? "Scan the QR sign at each place, or tap «I'm here» when you're there" : "امسح رمز QR عند كل مكان، أو اضغط «أنا هنا» وأنت فيه"}
                   </p>
                 </div>
-                <button onClick={() => setOpen(false)} className="grid size-9 place-items-center rounded-full bg-[#fff5f4] text-[#8e1b12] hover:bg-[#feeceb]" title={en ? "Close" : "إغلاق"} aria-label={en ? "Close" : "إغلاق"}>
+                <button onClick={() => setOpen(false)} className="grid size-9 place-items-center rounded-full bg-[#faf4ea] text-[#6c3a1c] hover:bg-[#f5eadb]" title={en ? "Close" : "إغلاق"} aria-label={en ? "Close" : "إغلاق"}>
                   <X className="size-5" />
                 </button>
               </div>
 
               <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
                 {/* Progress */}
-                <div className="rounded-2xl bg-[#fff8f7] border border-[#f6e1de] p-3">
-                  <div className="flex items-center justify-between text-xs font-bold text-[#3a1210]">
+                <div className="rounded-2xl bg-[#fcf7ef] border border-[#ede1ce] p-3">
+                  <div className="flex items-center justify-between text-xs font-bold text-[#3a2a1c]">
                     <span>{complete ? (en ? "All stamps collected!" : "جمعت كل الأختام!") : en ? "Your stamps" : "أختامك"}</span>
-                    <span className="text-[#b82e24]">
+                    <span className="text-[#94532d]">
                       {fmtNum(count, en)} {en ? "of" : "من"} {fmtNum(total, en)}
                     </span>
                   </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#f6e1de]">
-                    <div className="h-full rounded-full bg-[#b82e24] transition-all duration-500" style={{ width: `${(100 * count) / total}%` }} />
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#ede1ce]">
+                    <div className="h-full rounded-full bg-[#94532d] transition-all duration-500" style={{ width: `${(100 * count) / total}%` }} />
                   </div>
                 </div>
 
@@ -254,17 +254,17 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
                   {PASSPORT_STOPS.map((s) => {
                     const at = saved.stamps[s.id];
                     return (
-                      <li key={s.id} className={`flex items-center gap-3 rounded-2xl border p-3 ${at ? "border-[#f0c9c4] bg-[#fffaf9]" : "border-[#f2d8d6] bg-white"}`}>
+                      <li key={s.id} className={`flex items-center gap-3 rounded-2xl border p-3 ${at ? "border-[#e1c8a7] bg-[#fcf8f1]" : "border-[#e7d8c2] bg-white"}`}>
                         <span
                           className={`grid size-11 shrink-0 place-items-center rounded-full border-[3px] ${
-                            at ? "border-[#b82e24] bg-[#b82e24]/10 text-[#b82e24] -rotate-12" : "border-dashed border-[#e3c9c5] text-[#d4b5b1]"
+                            at ? "border-[#94532d] bg-[#94532d]/10 text-[#94532d] -rotate-12" : "border-dashed border-[#dcc8ad] text-[#cbb292]"
                           }`}
                         >
                           {at ? <Check className="size-6" strokeWidth={3} /> : <Stamp className="size-5" />}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-[#3a1210]">{name(s)}</p>
-                          <p className="text-[11px] text-[#7d6564]">
+                          <p className="text-sm font-bold text-[#3a2a1c]">{name(s)}</p>
+                          <p className="text-[11px] text-[#786450]">
                             {at
                               ? (en ? "Stamped " : "انختم ") + new Date(at).toLocaleDateString(en ? "en-GB" : "ar-SA", { day: "numeric", month: "long" })
                               : en ? "Not stamped yet" : "ما انختم للحين"}
@@ -272,20 +272,19 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
                         </div>
                         {!at && (
                           <div className="flex shrink-0 items-center gap-1.5">
-                            <a
-                              href={directionsUrl(s.lat, s.lng)}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="grid size-9 place-items-center rounded-xl border border-[#f2d6d3] text-[#8e1b12] hover:bg-[#fff5f4]"
+                            <button
+                              type="button"
+                              onClick={() => openNavigation({ lat: s.lat, lng: s.lng, name: en ? s.en : s.ar })}
+                              className="grid size-9 place-items-center rounded-xl border border-[#e6d5bd] text-[#6c3a1c] hover:bg-[#faf4ea]"
                               title={en ? "Directions" : "خذني له"}
                               aria-label={en ? `Directions to ${s.en}` : `الطريق إلى ${s.ar}`}
                             >
                               <Navigation className="size-4" />
-                            </a>
+                            </button>
                             <button
                               onClick={() => stampHere(s)}
                               disabled={busyId !== null}
-                              className="inline-flex items-center gap-1 rounded-xl bg-[#b82e24] px-3 py-2 text-[11px] font-bold text-white hover:bg-[#992017] disabled:opacity-60"
+                              className="inline-flex items-center gap-1 rounded-xl bg-[#94532d] px-3 py-2 text-[11px] font-bold text-white hover:bg-[#78411f] disabled:opacity-60"
                             >
                               {busyId === s.id ? <Loader2 className="size-3.5 animate-spin" /> : <MapPin className="size-3.5" />}
                               {en ? "I'm here" : "أنا هنا"}
@@ -298,11 +297,11 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
                 </ul>
 
                 {/* Share card */}
-                <div className="rounded-2xl border border-[#f2d6d3] p-3 space-y-2.5">
-                  <p className="text-xs font-bold text-[#3a1210]">
+                <div className="rounded-2xl border border-[#e6d5bd] p-3 space-y-2.5">
+                  <p className="text-xs font-bold text-[#3a2a1c]">
                     {complete ? (en ? "Your Al-Qasab Explorer certificate" : "شهادة «مستكشف القَصَب»") : en ? "«I visited Al-Qasab» card" : "بطاقة «زرت القَصَب»"}
                   </p>
-                  <label className="block text-[11px] text-[#7d6564]">
+                  <label className="block text-[11px] text-[#786450]">
                     {en ? "Name on the card (optional)" : "الاسم على البطاقة (اختياري)"}
                     <input
                       value={saved.name}
@@ -312,19 +311,19 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
                         update((p) => ({ ...p, name: v }));
                         setCard(null);
                       }}
-                      className="mt-1 w-full rounded-xl border border-[#f2d6d3] bg-[#fffbfb] px-3 py-2 text-base sm:text-sm text-[#3a1210] focus:border-[#b82e24] focus:outline-none"
+                      className="mt-1 w-full rounded-xl border border-[#e6d5bd] bg-[#fdfaf5] px-3 py-2 text-base sm:text-sm text-[#3a2a1c] focus:border-[#94532d] focus:outline-none"
                       placeholder={en ? "Your name" : "اسمك"}
                     />
                   </label>
                   {card ? (
                     <div className="space-y-2">
-                      <img src={card.url} alt={en ? "Your share card" : "بطاقتك"} className="mx-auto w-full max-w-[260px] rounded-xl border border-[#f2d6d3] shadow-sm" />
+                      <img src={card.url} alt={en ? "Your share card" : "بطاقتك"} className="mx-auto w-full max-w-[260px] rounded-xl border border-[#e6d5bd] shadow-sm" />
                       <button
                         onClick={async () => {
                           const r = await shareOrDownload(card.blob, en ? "en" : "ar");
                           if (r === "downloaded") setNotice({ text: en ? "Saved to your downloads." : "انحفظت البطاقة في التنزيلات.", good: true });
                         }}
-                        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#b82e24] px-3 py-2.5 text-xs font-bold text-white hover:bg-[#992017]"
+                        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#94532d] px-3 py-2.5 text-xs font-bold text-white hover:bg-[#78411f]"
                       >
                         <Share2 className="size-4" />
                         {en ? "Share or save" : "شارك أو احفظ"}
@@ -334,7 +333,7 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
                     <button
                       onClick={makeCard}
                       disabled={count === 0 || making}
-                      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#b82e24] px-3 py-2.5 text-xs font-bold text-[#b82e24] hover:bg-[#fff5f4] disabled:opacity-50"
+                      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#94532d] px-3 py-2.5 text-xs font-bold text-[#94532d] hover:bg-[#faf4ea] disabled:opacity-50"
                     >
                       {making ? <Loader2 className="size-4 animate-spin" /> : <Award className="size-4" />}
                       {count === 0 ? (en ? "Get a stamp first" : "اختم أول ختم عشان تطلع بطاقتك") : en ? "Make my card" : "سوّ بطاقتي"}

@@ -53,7 +53,7 @@ export function LeafletMap({
 
     if (route && points.length > 1) {
       L.polyline(points.map((p) => [p.lat, p.lng] as [number, number]), {
-        color: "#b82e24",
+        color: "#94532d",
         weight: 3,
         opacity: 0.75,
         dashArray: "6 8",

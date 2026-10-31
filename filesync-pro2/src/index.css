@@ -3,15 +3,15 @@
 @source "../index.html";
 
 :root {
-  --primary: #b82e24;
+  --primary: #94532d;
   --primary-foreground: #ffffff;
-  --background: #faf4f4;
-  --foreground: #2d1716;
+  --background: #f8f2e9;
+  --foreground: #2e2218;
   --card: #ffffff;
-  --card-foreground: #2d1716;
-  --muted: #f7eded;
-  --muted-foreground: #7d5654;
-  --border: #f2d6d3;
+  --card-foreground: #2e2218;
+  --muted: #f4ece0;
+  --muted-foreground: #775c46;
+  --border: #e6d5bd;
 }
 
 body {
@@ -27,13 +27,13 @@ body {
 }
 
 .salt-dot-pattern {
-  background-image: radial-gradient(rgba(184, 46, 36, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(148, 83, 45, 0.12) 1px, transparent 1px);
   background-size: 17px 17px;
 }
 
 .soft-grid {
-  background-image: linear-gradient(rgba(184, 46, 36, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(184, 46, 36, 0.035) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(148, 83, 45, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 83, 45, 0.035) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -76,7 +76,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 1rem;
-  border: 2px solid var(--c, #fda4af);
+  border: 2px solid var(--c, #d9a066);
   pointer-events: none;
   animation: vc-ring 760ms ease-out forwards;
 }
@@ -182,8 +182,8 @@ body {
 }
 .vc-talk-ring { animation: vc-talk-ring 1.1s ease-out infinite; }
 @keyframes vc-talk-ring {
-  from { box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.75), 0 25px 60px rgba(0, 0, 0, 0.55); }
-  to { box-shadow: 0 0 0 60px rgba(251, 113, 133, 0), 0 25px 60px rgba(0, 0, 0, 0.55); }
+  from { box-shadow: 0 0 0 0 rgba(201, 138, 75, 0.75), 0 25px 60px rgba(0, 0, 0, 0.55); }
+  to { box-shadow: 0 0 0 60px rgba(201, 138, 75, 0), 0 25px 60px rgba(0, 0, 0, 0.55); }
 }
 
 /* Main mic button: a ripple from the exact press point */
@@ -254,10 +254,10 @@ body {
 .sc-salt {
   opacity: 0.55;
   background-image:
-    radial-gradient(circle at 12% 30%, rgba(184, 46, 36, 0.10) 0 2px, transparent 3px),
-    radial-gradient(circle at 78% 18%, rgba(184, 46, 36, 0.08) 0 1.5px, transparent 2.5px),
-    radial-gradient(circle at 60% 80%, rgba(184, 46, 36, 0.09) 0 2px, transparent 3px),
-    radial-gradient(circle at 30% 70%, rgba(184, 46, 36, 0.07) 0 1.5px, transparent 2.5px);
+    radial-gradient(circle at 12% 30%, rgba(148, 83, 45, 0.10) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 18%, rgba(148, 83, 45, 0.08) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 60% 80%, rgba(148, 83, 45, 0.09) 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 70%, rgba(148, 83, 45, 0.07) 0 1.5px, transparent 2.5px);
   background-size: 90px 90px;
   animation: sc-drift 18s linear infinite;
 }
@@ -273,9 +273,9 @@ body {
   height: 30px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: #b82e24;
+  background: #94532d;
   border: 3px solid #fff;
-  box-shadow: 0 4px 10px rgba(80, 10, 5, 0.35);
+  box-shadow: 0 4px 10px rgba(70, 40, 15, 0.35);
   display: grid;
   place-items: center;
   transition: transform 200ms ease;

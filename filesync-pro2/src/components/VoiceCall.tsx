@@ -854,7 +854,7 @@ registerProcessor('mic-processor', MicProcessor);`;
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col bg-[#240b09]/95 p-3 sm:p-5 backdrop-blur-xl text-[#fef5f4] overflow-hidden ${
+      className={`fixed inset-0 z-50 flex flex-col bg-[#21160e]/95 p-3 sm:p-5 backdrop-blur-xl text-[#fbf5ec] overflow-hidden ${
         closingVia ? "vc-closing" : "vc-call-enter"
       }`}
       dir={isEn ? "ltr" : "rtl"}
@@ -864,25 +864,25 @@ registerProcessor('mic-processor', MicProcessor);`;
           <div
             className={`w-3 h-3 rounded-full ${
               status === "speaking"
-                ? "bg-rose-400 animate-ping"
+                ? "bg-amber-400 animate-ping"
                 : status === "user_speaking"
                 ? "bg-emerald-400 animate-pulse"
                 : status === "listening"
-                ? "bg-red-400 animate-pulse"
+                ? "bg-orange-400 animate-pulse"
                 : status === "error"
-                ? "bg-rose-500"
-                : "bg-red-300 animate-pulse"
+                ? "bg-amber-500"
+                : "bg-orange-300 animate-pulse"
             }`}
           />
           <div>
-            <h3 className="font-bold text-sm text-[#fef5f4] flex items-center gap-2">
+            <h3 className="font-bold text-sm text-[#fbf5ec] flex items-center gap-2">
               {isEn ? "Live Voice Broadcast • Al-Dahiya" : "بث صوتي مباشر • الداهية"}
-              <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/20 px-2 py-0.5 text-[10px] text-rose-300 border border-rose-500/30">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-300 border border-amber-500/30">
                 <Sparkles className="size-3" />
                 Gemini Live Native Audio
               </span>
             </h3>
-            <p className="text-[11px] text-[#e0b8b6]">
+            <p className="text-[11px] text-[#d8be9b]">
               {status === "connecting"
                 ? isEn ? "Connecting live audio stream..." : "جاري ربط خط البث الصوتي المباشر..."
                 : status === "user_speaking"
@@ -901,7 +901,7 @@ registerProcessor('mic-processor', MicProcessor);`;
         <button
           type="button"
           onClick={() => closeWithAnimation("x")}
-          className="relative rounded-full bg-white/10 hover:bg-white/20 active:scale-90 text-[#fef5f4] size-9 flex items-center justify-center transition"
+          className="relative rounded-full bg-white/10 hover:bg-white/20 active:scale-90 text-[#fbf5ec] size-9 flex items-center justify-center transition"
           title={isEn ? "Close" : "إغلاق"}
         >
           <X key={`x-${fx.x || 0}`} className={`w-5 h-5 ${fx.x ? "vc-x-spin" : ""}`} />
@@ -922,7 +922,7 @@ registerProcessor('mic-processor', MicProcessor);`;
                 transform: `scale(${1 + (status === "speaking" ? 0.25 : 0)})`,
                 opacity: isCameraOn || showcase ? 0 : status === "speaking" ? 0.45 : 0.2,
               }}
-              className="absolute size-64 sm:size-80 rounded-full bg-gradient-to-tr from-rose-700/50 via-amber-600/40 to-red-600/50 blur-3xl pointer-events-none transition-all duration-300"
+              className="absolute size-64 sm:size-80 rounded-full bg-gradient-to-tr from-amber-700/50 via-amber-600/40 to-orange-600/50 blur-3xl pointer-events-none transition-all duration-300"
             />
 
             {isCameraOn && (
@@ -980,7 +980,7 @@ registerProcessor('mic-processor', MicProcessor);`;
                 ))}
                 {showcase.images.length === 0 && (
                   // No photos yet: an info card in the salt-season colours
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#7a1a12] via-[#9e2319] to-[#c0582c] px-6 pt-24 pb-36 flex flex-col justify-start">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#5c331b] via-[#844826] to-[#b0682f] px-6 pt-24 pb-36 flex flex-col justify-start">
                     <div className="sc-salt absolute inset-0 opacity-40" aria-hidden="true" />
                     <MapPin className="relative size-9 text-amber-200 vc-pop" />
                     <h3 className="relative mt-3 text-xl font-bold text-white text-balance">{showcase.title}</h3>
@@ -992,7 +992,7 @@ registerProcessor('mic-processor', MicProcessor);`;
                     href={showcase.mapsUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="absolute top-14 end-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[11px] font-bold text-[#7a1a12] shadow hover:bg-white active:scale-95 transition"
+                    className="absolute top-14 end-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[11px] font-bold text-[#5c331b] shadow hover:bg-white active:scale-95 transition"
                   >
                     <MapPin className="size-3.5" />
                     {isEn ? "Photos on Google Maps" : "صورها على Google Maps"}
@@ -1067,13 +1067,13 @@ registerProcessor('mic-processor', MicProcessor);`;
                   style={{ height: `${height}px` }}
                   className={`w-1.5 rounded-full transition-all duration-100 ${
                     isMuted
-                      ? "bg-rose-500/40"
+                      ? "bg-amber-500/40"
                       : status === "speaking"
-                      ? "bg-rose-300"
+                      ? "bg-amber-300"
                       : status === "user_speaking"
                       ? "bg-emerald-400"
                       : micLevel > 0.05
-                      ? "bg-red-400"
+                      ? "bg-orange-400"
                       : "bg-white/20"
                   }`}
                 />
@@ -1082,7 +1082,7 @@ registerProcessor('mic-processor', MicProcessor);`;
           </div>
 
           <div className="flex flex-col items-center gap-1.5 max-w-md text-center px-4">
-            <h2 className="text-lg sm:text-2xl font-bold text-[#fef5f4]">
+            <h2 className="text-lg sm:text-2xl font-bold text-[#fbf5ec]">
               {isMuted
                 ? isEn ? "Microphone muted" : "المايك مغلق حالياً"
                 : status === "user_speaking"
@@ -1099,19 +1099,19 @@ registerProcessor('mic-processor', MicProcessor);`;
                 ? isEn ? "Connection alert" : "تنبيه في الاتصال"
                 : isEn ? "Ready" : "جاهز"}
             </h2>
-            <p className="text-xs sm:text-sm text-[#e0b8b6] max-w-sm mt-1">
+            <p className="text-xs sm:text-sm text-[#d8be9b] max-w-sm mt-1">
               {errorMessage ? (
-                <span className="text-rose-300 font-medium">{errorMessage}</span>
+                <span className="text-amber-300 font-medium">{errorMessage}</span>
               ) : isCameraOn ? (
                 <span className="text-emerald-300 font-semibold">
                   {isEn ? "Al-Dahiya can see your camera • Ask him \"what is this?\"" : "الداهية يشوف كاميرتك • اسأله «وش هذا؟»"}
                 </span>
               ) : isMuted ? (
-                <span className="text-rose-300 font-semibold">
+                <span className="text-amber-300 font-semibold">
                   {isEn ? "Microphone is muted • Click mic button to un-mute" : "المايك مغلق • اضغط زر المايك للتحدث"}
                 </span>
               ) : micLevel > 0.04 ? (
-                <span className="text-red-300 font-semibold">
+                <span className="text-orange-300 font-semibold">
                   {isEn ? "Transmitting audio..." : "جاري التقاط الصوت..."}
                 </span>
               ) : (
@@ -1130,8 +1130,8 @@ registerProcessor('mic-processor', MicProcessor);`;
             onClick={toggleMute}
             className={`relative size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl transition-all shadow-md flex items-center justify-center select-none active:scale-90 ${
               isMuted
-                ? "bg-rose-600 hover:bg-rose-700 text-white ring-4 ring-rose-500/30"
-                : "bg-white/10 hover:bg-white/20 text-[#fef5f4]"
+                ? "bg-amber-600 hover:bg-amber-700 text-white ring-4 ring-amber-500/30"
+                : "bg-white/10 hover:bg-white/20 text-[#fbf5ec]"
             }`}
             title={isMuted ? (isEn ? "Unmute Mic" : "تشغيل المايك") : (isEn ? "Mute Mic" : "كتم المايك")}
           >
@@ -1145,10 +1145,10 @@ registerProcessor('mic-processor', MicProcessor);`;
               {isMuted ? (
                 <MicOff className="size-5 sm:size-6 text-white" />
               ) : (
-                <Mic className="size-5 sm:size-6 text-rose-300" />
+                <Mic className="size-5 sm:size-6 text-amber-300" />
               )}
             </span>
-            {fx.mic ? <SaltBurst key={`mic-burst-${fx.mic}`} color={isMuted ? "#fda4af" : "#ffffff"} /> : null}
+            {fx.mic ? <SaltBurst key={`mic-burst-${fx.mic}`} color={isMuted ? "#d9a066" : "#ffffff"} /> : null}
           </button>
 
           {/* Camera: an aperture snaps shut and reopens, salt crystals fly */}
@@ -1165,12 +1165,12 @@ registerProcessor('mic-processor', MicProcessor);`;
             className={`relative size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl transition-all shadow-md flex items-center justify-center select-none active:scale-90 ${
               isCameraOn
                 ? "bg-emerald-600 hover:bg-emerald-700 text-white ring-4 ring-emerald-500/30"
-                : "bg-white/10 hover:bg-white/20 text-[#fef5f4]"
+                : "bg-white/10 hover:bg-white/20 text-[#fbf5ec]"
             }`}
             title={isCameraOn ? (isEn ? "Turn off camera" : "إيقاف الكاميرا") : (isEn ? "Show Al-Dahiya with your camera" : "شغّل الكاميرا وخل الداهية يشوف")}
           >
             <span key={`cam-icon-${fx.cam || 0}`} className={fx.cam ? "vc-pop" : ""}>
-              {isCameraOn ? <CameraOff className="size-5 sm:size-6" /> : <Camera className="size-5 sm:size-6 text-rose-300" />}
+              {isCameraOn ? <CameraOff className="size-5 sm:size-6" /> : <Camera className="size-5 sm:size-6 text-amber-300" />}
             </span>
             {fx.cam ? <span key={`shutter-${fx.cam}`} className="vc-shutter" /> : null}
             {fx.cam ? <SaltBurst key={`cam-burst-${fx.cam}`} color="#a7f3d0" /> : null}
@@ -1187,10 +1187,10 @@ registerProcessor('mic-processor', MicProcessor);`;
             }}
             className={`relative overflow-hidden flex-1 py-3 sm:py-4 px-4 min-h-[48px] rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md select-none flex items-center justify-center active:scale-[0.97] ${
               isMuted
-                ? "bg-rose-700 hover:bg-rose-800 text-white ring-4 ring-rose-500/30"
+                ? "bg-amber-700 hover:bg-amber-800 text-white ring-4 ring-amber-500/30"
                 : status === "user_speaking"
                 ? "bg-emerald-600 hover:bg-emerald-700 text-white ring-4 ring-emerald-500/30"
-                : "bg-[#b82e24] hover:bg-[#992017] text-white"
+                : "bg-[#94532d] hover:bg-[#78411f] text-white"
             }`}
           >
             {fx.main ? (
@@ -1217,11 +1217,11 @@ registerProcessor('mic-processor', MicProcessor);`;
           <button
             type="button"
             onClick={() => closeWithAnimation("end")}
-            className="relative size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl bg-rose-700 hover:bg-rose-800 text-white shadow-lg flex items-center justify-center transition active:scale-90"
+            className="relative size-12 sm:size-14 min-w-[48px] min-h-[48px] shrink-0 rounded-2xl bg-amber-700 hover:bg-amber-800 text-white shadow-lg flex items-center justify-center transition active:scale-90"
             title={isEn ? "End Call" : "إنهاء المكالمة"}
           >
             <Phone className={`size-5 sm:size-6 ${closingVia === "end" ? "vc-hangup" : "rotate-[135deg]"}`} />
-            {fx.end ? <SaltBurst key={`end-burst-${fx.end}`} color="#fb7185" /> : null}
+            {fx.end ? <SaltBurst key={`end-burst-${fx.end}`} color="#c98a4b" /> : null}
           </button>
         </div>
       </div>

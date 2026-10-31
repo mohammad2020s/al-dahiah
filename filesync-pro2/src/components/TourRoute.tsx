@@ -3,7 +3,8 @@ import { createPortal } from "react-dom";
 import { Footprints, Map as MapIcon, MessageCircle, Navigation, X } from "lucide-react";
 import { AL_QASAB_CAFES, AL_QASAB_LANDMARKS } from "../../server/alQasabScope.ts";
 import type { Language } from "../i18n";
-import { LeafletMap, directionsUrl, type MapPoint } from "./LeafletMap";
+import { LeafletMap, type MapPoint } from "./LeafletMap";
+import { openNavigation } from "./NavigateSheet";
 
 // A half-day route through Al-Qasab, ordered for the light: salt pans in the
 // soft morning, the old town midday, the watchtower at sunset, coffee after,
@@ -124,23 +125,23 @@ export function TourRoute({ language = "ar", onAsk }: { language?: Language; onA
 
   return (
     <>
-      <div className="sc-card rounded-[1.7rem] border border-[#f2d6d3] bg-white p-4 shadow-sm">
-        <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a1210]">
-          <Footprints className="size-4 text-[#b82e24]" />
+      <div className="sc-card rounded-[1.7rem] border border-[#e6d5bd] bg-white p-4 shadow-sm">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
+          <Footprints className="size-4 text-[#94532d]" />
           {isEn ? "Your day in Al-Qasab" : "جولتك في القَصَب"}
         </div>
         <ol className="mt-3 space-y-1.5">
           {stops.map((s) => (
             <li key={s.landmarkId} className="flex items-center gap-2 text-[11px] text-[#4a2f2d]">
-              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-[#b82e24] text-[10px] font-bold text-white">{s.index}</span>
+              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-[#94532d] text-[10px] font-bold text-white">{s.index}</span>
               <span className="font-semibold">{s.title}</span>
-              <span className="ms-auto shrink-0 text-[10px] text-[#9a6b67]">{isEn ? s.timeEn : s.timeAr}</span>
+              <span className="ms-auto shrink-0 text-[10px] text-[#947760]">{isEn ? s.timeEn : s.timeAr}</span>
             </li>
           ))}
         </ol>
         <button
           onClick={() => setOpen(true)}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#b82e24] px-3 py-2 text-xs font-bold text-white hover:bg-[#992017] active:scale-[0.98] transition"
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#94532d] px-3 py-2 text-xs font-bold text-white hover:bg-[#78411f] active:scale-[0.98] transition"
         >
           <MapIcon className="size-4" />
           {isEn ? "Show the route on the map" : "اعرض الجولة على الخريطة"}
@@ -155,12 +156,12 @@ export function TourRoute({ language = "ar", onAsk }: { language?: Language; onA
               onClick={(e) => e.stopPropagation()}
               className="tr-sheet flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-[1.8rem] sm:rounded-[1.8rem] bg-white shadow-2xl"
             >
-              <div className="flex items-center justify-between border-b border-[#f6dedc] px-5 py-3.5">
+              <div className="flex items-center justify-between border-b border-[#ede1cd] px-5 py-3.5">
                 <div>
-                  <p className="text-sm font-bold text-[#3a1210]">{isEn ? "Your day in Al-Qasab" : "جولتك في القَصَب"}</p>
-                  <p className="text-[11px] text-[#7d6564]">{isEn ? "A half-day route, best started early" : "جولة نص يوم، والأفضل تبدأها بدري"}</p>
+                  <p className="text-sm font-bold text-[#3a2a1c]">{isEn ? "Your day in Al-Qasab" : "جولتك في القَصَب"}</p>
+                  <p className="text-[11px] text-[#786450]">{isEn ? "A half-day route, best started early" : "جولة نص يوم، والأفضل تبدأها بدري"}</p>
                 </div>
-                <button onClick={() => setOpen(false)} className="grid size-9 place-items-center rounded-full bg-[#fff5f4] text-[#8e1b12] hover:bg-[#feeceb]" title={isEn ? "Close" : "إغلاق"}>
+                <button onClick={() => setOpen(false)} className="grid size-9 place-items-center rounded-full bg-[#faf4ea] text-[#6c3a1c] hover:bg-[#f5eadb]" title={isEn ? "Close" : "إغلاق"}>
                   <X className="size-5" />
                 </button>
               </div>
@@ -172,35 +173,36 @@ export function TourRoute({ language = "ar", onAsk }: { language?: Language; onA
                     id={`tour-stop-${s.landmarkId}`}
                     onClick={() => setActiveId(s.landmarkId)}
                     className={`tr-stop flex gap-3 rounded-2xl border p-3 transition cursor-pointer ${
-                      activeId === s.landmarkId ? "border-teal-600 bg-teal-50/60" : "border-[#f2d8d6] bg-white hover:bg-[#fffaf9]"
+                      activeId === s.landmarkId ? "border-teal-600 bg-teal-50/60" : "border-[#e7d8c2] bg-white hover:bg-[#fcf8f1]"
                     }`}
                     style={{ animationDelay: `${s.index * 60}ms` }}
                   >
-                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#b82e24] text-xs font-bold text-white">{s.index}</span>
+                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#94532d] text-xs font-bold text-white">{s.index}</span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-baseline gap-x-2">
-                        <span className="text-sm font-bold text-[#321210]">{s.title}</span>
-                        <span className="text-[11px] font-semibold text-[#b85c54]">{isEn ? s.timeEn : s.timeAr}</span>
+                        <span className="text-sm font-bold text-[#33251a]">{s.title}</span>
+                        <span className="text-[11px] font-semibold text-[#a8744a]">{isEn ? s.timeEn : s.timeAr}</span>
                       </div>
-                      <p className="mt-1 text-xs leading-5 text-[#5a4342]">{isEn ? s.tipEn : s.tipAr}</p>
+                      <p className="mt-1 text-xs leading-5 text-[#584535]">{isEn ? s.tipEn : s.tipAr}</p>
                       <div className="mt-2 flex flex-wrap gap-2">
-                        <a
-                          href={directionsUrl(s.lat, s.lng)}
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1 rounded-lg bg-[#b82e24] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#992017]"
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openNavigation({ lat: s.lat, lng: s.lng, name: s.title });
+                          }}
+                          className="inline-flex items-center gap-1 rounded-lg bg-[#94532d] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#78411f]"
                         >
                           <Navigation className="size-3.5" />
                           {isEn ? "Take me there" : "خذني لها"}
-                        </a>
+                        </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setOpen(false);
                             onAsk(isEn ? s.askEn : s.askAr);
                           }}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[#f2d6d3] bg-[#fff5f4] px-2.5 py-1.5 text-[11px] font-bold text-[#8e1b12] hover:bg-[#feeceb]"
+                          className="inline-flex items-center gap-1 rounded-lg border border-[#e6d5bd] bg-[#faf4ea] px-2.5 py-1.5 text-[11px] font-bold text-[#6c3a1c] hover:bg-[#f5eadb]"
                         >
                           <MessageCircle className="size-3.5" />
                           {isEn ? "Ask Al-Dahiya" : "اسأل الداهية"}

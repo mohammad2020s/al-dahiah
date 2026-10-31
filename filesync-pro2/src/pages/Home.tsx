@@ -23,8 +23,11 @@ import {
   X,
   CornerDownLeft,
   Ticket,
+  Navigation,
 } from "lucide-react";
 import { MalhAlQasabLogo, TanmiahLogo } from "../components/BrandLogos";
+import { RichText } from "../components/RichText";
+import { NavigateSheet, openNavigation } from "../components/NavigateSheet";
 // The call screen pulls in three.js and the salt bag; load it only when someone calls
 import { preloadGrandpa } from "../components/grandpaFrames";
 // Fetch the call screen and the grandfather's paintings together
@@ -108,47 +111,47 @@ function WeatherCard({ weather, language = "ar" }: { weather: WeatherData; langu
   const t = translations[language];
 
   return (
-    <div className="mt-3 overflow-hidden rounded-[1.35rem] border border-[#f2d4d1] bg-gradient-to-br from-white to-[#fff6f5] p-4 shadow-sm sm:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#f6dedc] pb-3.5">
+    <div className="mt-3 overflow-hidden rounded-[1.35rem] border border-[#e5d2b8] bg-gradient-to-br from-white to-[#fbf5ec] p-4 shadow-sm sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ede1cd] pb-3.5">
         <div className="flex items-center gap-2.5">
-          <div className="grid size-10 place-items-center rounded-2xl bg-[#b82e24] text-white shadow-sm shadow-red-900/10">
+          <div className="grid size-10 place-items-center rounded-2xl bg-[#94532d] text-white shadow-sm shadow-stone-900/10">
             <CloudSun className="size-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-xs font-bold text-[#3a1210]">{t.weatherCardTitle}</h3>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#b82e24]/10 px-2 py-0.5 text-[10px] font-semibold text-[#b82e24]">
-                <span className="size-1.5 rounded-full bg-[#b82e24] animate-pulse" />
+              <h3 className="text-xs font-bold text-[#3a2a1c]">{t.weatherCardTitle}</h3>
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#94532d]/10 px-2 py-0.5 text-[10px] font-semibold text-[#94532d]">
+                <span className="size-1.5 rounded-full bg-[#94532d] animate-pulse" />
                 {weather.source === "fallback" ? t.weatherFallbackBadge : t.weatherLiveBadge}
               </span>
             </div>
-            <p className="mt-0.5 text-[10px] text-[#7d6564]">
+            <p className="mt-0.5 text-[10px] text-[#786450]">
               {weather.source === "fallback" ? t.weatherFallbackAttribution : t.weatherGoogleAttribution}
             </p>
           </div>
         </div>
         <div className="flex items-baseline gap-1 text-right">
-          <span className="font-display-ar text-2xl font-bold text-[#a82319] sm:text-3xl">{weather.temperature}°</span>
-          <span className="text-xs font-semibold text-[#8e1b12]">{t.celsius}</span>
+          <span className="font-display-ar text-2xl font-bold text-[#844826] sm:text-3xl">{weather.temperature}°</span>
+          <span className="text-xs font-semibold text-[#6c3a1c]">{t.celsius}</span>
         </div>
       </div>
 
       <div className="mt-3.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div className="rounded-xl border border-[#f5dfdc] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[10px] font-medium text-[#7d6564]">{t.weatherCondition}</p>
-          <p className="mt-1 text-xs font-bold text-[#2d1716]">{weather.conditionText}</p>
+        <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
+          <p className="text-[10px] font-medium text-[#786450]">{t.weatherCondition}</p>
+          <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.conditionText}</p>
         </div>
-        <div className="rounded-xl border border-[#f5dfdc] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[10px] font-medium text-[#7d6564]">{t.weatherFeelsLike}</p>
-          <p className="mt-1 text-xs font-bold text-[#2d1716]">{weather.feelsLike}° {t.celsius}</p>
+        <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
+          <p className="text-[10px] font-medium text-[#786450]">{t.weatherFeelsLike}</p>
+          <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.feelsLike}° {t.celsius}</p>
         </div>
-        <div className="rounded-xl border border-[#f5dfdc] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[10px] font-medium text-[#7d6564]">{t.weatherHumidity}</p>
-          <p className="mt-1 text-xs font-bold text-[#2d1716]">{weather.humidity}%</p>
+        <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
+          <p className="text-[10px] font-medium text-[#786450]">{t.weatherHumidity}</p>
+          <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.humidity}%</p>
         </div>
-        <div className="rounded-xl border border-[#f5dfdc] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[10px] font-medium text-[#7d6564]">{t.weatherWindSpeed}</p>
-          <p className="mt-1 text-xs font-bold text-[#2d1716]">{weather.windSpeed} {t.weatherKmH}</p>
+        <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
+          <p className="text-[10px] font-medium text-[#786450]">{t.weatherWindSpeed}</p>
+          <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.windSpeed} {t.weatherKmH}</p>
         </div>
       </div>
     </div>
@@ -219,7 +222,7 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
   }, [servicePins, language, multiPin, allPlaces, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]);
 
   return (
-    <div className="my-4 overflow-hidden rounded-3xl border border-[#f2d4d1] bg-white shadow-lg shadow-gray-200/50 w-full">
+    <div className="my-4 overflow-hidden rounded-3xl border border-[#e5d2b8] bg-white shadow-lg shadow-gray-200/50 w-full">
       <LeafletMap
         className="h-64 sm:h-72"
         points={mapPoints}
@@ -227,75 +230,76 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
         fitIds={servicePins ? servicePins.map((p) => p.id) : multiPin ? CAFE_PIN_IDS : undefined}
         zoom={17}
       />
-      <div className="flex items-center justify-between gap-2 border-t border-[#f4dedd] px-3 py-2.5">
-        <span className="min-w-0 truncate text-xs font-bold text-[#321210]">
+      <div className="flex items-center justify-between gap-2 border-t border-[#ebdfcc] px-3 py-2.5">
+        <span className="min-w-0 truncate text-xs font-bold text-[#33251a]">
           {servicePins ? (language === "en" && location.nameEn ? location.nameEn : location.name) : locationTitle}
         </span>
         {allPlaces || servicePins ? (
-          <span className="shrink-0 text-[11px] text-[#7d6564]">{language === "en" ? "Tap a pin to see its name" : "اضغط على أي دبوس يطلع اسمه"}</span>
+          <span className="shrink-0 text-[11px] text-[#786450]">{language === "en" ? "Tap a pin to see its name" : "اضغط على أي دبوس يطلع اسمه"}</span>
         ) : (
-        <a
-          href={directionsUrl(activeCoordinates.lat, activeCoordinates.lng)}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#b82e24] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#992017]"
+        <button
+          type="button"
+          onClick={() => openNavigation({ lat: activeCoordinates.lat, lng: activeCoordinates.lng, name: locationTitle })}
+          className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#78411f]"
         >
-          <ExternalLink className="size-3.5" />
+          <Navigation className="size-3.5" />
           {language === "en" ? "Take me there" : "خذني لها"}
-        </a>
+        </button>
         )}
       </div>
 
       {servicePins && (
-        <div className="border-t border-[#f4dedd] bg-[#fffaf9] p-3 sm:p-4 space-y-1.5">
+        <div className="border-t border-[#ebdfcc] bg-[#fcf8f1] p-3 sm:p-4 space-y-1.5">
           {servicePins.map((p) => (
-            <div key={p.id} className="flex items-center justify-between gap-2 rounded-xl border border-[#f2d8d6] bg-white px-2.5 py-2">
-              <span className="flex min-w-0 items-center gap-2 text-xs font-bold text-[#321210]">
+            <div key={p.id} className="flex items-center justify-between gap-2 rounded-xl border border-[#e7d8c2] bg-white px-2.5 py-2">
+              <span className="flex min-w-0 items-center gap-2 text-xs font-bold text-[#33251a]">
                 <span className={`size-2.5 shrink-0 rounded-full ${p.kind === "wc" ? "bg-[#2563a8]" : "bg-[#2f7d4f]"}`} />
                 <span className="truncate">{language === "en" && p.nameEn ? p.nameEn : p.name}</span>
               </span>
-              <a
-                href={directionsUrl(p.lat, p.lng)}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#b82e24] px-2 py-1 text-[10px] font-bold text-white hover:bg-[#992017]"
+              <button
+                type="button"
+                onClick={() => openNavigation({ lat: p.lat, lng: p.lng, name: language === "en" && p.nameEn ? p.nameEn : p.name })}
+                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2 py-1 text-[10px] font-bold text-white hover:bg-[#78411f]"
               >
-                <ExternalLink className="size-3" />
+                <Navigation className="size-3" />
                 {language === "en" ? "Take me there" : "خذني له"}
-              </a>
+              </button>
             </div>
           ))}
         </div>
       )}
 
       {isCafes && location.places && (
-        <div className="border-t border-[#f4dedd] bg-[#fffaf9] p-3 sm:p-4">
+        <div className="border-t border-[#ebdfcc] bg-[#fcf8f1] p-3 sm:p-4">
           <div className="space-y-2">
             {location.places.map((place: any) => (
               <div
                 key={place.id}
-                className="rounded-xl border border-[#f2d8d6] bg-white p-2.5 transition hover:shadow-xs"
+                className="rounded-xl border border-[#e7d8c2] bg-white p-2.5 transition hover:shadow-xs"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-[#321210]">{place.name}</span>
+                      <span className="text-xs font-bold text-[#33251a]">{place.name}</span>
                       <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[9px] font-extrabold text-amber-800">
                         <Star className="size-2.5 fill-amber-500 text-amber-500" />
                         {place.rating} / 5
                       </span>
                     </div>
-                    <p className="mt-1 text-[10.5px] text-[#5a4342]">{place.description}</p>
+                    <p className="mt-1 text-[10.5px] text-[#584535]">{place.description}</p>
                   </div>
-                  <a
-                    href={place.directionsUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 rounded-lg bg-[#b82e24] px-2 py-1 text-[10px] font-bold text-white shadow-xs hover:bg-[#992017]"
+                  <button
+                    type="button"
+                    onClick={() =>
+                      place.coordinates
+                        ? openNavigation({ lat: place.coordinates.lat, lng: place.coordinates.lng, name: place.name })
+                        : window.open(place.directionsUrl, "_blank", "noopener")
+                    }
+                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2 py-1 text-[10px] font-bold text-white shadow-xs hover:bg-[#78411f]"
                   >
-                    <ExternalLink className="size-3" />
-                    <span>Google</span>
-                  </a>
+                    <Navigation className="size-3" />
+                    <span>{language === "en" ? "Take me there" : "خذني له"}</span>
+                  </button>
                 </div>
               </div>
             ))}
@@ -315,7 +319,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleCopy = () => {
-    navigator.clipboard?.writeText(message.content);
+    navigator.clipboard?.writeText(message.content.replace(/\*\*/g, ""));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -336,7 +340,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
       const res = await fetch("/api/speak", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: message.content }),
+        body: JSON.stringify({ text: message.content.replace(/\*\*|^\s*[*-]\s+/gm, "") }),
       });
       const data = await res.json();
       setIsLoadingAudio(false);
@@ -363,7 +367,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
   return (
     <div className={`flex flex-col ${isUser ? "items-start" : "items-start w-full"}`}>
       {isUser ? (
-        <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-[#b82e24] px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-red-950/10">
+        <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-[#94532d] px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-stone-950/10">
           {message.photo && (
             <img
               src={message.photo}
@@ -378,7 +382,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
           <div className="flex items-center justify-between pr-0.5">
             <div className="flex items-center gap-2">
               <MalhAlQasabLogo size="sm" className="rounded-xl" />
-              <span className="text-xs font-bold text-[#3a1210]">{t.appName}</span>
+              <span className="text-xs font-bold text-[#3a2a1c]">{t.appName}</span>
             </div>
 
             <div className="flex items-center gap-1.5">
@@ -386,16 +390,16 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
                 <>
                   <button
                     onClick={handleCopy}
-                    className="inline-flex items-center gap-1 rounded-full border border-[#f2d4d1] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#8e1b12] shadow-xs transition hover:bg-[#fff2f1]"
+                    className="inline-flex items-center gap-1 rounded-full border border-[#e5d2b8] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#6c3a1c] shadow-xs transition hover:bg-[#f8efe2]"
                   >
-                    {copied ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3 text-[#b82e24]" />}
+                    {copied ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3 text-[#94532d]" />}
                     <span>{copied ? "تم النسخ" : "نسخ"}</span>
                   </button>
 
                   <button
                     onClick={handleToggleSpeak}
                     disabled={isLoadingAudio}
-                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-[#f2d4d1] bg-white text-[#8e1b12] hover:bg-[#fff2f1] shadow-xs"
+                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-[#e5d2b8] bg-white text-[#6c3a1c] hover:bg-[#f8efe2] shadow-xs"
                   >
                     {isLoadingAudio ? (
                       <Loader2 className="size-3 animate-spin" />
@@ -406,7 +410,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
                       </>
                     ) : (
                       <>
-                        <Volume2 className="size-3.5 text-[#b82e24]" />
+                        <Volume2 className="size-3.5 text-[#94532d]" />
                         <span>{t.listenAudio}</span>
                       </>
                     )}
@@ -419,15 +423,15 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
           <div
             className={`rounded-[1.4rem] border px-5 py-4 text-sm leading-7 shadow-sm sm:px-6 sm:py-5 ${
               message.guarded
-                ? "border-[#f4d5d2] bg-[#fff8f7] text-[#6d2520]"
-                : "border-[#f2d6d3] bg-white text-[#241515]"
+                ? "border-[#e8d5bb] bg-[#fcf7ef] text-[#6d2520]"
+                : "border-[#e6d5bd] bg-white text-[#241515]"
             }`}
           >
             {message.content ? (
-              <p className="whitespace-pre-wrap">{message.content}</p>
+              <RichText text={message.content} />
             ) : (
-              <div className="flex items-center gap-2 py-1 text-xs text-[#7d6564]">
-                <Loader2 className="size-4 animate-spin text-[#b82e24]" />
+              <div className="flex items-center gap-2 py-1 text-xs text-[#786450]">
+                <Loader2 className="size-4 animate-spin text-[#94532d]" />
                 <span>{t.thinking}</span>
               </div>
             )}
@@ -641,7 +645,7 @@ export default function Home() {
   return (
     <main
       dir={language === "ar" ? "rtl" : "ltr"}
-      className="soft-grid relative min-h-screen overflow-hidden bg-[#faf4f4] text-[#2d1716]"
+      className="soft-grid relative min-h-screen overflow-hidden bg-[#f8f2e9] text-[#2e2218]"
     >
       <LanguageModal
         isOpen={isLanguageModalOpen}
@@ -657,6 +661,9 @@ export default function Home() {
         originRect={callOriginRect}
       />
 
+      {/* In-site turn-by-turn directions, opened by every «خذني لها» button */}
+      <NavigateSheet language={language} />
+
       {isVoiceCallOpen && (
         <Suspense fallback={null}>
           <VoiceCall
@@ -669,12 +676,12 @@ export default function Home() {
 
       <div className="relative mx-auto flex min-h-screen max-w-[1480px] flex-col px-4 py-4 sm:px-6 lg:px-8">
         {/* Header Bar */}
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[#f2d6d3] bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur">
+        <header className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[#e6d5bd] bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur">
           {/* Logo & Name */}
           <div className="flex items-center gap-3">
             <MalhAlQasabLogo size="md" className="rounded-2xl" />
             <div>
-              <h1 className="font-['Alexandria'] text-xl sm:text-2xl font-bold leading-none text-[#992017]">
+              <h1 className="font-['Alexandria'] text-xl sm:text-2xl font-bold leading-none text-[#78411f]">
                 الداهية
               </h1>
               <p className="mt-1 text-[10px] font-semibold text-[#a14e47]">
@@ -684,36 +691,36 @@ export default function Home() {
           </div>
 
           {/* Sponsor Tag */}
-          <div className="flex items-center gap-2.5 rounded-full border border-[#f2d6d3] bg-[#fffbfb] px-4 py-1.5 shadow-xs">
+          <div className="flex items-center gap-2.5 rounded-full border border-[#e6d5bd] bg-[#fdfaf5] px-4 py-1.5 shadow-xs">
             <div className="text-right leading-tight">
-              <p className="text-[9px] font-medium text-[#b85c54]">{t.sponsoredBy}</p>
+              <p className="text-[9px] font-medium text-[#a8744a]">{t.sponsoredBy}</p>
               <p className="mt-0.5 text-[11px] font-bold text-[#6a1914]">
                 {t.sponsorName}
               </p>
             </div>
-            <div className="grid size-8 place-items-center rounded-full bg-white border border-[#f2d6d3] p-0.5">
+            <div className="grid size-8 place-items-center rounded-full bg-white border border-[#e6d5bd] p-0.5">
               <TanmiahLogo size="sm" />
             </div>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#f2d6d3] bg-[#fff7f6] px-3 py-1.5 text-xs font-semibold text-[#a82319]">
-              <span className="size-2 rounded-full bg-[#b82e24] animate-pulse" />
+            <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#e6d5bd] bg-[#fbf6ee] px-3 py-1.5 text-xs font-semibold text-[#844826]">
+              <span className="size-2 rounded-full bg-[#94532d] animate-pulse" />
               <span>{t.onlineStatus}</span>
             </div>
 
             <button
               onClick={() => setIsLanguageModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-[#f2d6d3] bg-[#fff7f6] px-3 py-1.5 text-xs font-bold text-[#8e1b12] shadow-xs hover:bg-[#feeceb] transition"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#e6d5bd] bg-[#fbf6ee] px-3 py-1.5 text-xs font-bold text-[#6c3a1c] shadow-xs hover:bg-[#f5eadb] transition"
             >
-              <Globe className="size-3.5 text-[#b82e24]" />
+              <Globe className="size-3.5 text-[#94532d]" />
               <span>{language === "ar" ? "English / العربية" : "العربية / English"}</span>
             </button>
 
             <button
               onClick={() => setMessages([])}
-              className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs text-[#7d5654] hover:bg-[#feeceb] hover:text-[#8e1b12] transition"
+              className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs text-[#775c46] hover:bg-[#f5eadb] hover:text-[#6c3a1c] transition"
             >
               <Plus className="size-4" />
               <span className="hidden sm:inline">{t.newChat}</span>
@@ -726,7 +733,7 @@ export default function Home() {
           {/* Sidebar */}
           <aside className="w-full lg:w-[300px] shrink-0 flex flex-col gap-4">
             {/* Top Red Gradient Card */}
-            <div className="relative overflow-hidden rounded-[1.7rem] bg-gradient-to-br from-[#801b13] via-[#9e2319] to-[#b32c21] p-5 text-white shadow-lg shadow-red-950/20">
+            <div className="relative overflow-hidden rounded-[1.7rem] bg-gradient-to-br from-[#801b13] via-[#844826] to-[#b32c21] p-5 text-white shadow-lg shadow-stone-950/20">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-bold">
                 <Sparkles className="size-3" />
                 {t.specialtyBadge}
@@ -735,7 +742,7 @@ export default function Home() {
                 {t.guideTitle1} <br />
                 {t.guideTitle2}
               </h2>
-              <p className="mt-2 text-xs leading-6 text-[#fae1e0]">
+              <p className="mt-2 text-xs leading-6 text-[#f0e1cb]">
                 {t.guideDesc}
               </p>
             </div>
@@ -748,49 +755,49 @@ export default function Home() {
 
             {/* Weather Card */}
             {weatherData && (
-              <div className="rounded-[1.7rem] border border-[#f2d6d3] bg-white p-4 shadow-sm">
+              <div className="rounded-[1.7rem] border border-[#e6d5bd] bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-[#fff5f4] border border-[#f5dfdc] px-2 py-0.5 text-[9px] font-bold text-[#a82319]">
+                  <span className="rounded-full bg-[#faf4ea] border border-[#ede0cb] px-2 py-0.5 text-[9px] font-bold text-[#844826]">
                     Google Weather
                   </span>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a1210]">
-                    <CloudSun className="size-4 text-[#b82e24]" />
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
+                    <CloudSun className="size-4 text-[#94532d]" />
                     <span>{t.weatherNow}</span>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between">
                   <button
                     onClick={() => askQuestion(language === "en" ? "What is the weather in Al-Qasab now?" : "ما هو طقس القصب الآن؟")}
-                    className="rounded-xl border border-[#f2d6d3] bg-[#fff5f4] px-3 py-1.5 text-[10px] font-bold text-[#8e1b12] hover:bg-[#feeceb] transition"
+                    className="rounded-xl border border-[#e6d5bd] bg-[#faf4ea] px-3 py-1.5 text-[10px] font-bold text-[#6c3a1c] hover:bg-[#f5eadb] transition"
                   >
                     {t.askAssistant}
                   </button>
                   <div className="text-left">
-                    <p className="text-2xl font-bold text-[#a82319]">{weatherData.temperature}°</p>
-                    <p className="text-[11px] text-[#7d6564] text-right">{weatherData.conditionText}</p>
+                    <p className="text-2xl font-bold text-[#844826]">{weatherData.temperature}°</p>
+                    <p className="text-[11px] text-[#786450] text-right">{weatherData.conditionText}</p>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Policy Badge Card */}
-            <div className="rounded-[1.4rem] border border-[#f2d6d3] bg-white/85 p-4 text-[11px] leading-5 text-[#6b4c4a] flex items-center gap-2">
-              <BadgeCheck className="size-4 text-[#b82e24] shrink-0" />
+            <div className="rounded-[1.4rem] border border-[#e6d5bd] bg-white/85 p-4 text-[11px] leading-5 text-[#685140] flex items-center gap-2">
+              <BadgeCheck className="size-4 text-[#94532d] shrink-0" />
               <span>{t.scopeNotice}</span>
             </div>
           </aside>
 
           {/* Main Chat Container */}
-          <section className="flex-1 flex min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] border border-[#f2d6d3] bg-white/95 shadow-md">
+          <section className="flex-1 flex min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] border border-[#e6d5bd] bg-white/95 shadow-md">
             {/* Top Bar inside Chat */}
-            <div className="flex items-center justify-between border-b border-[#f6dedc] bg-white px-5 py-3.5">
+            <div className="flex items-center justify-between border-b border-[#ede1cd] bg-white px-5 py-3.5">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-800">
                 <Timer className="size-3 text-emerald-600 animate-pulse" />
                 <span>{t.sevenSecondBadge}</span>
               </div>
               <div className="text-right">
-                <p className="text-xs font-bold text-[#3a1210]">{t.chatHeaderTitle}</p>
-                <p className="text-[11px] text-[#7d6564]">{t.chatHeaderSubtitle}</p>
+                <p className="text-xs font-bold text-[#3a2a1c]">{t.chatHeaderTitle}</p>
+                <p className="text-[11px] text-[#786450]">{t.chatHeaderSubtitle}</p>
               </div>
             </div>
 
@@ -799,13 +806,13 @@ export default function Home() {
               {messages.length === 0 ? (
                 /* Welcome Screen in the Center */
                 <div className="mx-auto flex min-h-[400px] max-w-xl flex-col items-center justify-center text-center">
-                  <div className="mb-4 size-32 rounded-3xl border border-[#f2d6d3] shadow-md inline-flex items-center justify-center overflow-hidden bg-white p-1">
+                  <div className="mb-4 size-32 rounded-3xl border border-[#e6d5bd] shadow-md inline-flex items-center justify-center overflow-hidden bg-white p-1">
                     <MalhAlQasabLogo size="xl" className="w-full h-full rounded-2xl" />
                   </div>
-                  <h2 className="font-['Alexandria'] text-2xl sm:text-3xl font-bold text-[#3a1210]">
+                  <h2 className="font-['Alexandria'] text-2xl sm:text-3xl font-bold text-[#3a2a1c]">
                     {t.welcomeTitle}
                   </h2>
-                  <p className="mt-2 text-xs sm:text-sm leading-6 text-[#6b4c4a] max-w-md">
+                  <p className="mt-2 text-xs sm:text-sm leading-6 text-[#685140] max-w-md">
                     {t.welcomeDesc}
                   </p>
 
@@ -816,10 +823,10 @@ export default function Home() {
                         key={q}
                         disabled={isStreaming}
                         onClick={() => askQuestion(q)}
-                        className="group flex items-center justify-between rounded-2xl border border-[#f2d6d3] bg-white p-4 text-start text-xs font-medium text-[#3a1210] hover:border-[#b82e24] hover:bg-[#fff5f4] transition shadow-xs"
+                        className="group flex items-center justify-between rounded-2xl border border-[#e6d5bd] bg-white p-4 text-start text-xs font-medium text-[#3a2a1c] hover:border-[#94532d] hover:bg-[#faf4ea] transition shadow-xs"
                       >
                         <span className="flex-1">{q}</span>
-                        <ArrowUpLeft className="size-4 text-[#b82e24] shrink-0 transition-transform group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
+                        <ArrowUpLeft className="size-4 text-[#94532d] shrink-0 transition-transform group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
                       </button>
                     ))}
                   </div>
@@ -840,7 +847,7 @@ export default function Home() {
                           href={m.mapsUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="pg-enter mt-2 inline-flex items-center gap-1.5 rounded-xl border border-[#f2d6d3] bg-white px-3 py-2 text-xs font-bold text-[#8e1b12] shadow-sm hover:bg-[#fff5f4]"
+                          className="pg-enter mt-2 inline-flex items-center gap-1.5 rounded-xl border border-[#e6d5bd] bg-white px-3 py-2 text-xs font-bold text-[#6c3a1c] shadow-sm hover:bg-[#faf4ea]"
                         >
                           <ExternalLink className="size-3.5" />
                           {language === "en" ? "More photos on Google Maps" : "صور أكثر على Google Maps"}
@@ -862,7 +869,7 @@ export default function Home() {
                           href={m.link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="pg-enter mt-2 ms-2 inline-flex items-center gap-1.5 rounded-xl border border-[#EAD0CB] bg-white px-3 py-2 text-xs font-bold text-[#B2512F] shadow-sm hover:bg-[#F1E7E7]"
+                          className="pg-enter mt-2 ms-2 inline-flex items-center gap-1.5 rounded-xl border border-[#e4d2ba] bg-white px-3 py-2 text-xs font-bold text-[#B2512F] shadow-sm hover:bg-[#f3ebdf]"
                         >
                           <ExternalLink className="size-3.5" />
                           {m.link.label}
@@ -878,9 +885,9 @@ export default function Home() {
                               key={q}
                               type="button"
                               onClick={() => askQuestion(q)}
-                              className="inline-flex items-center gap-1.5 rounded-full border border-[#f2d4d1] bg-[#fffbfb] px-3 py-1.5 text-xs font-semibold text-[#8e1b12] shadow-xs hover:border-[#b82e24] hover:bg-[#feeceb] transition active:scale-95"
+                              className="inline-flex items-center gap-1.5 rounded-full border border-[#e5d2b8] bg-[#fdfaf5] px-3 py-1.5 text-xs font-semibold text-[#6c3a1c] shadow-xs hover:border-[#94532d] hover:bg-[#f5eadb] transition active:scale-95"
                             >
-                              <CornerDownLeft className={`size-3.5 text-[#b82e24] ${language === "en" ? "-scale-x-100" : ""}`} />
+                              <CornerDownLeft className={`size-3.5 text-[#94532d] ${language === "en" ? "-scale-x-100" : ""}`} />
                               {q}
                             </button>
                           ))}
@@ -894,7 +901,7 @@ export default function Home() {
             </div>
 
             {/* Bottom Quick Topic Pills & Input Bar */}
-            <div className="border-t border-[#f6dedc] bg-white/90 p-3 sm:p-5">
+            <div className="border-t border-[#ede1cd] bg-white/90 p-3 sm:p-5">
               {/* Quick Pills row */}
               <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto pb-2.5 scroll-smooth justify-center">
                 {[
@@ -909,7 +916,7 @@ export default function Home() {
                     type="button"
                     disabled={isStreaming}
                     onClick={() => askQuestion(chip.q)}
-                    className="shrink-0 rounded-full border border-[#f2d4d1] bg-[#fffbfb] px-3 py-1.5 text-[11px] font-semibold text-[#8e1b12] shadow-xs hover:border-[#b82e24] hover:bg-[#feeceb] transition active:scale-95 disabled:opacity-50"
+                    className="shrink-0 rounded-full border border-[#e5d2b8] bg-[#fdfaf5] px-3 py-1.5 text-[11px] font-semibold text-[#6c3a1c] shadow-xs hover:border-[#94532d] hover:bg-[#f5eadb] transition active:scale-95 disabled:opacity-50"
                   >
                     {chip.label}
                   </button>
@@ -922,36 +929,36 @@ export default function Home() {
                   <div className="mb-2 flex items-center gap-2 px-1">
                     {pendingPhoto && (
                       <div className="relative">
-                        <img src={pendingPhoto.preview} alt={language === "en" ? "Photo to send" : "الصورة اللي بترسلها"} className="size-14 rounded-xl border border-[#f2d6d3] object-cover shadow-xs" />
+                        <img src={pendingPhoto.preview} alt={language === "en" ? "Photo to send" : "الصورة اللي بترسلها"} className="size-14 rounded-xl border border-[#e6d5bd] object-cover shadow-xs" />
                         <button
                           type="button"
                           onClick={() => setPendingPhoto(null)}
-                          className="absolute -top-2 -left-2 grid size-6 place-items-center rounded-full bg-[#3a1210] text-white shadow"
+                          className="absolute -top-2 -left-2 grid size-6 place-items-center rounded-full bg-[#3a2a1c] text-white shadow"
                           aria-label={language === "en" ? "Remove photo" : "احذف الصورة"}
                         >
                           <X className="size-3.5" />
                         </button>
                       </div>
                     )}
-                    <p className={`text-[11px] ${photoError ? "text-[#b82e24]" : "text-[#7d6564]"}`}>
+                    <p className={`text-[11px] ${photoError ? "text-[#94532d]" : "text-[#786450]"}`}>
                       {photoError || (language === "en" ? "Add a question, or just send: Al-Dahiya will tell you what it is." : "اكتب سؤالك أو أرسلها كذا، والداهية يقول لك وش هي.")}
                     </p>
                   </div>
                 )}
-                <div className="flex items-center gap-2 rounded-[1.35rem] border border-[#f0d0cc] bg-white p-2 shadow-sm focus-within:border-[#b82e24] focus-within:ring-2 focus-within:ring-[#b82e24]/10">
+                <div className="flex items-center gap-2 rounded-[1.35rem] border border-[#e4cfb3] bg-white p-2 shadow-sm focus-within:border-[#94532d] focus-within:ring-2 focus-within:ring-[#94532d]/10">
                   <button
                     ref={callButtonRef}
                     type="button"
                     onClick={handleStartCall}
                     disabled={isCallAnimating}
-                    className="relative size-11 shrink-0 rounded-2xl bg-[#8e1b12] text-white flex items-center justify-center hover:bg-[#72130c] transition shadow-sm disabled:opacity-80 cursor-pointer"
+                    className="relative size-11 shrink-0 rounded-2xl bg-[#6c3a1c] text-white flex items-center justify-center hover:bg-[#72130c] transition shadow-sm disabled:opacity-80 cursor-pointer"
                     title={t.liveCallTooltip}
                   >
                     <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
                     </span>
-                    <Phone className="size-5 text-rose-200" />
+                    <Phone className="size-5 text-amber-200" />
                   </button>
 
                   <button
@@ -959,7 +966,7 @@ export default function Home() {
                     onClick={handleStartCall}
                     disabled={isCallAnimating}
                     // Opens the same voice call as the phone button: hidden on phones to leave room for typing
-                    className="hidden sm:flex size-11 shrink-0 rounded-2xl bg-[#feeceb] hover:bg-[#fcd9d6] text-[#b82e24] items-center justify-center transition shadow-xs disabled:opacity-80 cursor-pointer"
+                    className="hidden sm:flex size-11 shrink-0 rounded-2xl bg-[#f5eadb] hover:bg-[#eedbc1] text-[#94532d] items-center justify-center transition shadow-xs disabled:opacity-80 cursor-pointer"
                     title={t.micHoldTooltip}
                   >
                     <Mic className="size-5" />
@@ -979,7 +986,7 @@ export default function Home() {
                     type="button"
                     onClick={() => photoInputRef.current?.click()}
                     disabled={isStreaming}
-                    className="size-11 shrink-0 rounded-2xl bg-[#feeceb] hover:bg-[#fcd9d6] text-[#b82e24] flex items-center justify-center transition shadow-xs disabled:opacity-60 cursor-pointer"
+                    className="size-11 shrink-0 rounded-2xl bg-[#f5eadb] hover:bg-[#eedbc1] text-[#94532d] flex items-center justify-center transition shadow-xs disabled:opacity-60 cursor-pointer"
                     title={language === "en" ? "Snap & ask: send a photo" : "صوّر واسأل"}
                     aria-label={language === "en" ? "Snap & ask: send a photo" : "صوّر واسأل"}
                   >
@@ -1002,7 +1009,7 @@ export default function Home() {
                     type="submit"
                     aria-label={language === "en" ? "Send" : "إرسال"}
                     disabled={(!input.trim() && !pendingPhoto) || isStreaming}
-                    className="size-11 shrink-0 rounded-2xl bg-[#b82e24] text-white flex items-center justify-center hover:bg-[#992017] transition disabled:opacity-50"
+                    className="size-11 shrink-0 rounded-2xl bg-[#94532d] text-white flex items-center justify-center hover:bg-[#78411f] transition disabled:opacity-50"
                   >
                     {isStreaming ? (
                       <Loader2 className="size-5 animate-spin" />
@@ -1011,7 +1018,7 @@ export default function Home() {
                     )}
                   </button>
                 </div>
-                <p className="mt-2 text-center text-[10px] text-[#916b69]">
+                <p className="mt-2 text-center text-[10px] text-[#8d7259]">
                   {t.iphoneNotice}
                 </p>
               </form>
@@ -1019,7 +1026,7 @@ export default function Home() {
           </section>
         </section>
 
-        <footer className="pb-2 text-center text-[10px] text-[#916b69]">
+        <footer className="pb-2 text-center text-[10px] text-[#8d7259]">
           {t.footerText}
         </footer>
       </div>

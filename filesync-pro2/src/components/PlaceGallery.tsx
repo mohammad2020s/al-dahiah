@@ -44,13 +44,13 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
   };
 
   return (
-    <div className="pg-enter mt-2 w-full max-w-md rounded-3xl border border-[#f2d6d3] bg-white p-2.5 shadow-sm">
+    <div className="pg-enter mt-2 w-full max-w-md rounded-3xl border border-[#e6d5bd] bg-white p-2.5 shadow-sm">
       <div className="flex items-center justify-between px-1.5 pb-2">
-        <span className="flex items-center gap-1.5 text-xs font-bold text-[#7a1f18]">
-          <Images className="size-4 text-[#b82e24]" />
+        <span className="flex items-center gap-1.5 text-xs font-bold text-[#5c331b]">
+          <Images className="size-4 text-[#94532d]" />
           {isEn ? "Real photos" : "صور حقيقية من المكان"}
         </span>
-        <span dir="ltr" className="text-[11px] font-medium text-[#9a6b67] tabular-nums">
+        <span dir="ltr" className="text-[11px] font-medium text-[#947760] tabular-nums">
           {active + 1} / {count}
         </span>
       </div>
@@ -59,7 +59,7 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
         type="button"
         onClick={() => setViewerOpen(true)}
         {...swipeHandlers}
-        className="group relative block w-full overflow-hidden rounded-2xl bg-[#2b1716] aspect-[4/3] focus-visible:outline-2 focus-visible:outline-[#b82e24]"
+        className="group relative block w-full overflow-hidden rounded-2xl bg-[#2a2016] aspect-[4/3] focus-visible:outline-2 focus-visible:outline-[#94532d]"
         title={isEn ? "Open full screen" : "عرض بملء الشاشة"}
       >
         <img
@@ -94,7 +94,7 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
               onClick={() => setActive(i)}
               style={{ animationDelay: `${80 + i * 60}ms` }}
               className={`pg-thumb relative size-16 shrink-0 snap-start overflow-hidden rounded-xl transition ${
-                i === active ? "ring-2 ring-[#b82e24] ring-offset-2" : "opacity-70 hover:opacity-100"
+                i === active ? "ring-2 ring-[#94532d] ring-offset-2" : "opacity-70 hover:opacity-100"
               }`}
               title={img.caption}
             >

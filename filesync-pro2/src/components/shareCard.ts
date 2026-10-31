@@ -8,7 +8,7 @@ const H = 1350;
 const BRAND = "#B2512F";
 const DARK = "#8f3c22";
 const SOFT = "#D18372";
-const INK = "#321210";
+const INK = "#33251a";
 const MUTED = "#8a6a67";
 
 const digits = (n: number, en: boolean) => (en ? String(n) : n.toLocaleString("ar-SA"));
@@ -65,7 +65,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   const complete = done.length === PASSPORT_STOPS.length;
 
   // Background + red header
-  ctx.fillStyle = "#F1E7E7";
+  ctx.fillStyle = "#f3ebdf";
   ctx.fillRect(0, 0, W, H);
   const grad = ctx.createLinearGradient(0, 0, W, 460);
   grad.addColorStop(0, DARK);
@@ -104,7 +104,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   fitText(ctx, title, W - 120, 800, 84);
   ctx.fillText(title, W / 2, 290);
   ctx.font = '600 34px Alexandria, sans-serif';
-  ctx.fillStyle = "#F1E7E7";
+  ctx.fillStyle = "#f3ebdf";
   ctx.fillText(en ? "Al-Qasab Salt Season · Salt Passport" : "موسم ملح القَصَب · جواز الملح", W / 2, 375);
 
   // Name / certificate line
@@ -155,7 +155,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
       ctx.lineTo(cx + 25, cy - 16);
       ctx.stroke();
     } else {
-      ctx.strokeStyle = "#EAD0CB";
+      ctx.strokeStyle = "#e4d2ba";
       ctx.setLineDash([14, 12]);
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -163,7 +163,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
     }
     ctx.restore();
 
-    ctx.fillStyle = stamped ? INK : "#b9a19e";
+    ctx.fillStyle = stamped ? INK : "#b3a08a";
     fitText(ctx, en ? stop.en : stop.ar, cellW - 40, 700, 32);
     ctx.fillText(en ? stop.en : stop.ar, cx, cy + 90);
   });

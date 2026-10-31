@@ -22,23 +22,23 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md overflow-hidden rounded-[2rem] border border-[#f2d6d3] bg-gradient-to-b from-white to-[#faf3f3] p-6 shadow-2xl sm:p-8">
-        <div className="pointer-events-none absolute -left-16 -top-16 size-48 rounded-full bg-rose-200/40 blur-2xl" />
-        <div className="pointer-events-none absolute -bottom-16 -right-16 size-48 rounded-full bg-red-300/20 blur-2xl" />
+      <div className="relative w-full max-w-md overflow-hidden rounded-[2rem] border border-[#e6d5bd] bg-gradient-to-b from-white to-[#f7f1e7] p-6 shadow-2xl sm:p-8">
+        <div className="pointer-events-none absolute -left-16 -top-16 size-48 rounded-full bg-amber-200/40 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-16 -right-16 size-48 rounded-full bg-orange-300/20 blur-2xl" />
 
         <div className="relative flex flex-col items-center text-center">
           <div className="relative mb-4">
             <AlQasabLogo size="large" />
           </div>
 
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#b82e24]/10 px-3 py-1 text-[11px] font-bold text-[#b82e24]">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#94532d]/10 px-3 py-1 text-[11px] font-bold text-[#94532d]">
             <Globe className="size-3.5" /> Language / اللغة
           </span>
 
-          <h2 className="mt-3 font-['Alexandria'] text-xl font-bold text-[#3a1210] sm:text-2xl">
+          <h2 className="mt-3 font-['Alexandria'] text-xl font-bold text-[#3a2a1c] sm:text-2xl">
             {isFirstVisit ? "مرحباً بك في الداهية" : "تغيير اللغة • Language"}
           </h2>
-          <p className="mt-2 text-xs leading-5 text-[#7a5957] sm:text-sm">
+          <p className="mt-2 text-xs leading-5 text-[#775d46] sm:text-sm">
             {isFirstVisit
               ? "يرجى اختيار لغة الاستخدام للمتابعة • Please select your language to start"
               : "اختر اللغة المناسبة لتجربة تفاعلية مميزة"}
@@ -49,27 +49,27 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({
               onClick={() => onSelectLanguage("ar")}
               className={`group flex w-full items-center justify-between rounded-2xl border p-4 text-right transition-all duration-200 active:scale-[0.98] ${
                 currentLanguage === "ar"
-                  ? "border-[#b82e24] bg-[#b82e24] text-white shadow-md shadow-[#b82e24]/20"
-                  : "border-[#f2d6d3] bg-white text-[#3a1210] hover:border-[#b82e24] hover:bg-[#fff5f4]"
+                  ? "border-[#94532d] bg-[#94532d] text-white shadow-md shadow-[#94532d]/20"
+                  : "border-[#e6d5bd] bg-white text-[#3a2a1c] hover:border-[#94532d] hover:bg-[#faf4ea]"
               }`}
             >
               <div className="flex items-center gap-3">
                 <span
                   className={`grid size-10 place-items-center rounded-xl font-bold text-sm ${
-                    currentLanguage === "ar" ? "bg-white/20 text-white" : "bg-[#fdedec] text-[#b82e24]"
+                    currentLanguage === "ar" ? "bg-white/20 text-white" : "bg-[#f6ecdd] text-[#94532d]"
                   }`}
                 >
                   ض
                 </span>
                 <div className="text-right">
                   <p className="font-['Alexandria'] text-sm font-bold">العربية (Arabic)</p>
-                  <p className={`text-[11px] ${currentLanguage === "ar" ? "text-rose-100" : "text-[#7a5957]"}`}>
+                  <p className={`text-[11px] ${currentLanguage === "ar" ? "text-amber-100" : "text-[#775d46]"}`}>
                     الواجهة والإجابات باللغة العربية
                   </p>
                 </div>
               </div>
               {currentLanguage === "ar" && (
-                <div className="grid size-6 place-items-center rounded-full bg-white text-[#b82e24]">
+                <div className="grid size-6 place-items-center rounded-full bg-white text-[#94532d]">
                   <Check className="size-4 stroke-[3]" />
                 </div>
               )}
@@ -79,27 +79,27 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({
               onClick={() => onSelectLanguage("en")}
               className={`group flex w-full items-center justify-between rounded-2xl border p-4 text-left transition-all duration-200 active:scale-[0.98] ${
                 currentLanguage === "en"
-                  ? "border-[#b82e24] bg-[#b82e24] text-white shadow-md shadow-[#b82e24]/20"
-                  : "border-[#f2d6d3] bg-white text-[#3a1210] hover:border-[#b82e24] hover:bg-[#fff5f4]"
+                  ? "border-[#94532d] bg-[#94532d] text-white shadow-md shadow-[#94532d]/20"
+                  : "border-[#e6d5bd] bg-white text-[#3a2a1c] hover:border-[#94532d] hover:bg-[#faf4ea]"
               }`}
             >
               <div className="flex items-center gap-3">
                 <span
                   className={`grid size-10 place-items-center rounded-xl font-bold text-sm ${
-                    currentLanguage === "en" ? "bg-white/20 text-white" : "bg-[#fdedec] text-[#b82e24]"
+                    currentLanguage === "en" ? "bg-white/20 text-white" : "bg-[#f6ecdd] text-[#94532d]"
                   }`}
                 >
                   EN
                 </span>
                 <div>
                   <p className="font-['Alexandria'] text-sm font-bold">English</p>
-                  <p className={`text-[11px] ${currentLanguage === "en" ? "text-rose-100" : "text-[#7a5957]"}`}>
+                  <p className={`text-[11px] ${currentLanguage === "en" ? "text-amber-100" : "text-[#775d46]"}`}>
                     Interface & responses in English
                   </p>
                 </div>
               </div>
               {currentLanguage === "en" && (
-                <div className="grid size-6 place-items-center rounded-full bg-white text-[#b82e24]">
+                <div className="grid size-6 place-items-center rounded-full bg-white text-[#94532d]">
                   <Check className="size-4 stroke-[3]" />
                 </div>
               )}
@@ -109,7 +109,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({
           {!isFirstVisit && onClose && (
             <button
               onClick={onClose}
-              className="mt-5 text-xs font-semibold text-[#8a6866] hover:text-[#b82e24] hover:underline"
+              className="mt-5 text-xs font-semibold text-[#8a6866] hover:text-[#94532d] hover:underline"
             >
               إلغاء / Cancel
             </button>

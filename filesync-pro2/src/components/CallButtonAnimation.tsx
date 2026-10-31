@@ -103,7 +103,7 @@ export const CallButtonAnimation: React.FC<CallButtonAnimationProps> = ({
 
       {/* Step C: Circular ripple pulse */}
       <div
-        className="absolute rounded-full border-2 border-rose-500/80 bg-rose-500/20 shadow-lg shadow-rose-500/40"
+        className="absolute rounded-full border-2 border-amber-500/80 bg-amber-500/20 shadow-lg shadow-rose-500/40"
         style={{
           left: 0,
           top: 0,
@@ -115,7 +115,7 @@ export const CallButtonAnimation: React.FC<CallButtonAnimationProps> = ({
 
       {/* Step A -> B -> C -> D: The animated call button */}
       <div
-        className="absolute flex items-center justify-center rounded-2xl bg-[#8e1b12] text-white shadow-xl"
+        className="absolute flex items-center justify-center rounded-2xl bg-[#6c3a1c] text-white shadow-xl"
         style={{
           left: 0,
           top: 0,
@@ -124,7 +124,7 @@ export const CallButtonAnimation: React.FC<CallButtonAnimationProps> = ({
           animation: "callButtonFly 1100ms cubic-bezier(0.22, 1, 0.36, 1) forwards",
         }}
       >
-        <Phone className="size-5 text-rose-100" />
+        <Phone className="size-5 text-amber-100" />
       </div>
     </div>
   );

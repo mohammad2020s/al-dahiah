@@ -15,7 +15,7 @@ function TicketLink({ isEn }: { isEn: boolean }) {
       href={TICKETS_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#B2512F] bg-white px-3 py-2 text-xs font-bold text-[#B2512F] hover:bg-[#F1E7E7] active:scale-[0.98] transition"
+      className="relative mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#B2512F] bg-white px-3 py-2 text-xs font-bold text-[#B2512F] hover:bg-[#f3ebdf] active:scale-[0.98] transition"
     >
       <Ticket className="size-4" />
       {isEn ? "Get your free ticket" : "سجّل واحصل على تذكرتك المجانية"}
@@ -44,17 +44,17 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
   if (left <= 0) {
     return (
       <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
-        <div className="flex items-center gap-2 text-sm font-bold text-[#7a1f18]">
+        <div className="flex items-center gap-2 text-sm font-bold text-[#5c331b]">
           <PartyPopper className="size-5 text-amber-600" />
           {isEn ? "Al-Qasab Salt Season is on now!" : "موسم ملح القَصَب انطلق، حيّاكم!"}
         </div>
         <button
           onClick={() => onAsk(isEn ? "What's on at the Salt Season?" : "وش فعاليات موسم الملح؟")}
-          className="mt-3 w-full rounded-xl bg-[#b82e24] px-3 py-2 text-xs font-bold text-white hover:bg-[#992017] active:scale-[0.98] transition"
+          className="mt-3 w-full rounded-xl bg-[#94532d] px-3 py-2 text-xs font-bold text-white hover:bg-[#78411f] active:scale-[0.98] transition"
         >
           {isEn ? "What's on?" : "وش فيه بالموسم؟"}
         </button>
-        <p className="mt-2 text-center text-[11px] font-medium text-[#7d6564]">
+        <p className="mt-2 text-center text-[11px] font-medium text-[#786450]">
           {isEn ? "Daily 4:00–11:00 pm until 28 November · free entry" : "يومياً من ٤ العصر إلى ١١ الليل حتى ٢٨ نوفمبر · الدخول مجاني"}
         </p>
         <TicketLink isEn={isEn} />
@@ -71,7 +71,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
   ];
 
   return (
-    <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-[#EAD0CB] bg-white p-4 shadow-sm">
+    <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-[#e4d2ba] bg-white p-4 shadow-sm">
       {/* Salt crystals drifting in the background */}
       <div className="sc-salt pointer-events-none absolute inset-0" aria-hidden="true" />
       {/* Contour pattern from the «ملح القصب» brand identity */}
@@ -82,11 +82,11 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
       />
       <div className="relative flex items-center justify-between gap-3">
         <div>
-          <span className="flex items-center gap-1.5 text-xs font-bold text-[#3a1210]">
+          <span className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
             <CalendarDays className="size-4 text-[#B2512F]" />
             {isEn ? "Salt Season countdown" : "باقي على موسم ملح القَصَب"}
           </span>
-          <span className="mt-1 inline-block rounded-full border border-[#EAD0CB] bg-[#F1E7E7] px-2 py-0.5 text-[9px] font-bold text-[#B2512F]">
+          <span className="mt-1 inline-block rounded-full border border-[#e4d2ba] bg-[#f3ebdf] px-2 py-0.5 text-[9px] font-bold text-[#B2512F]">
             {isEn ? "4th edition · official" : "النسخة الرابعة · رسمي"}
           </span>
         </div>
@@ -100,7 +100,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
           </div>
         ))}
       </div>
-      <p className="relative mt-2.5 text-center text-[11px] font-medium text-[#7d6564]">
+      <p className="relative mt-2.5 text-center text-[11px] font-medium text-[#786450]">
         {isEn ? `19–28 November 2026 · daily 4:00–11:00 pm · free entry` : `من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦ · يومياً ٤ العصر – ١١ الليل · الدخول مجاني`}
       </p>
       <TicketLink isEn={isEn} />
