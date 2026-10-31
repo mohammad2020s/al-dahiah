@@ -798,7 +798,7 @@ export default function Home() {
           </aside>
 
           {/* Main Chat Container */}
-          <section className="flex-1 flex min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] border border-[#e6d5bd] bg-white/95 shadow-md">
+          <section className="flex-1 flex min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] border border-[#e6d5bd] bg-white/80 shadow-md backdrop-blur-sm">
             {/* Top Bar inside Chat */}
             <div className="flex items-center justify-between border-b border-[#ede1cd] bg-white px-5 py-3.5">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-800">

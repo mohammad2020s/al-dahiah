@@ -330,9 +330,10 @@ body {
 @keyframes bgs-kb-a { from { transform: scale(1.12) translate(1.5%, 1%); } to { transform: scale(1) translate(0, 0); } }
 @keyframes bgs-kb-b { from { transform: scale(1) translate(-1%, 0); } to { transform: scale(1.12) translate(1%, -1%); } }
 .bgs-veil {
+  /* Lighter at the edges so the photos read, a touch denser in the middle behind the text */
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(248, 242, 233, 0.62) 0%, rgba(248, 242, 233, 0.8) 55%),
-    linear-gradient(180deg, rgba(248, 242, 233, 0.55) 0%, rgba(248, 242, 233, 0.82) 100%);
+    radial-gradient(ellipse at 50% 45%, rgba(248, 242, 233, 0.5) 0%, rgba(248, 242, 233, 0.22) 70%),
+    linear-gradient(180deg, rgba(248, 242, 233, 0.2) 0%, rgba(248, 242, 233, 0.45) 100%);
 }
 .bgs-caption { animation: bgs-cap 0.9s ease both; }
 @keyframes bgs-cap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
