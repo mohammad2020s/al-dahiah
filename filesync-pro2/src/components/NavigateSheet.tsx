@@ -99,6 +99,9 @@ function instruction(step: Step, en: boolean): string {
         : en
           ? `Go through the roundabout${on}`
           : `ادخل الدوّار${on}`;
+    case "exit roundabout":
+    case "exit rotary":
+      return en ? `Exit the roundabout${on}` : `اطلع من الدوّار${on}`;
     case "continue":
     case "new name":
       return dir === "straight" ? (en ? `Continue straight${on}` : `كمّل على طول${on}`) : en ? `Keep ${dir}${on}` : `خلّك ${DIR_AR[dir] || ""}${on}`;
