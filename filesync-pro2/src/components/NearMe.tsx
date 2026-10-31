@@ -42,10 +42,11 @@ function fmtDist(d: number, en: boolean) {
   const n = (x: number) => (en ? String(x) : x.toLocaleString("ar-SA"));
   if (d < 1) {
     const m = Math.round((d * 1000) / 10) * 10;
-    return en ? `${m} m · ${walkMin} min walk` : `${n(m)} م · ${n(walkMin)} دقيقة مشي`;
+    if (en) return `${m} m, ${walkMin} min walk`;
+    return `${n(m)} متر، ${walkMin === 1 ? "دقيقة مشي" : walkMin === 2 ? "دقيقتين مشي" : `${n(walkMin)} دقايق مشي`}`;
   }
   const k = Math.round(d * 10) / 10;
-  return en ? `${k} km` : `${n(k)} كم`;
+  return en ? `${k} km` : `${n(k)} كيلو`;
 }
 
 export function NearMe({ language = "ar" }: { language?: Language }) {
@@ -111,7 +112,7 @@ export function NearMe({ language = "ar" }: { language?: Language }) {
       >
         <div className="sadu-strip -mx-4 -mt-4 mb-3 rounded-t-[1.8rem]" />
         <div className="flex items-center justify-between">
-          <h2 className="font-kufi flex items-center gap-2 text-lg font-bold text-[#3a2a1c]">
+          <h2 className="font-['Alexandria'] flex items-center gap-2 text-lg font-bold text-[#3a2a1c]">
             <LocateFixed className="size-5 text-[#94532d]" />
             {en ? "Near me now" : "قريب مني الحين"}
           </h2>

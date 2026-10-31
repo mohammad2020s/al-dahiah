@@ -55,7 +55,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
           {isEn ? "What's on?" : "وش فيه بالموسم؟"}
         </button>
         <p className="mt-2 text-center text-[11px] font-medium text-[#786450]">
-          {isEn ? "Daily 4:00–11:00 pm until 28 November · free entry" : "يومياً من ٤ العصر إلى ١١ الليل حتى ٢٨ نوفمبر · الدخول مجاني"}
+          {isEn ? "Daily 4:00–11:00 pm until 28 November · free entry" : "يومياً من ٤ العصر إلى ١١ الليل حتى ٢٨ نوفمبر، والدخول مجاني"}
         </p>
         <TicketLink isEn={isEn} />
       </div>
@@ -101,7 +101,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
         ))}
       </div>
       <p className="relative mt-2.5 text-center text-[11px] font-medium text-[#786450]">
-        {isEn ? `19–28 November 2026 · daily 4:00–11:00 pm · free entry` : `من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦ · يومياً ٤ العصر – ١١ الليل · الدخول مجاني`}
+        {isEn ? `19–28 November 2026 · daily 4:00–11:00 pm · free entry` : `من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً ٤ العصر إلى ١١ الليل، والدخول مجاني`}
       </p>
       <TicketLink isEn={isEn} />
     </div>

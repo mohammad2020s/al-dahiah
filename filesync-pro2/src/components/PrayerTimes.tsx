@@ -136,7 +136,7 @@ export function PrayerTimes({ language = "ar", onAsk }: { language?: Language; o
       <div className="mt-3 rounded-2xl bg-gradient-to-l from-[#6c3a1c] to-[#94532d] px-3 py-2.5 text-white">
         <p className="text-[11px] text-white/80">{en ? "Next prayer" : "الصلاة الجاية"}</p>
         <p className="text-base font-bold">
-          {en ? next.en : next.ar} · {fmtClock(times[next.key], en)}
+          {en ? next.en : next.ar}{en ? " · " : "، "}{fmtClock(times[next.key], en)}
         </p>
         <p className="text-[11px] text-white/85">{en ? `in ${fmtLeft(left, en)}` : `باقي ${fmtLeft(left, en)}`}</p>
       </div>

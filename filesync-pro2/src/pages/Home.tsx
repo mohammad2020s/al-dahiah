@@ -838,7 +838,7 @@ export default function Home() {
                 <LocateFixed className="size-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="font-kufi block text-sm font-bold text-[#3a2a1c]">{language === "en" ? "Near me now" : "قريب مني الحين"}</span>
+                <span className="font-['Alexandria'] block text-sm font-bold text-[#3a2a1c]">{language === "en" ? "Near me now" : "قريب مني الحين"}</span>
                 <span className="block text-xs text-[#786450]">{language === "en" ? "Nearest mosque, restroom and café" : "أقرب مسجد ودورة مياه ومقهى"}</span>
               </span>
             </button>
@@ -902,7 +902,7 @@ export default function Home() {
             <div className="sadu-strip" aria-hidden="true" />
             {/* Top Bar inside Chat */}
             <div className="flex items-center justify-between border-b border-[#ede1cd] bg-white px-5 py-3.5">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
+              <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
                 <Timer className="size-3 text-emerald-600 animate-pulse" />
                 <span>{t.sevenSecondBadge}</span>
               </div>
@@ -937,7 +937,7 @@ export default function Home() {
                         <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-3.5 pt-12">
                           <span>
                             <span className="block text-[11px] font-semibold text-white/80">{language === "en" ? "Behind you right now" : "اللي وراك الحين"}</span>
-                            <span className="font-kufi block text-base font-bold text-white">{language === "en" ? slide.en : slide.ar}</span>
+                            <span className="font-['Alexandria'] block text-base font-bold text-white">{language === "en" ? slide.en : slide.ar}</span>
                           </span>
                           <span className="shrink-0 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#6c3a1c] shadow">
                             {language === "en" ? "Tell me about it" : "علّمني عنه"}

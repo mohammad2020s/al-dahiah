@@ -93,7 +93,7 @@ export function WelcomeGrandpa({ language = "ar", onCall }: { language?: Languag
         />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <p className="font-kufi text-base font-bold text-[#3a2a1c]">{en ? "Welcome!" : "يا هلا والله!"}</p>
+            <p className="font-['Alexandria'] text-base font-bold text-[#3a2a1c]">{en ? "Welcome!" : "يا هلا والله!"}</p>
             <button type="button" onClick={close} className="-mt-1 grid size-7 shrink-0 place-items-center rounded-full text-[#786450] hover:bg-[#f3ebdf]" aria-label={en ? "Close" : "إغلاق"}>
               <X className="size-4" />
             </button>

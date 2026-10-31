@@ -35,7 +35,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({
             <Globe className="size-3.5" /> Language / اللغة
           </span>
 
-          <h2 className="mt-3 font-kufi text-xl font-bold text-[#3a2a1c] sm:text-2xl">
+          <h2 className="mt-3 font-['Alexandria'] text-xl font-bold text-[#3a2a1c] sm:text-2xl">
             {isFirstVisit ? "مرحباً بك في الداهية" : "تغيير اللغة • Language"}
           </h2>
           <p className="mt-2 text-xs leading-5 text-[#775d46] sm:text-sm">
@@ -62,7 +62,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({
                   ض
                 </span>
                 <div className="text-right">
-                  <p className="font-kufi text-sm font-bold">العربية (Arabic)</p>
+                  <p className="font-['Alexandria'] text-sm font-bold">العربية (Arabic)</p>
                   <p className={`text-[11px] ${currentLanguage === "ar" ? "text-amber-100" : "text-[#775d46]"}`}>
                     الواجهة والإجابات باللغة العربية
                   </p>
@@ -92,7 +92,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({
                   EN
                 </span>
                 <div>
-                  <p className="font-kufi text-sm font-bold">English</p>
+                  <p className="font-['Alexandria'] text-sm font-bold">English</p>
                   <p className={`text-[11px] ${currentLanguage === "en" ? "text-amber-100" : "text-[#775d46]"}`}>
                     Interface & responses in English
                   </p>
