@@ -67,6 +67,13 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
           src={current.src}
           alt={current.caption}
           loading="lazy"
+          // A wide chart (like the season's location key) is shown whole instead of cropped
+          onLoad={(e) => {
+            const im = e.currentTarget;
+            const wide = im.naturalWidth / Math.max(1, im.naturalHeight) > 1.8;
+            im.style.objectFit = wide ? "contain" : "";
+            im.style.background = wide ? "#f1e8df" : "";
+          }}
           className="pg-fade size-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-3 pt-10 text-start">

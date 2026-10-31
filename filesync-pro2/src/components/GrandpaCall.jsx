@@ -123,9 +123,10 @@ const SILENCE_THRESHOLD = 0.02;
 const ATTACK_TIME = 0.06;
 const RELEASE_TIME = 0.13;
 const CLOSED_EPSILON = 0.015;
-// The face sits a bit above the picture's centre: show it larger and shifted down so the face fills the circle
-const PLANE_SIZE = 2.6;
-const PLANE_Y = -0.2;
+// The painting covers the whole view (top edge included: nothing behind it may show), shifted down a
+// little so the face sits in the middle of the circle. The CSS fallback below matches this framing.
+const PLANE_SIZE = 2.64;
+const PLANE_Y = -0.15;
 
 
 function GrandpaScene({ audioLevel = 0, isSpeaking = false, analyserNode = null }) {
@@ -270,7 +271,7 @@ export default function GrandpaCall({
         overflow: 'hidden',
         position: 'relative',
         // Shown while the paintings load
-        background: 'url(/images/shayeb/base.jpg) center 22% / 112% no-repeat, #8a4a32',
+        background: 'url(/images/shayeb/base.jpg) center 2% / 113% no-repeat, #8a4a32',
         boxShadow: '0 25px 60px rgba(0,0,0,0.55)',
         ...style,
       }}
