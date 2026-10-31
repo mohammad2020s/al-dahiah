@@ -388,7 +388,9 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       isCafeQuestion(userPrompt) ||
       isDirectionsQuestion(userPrompt) ||
       // Look at the answer text only for real Gemini answers (the canned welcome mentions cafes)
-      (!usedFallback && (isLocationQuestion(finalAnswer) || isCafeQuestion(finalAnswer))));
+      // (not for the season / its stations: those answers list the season's own coffee stalls)
+      (!usedFallback && topicId !== "season" && topicId !== "season_map" &&
+        (isLocationQuestion(finalAnswer) || isCafeQuestion(finalAnswer))));
 
     const locationData = allPlacesMap
       ? ALL_PLACES_LOCATION
