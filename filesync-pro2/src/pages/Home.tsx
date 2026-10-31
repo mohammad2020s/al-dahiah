@@ -44,6 +44,9 @@ import { PLACE_TOPICS } from "../../server/alQasabKnowledge.ts";
 import { TourRoute } from "../components/TourRoute";
 import { PlaceGallery, type PlaceImage } from "../components/PlaceGallery";
 import { SeasonCountdown } from "../components/SeasonCountdown";
+import { BackgroundSlideshow } from "../components/BackgroundSlideshow";
+import { PrayerTimes } from "../components/PrayerTimes";
+import { DidYouKnow } from "../components/DidYouKnow";
 import { SaltPassport } from "../components/SaltPassport";
 import { Language, translations } from "../i18n";
 
@@ -674,7 +677,10 @@ export default function Home() {
         </Suspense>
       )}
 
-      <div className="relative mx-auto flex min-h-screen max-w-[1480px] flex-col px-4 py-4 sm:px-6 lg:px-8">
+      {/* Photos of Al-Qasab drifting behind the page */}
+      <BackgroundSlideshow language={language} onAsk={(q) => askQuestion(q)} />
+
+      <div className="relative z-[1] mx-auto flex min-h-screen max-w-[1480px] flex-col px-4 py-4 sm:px-6 lg:px-8">
         {/* Header Bar */}
         <header className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[#e6d5bd] bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur">
           {/* Logo & Name */}
@@ -749,9 +755,13 @@ export default function Home() {
 
             <SeasonCountdown language={language} onAsk={askQuestion} />
 
+            <DidYouKnow language={language} onAsk={(q) => askQuestion(q)} />
+
             <TourRoute language={language} onAsk={askQuestion} />
 
             <SaltPassport language={language} />
+
+            <PrayerTimes language={language} onAsk={(q) => askQuestion(q)} />
 
             {/* Weather Card */}
             {weatherData && (

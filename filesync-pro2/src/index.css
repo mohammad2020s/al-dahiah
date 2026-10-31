@@ -313,3 +313,31 @@ body {
   to { transform: scale(1) translate(0, 0); }
 }
 @media (prefers-reduced-motion: reduce) { .vc-kenburns { animation: none; } }
+
+/* ---------- Background photo slideshow (Al-Qasab) ---------- */
+.bgs-slide {
+  position: absolute;
+  inset: -4%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.8s ease;
+  will-change: opacity, transform;
+}
+.bgs-on { opacity: 1; }
+.bgs-kb-a.bgs-on { animation: bgs-kb-a 9s ease-out forwards; }
+.bgs-kb-b.bgs-on { animation: bgs-kb-b 9s ease-out forwards; }
+@keyframes bgs-kb-a { from { transform: scale(1.12) translate(1.5%, 1%); } to { transform: scale(1) translate(0, 0); } }
+@keyframes bgs-kb-b { from { transform: scale(1) translate(-1%, 0); } to { transform: scale(1.12) translate(1%, -1%); } }
+.bgs-veil {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(248, 242, 233, 0.62) 0%, rgba(248, 242, 233, 0.8) 55%),
+    linear-gradient(180deg, rgba(248, 242, 233, 0.55) 0%, rgba(248, 242, 233, 0.82) 100%);
+}
+.bgs-caption { animation: bgs-cap 0.9s ease both; }
+@keyframes bgs-cap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.dyk-fade { animation: bgs-cap 0.7s ease both; }
+@media (prefers-reduced-motion: reduce) {
+  .bgs-slide { transition: none; }
+  .bgs-caption, .dyk-fade { animation: none; }
+}

@@ -42,6 +42,12 @@ type Step = {
 type Route = { line: [number, number][]; steps: Step[]; distance: number; duration: number };
 
 const BRAND = "#94532d";
+// Where a visitor without location can start from
+const START_POINTS = [
+  { ar: "من بوابة الموسم", en: "From the season gate", lat: 25.2983509, lng: 45.5072574 },
+  { ar: "من وسط القَصَب", en: "From the town centre", lat: 25.2914614, lng: 45.5279583 },
+  { ar: "من مدخل القَصَب (طريق ٥٤٦)", en: "From the town entrance (road 546)", lat: 25.3015, lng: 45.5287 },
+];
 const ROUTER = (mode: Mode) =>
   `https://routing.openstreetmap.de/routed-${mode}/route/v1/${mode === "car" ? "driving" : "foot"}`;
 
@@ -156,6 +162,9 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
   const [target, setTarget] = useState<NavTarget | null>(null);
   const [mode, setMode] = useState<Mode>("car");
   const [pos, setPos] = useState<[number, number] | null>(null);
+  const [manual, setManual] = useState(false);
+  const [locIssue, setLocIssue] = useState<null | "device-off" | "site-denied" | "unavailable">(null);
+  const manualRef = useRef(false);
   const [route, setRoute] = useState<Route | null>(null);
   const [stepIdx, setStepIdx] = useState(0);
   const [error, setError] = useState<string>("");
@@ -178,6 +187,9 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
       setTarget(t);
       setRoute(null);
       setPos(null);
+      setManual(false);
+      manualRef.current = false;
+      setLocIssue(null);
       setStepIdx(0);
       setError("");
       setFollow(true);
@@ -205,22 +217,41 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
       setError(en ? "Location isn't available on this device." : "جهازك ما يدعم تحديد الموقع.");
       return;
     }
-    const id = navigator.geolocation.watchPosition(
-      (p) => setPos([p.coords.latitude, p.coords.longitude]),
-      (err) =>
-        setError(
-          err.code === 1
-            ? en
-              ? "Allow location access so I can guide you there."
-              : "اسمح للموقع بمعرفة مكانك عشان أوجّهك."
-            : en
-              ? "Couldn't find your location yet."
-              : "ما قدرت أحدد مكانك للحين."
-        ),
-      { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 }
-    );
+    let id = 0;
+    let lowAccuracy = false;
+    const onFix = (p: GeolocationPosition) => {
+      if (manualRef.current) return;
+      setPos([p.coords.latitude, p.coords.longitude]);
+      setLocIssue(null);
+    };
+    const onFail = async (err: GeolocationPositionError) => {
+      if (err.code === 3 && !lowAccuracy) {
+        // No GPS fix in time (common indoors / on computers): try the network position
+        lowAccuracy = true;
+        navigator.geolocation.clearWatch(id);
+        id = navigator.geolocation.watchPosition(onFix, onFail, { enableHighAccuracy: false, maximumAge: 60000, timeout: 20000 });
+        return;
+      }
+      // «Denied» while the site itself is allowed means the device's location service is off
+      let siteAllowed = false;
+      try {
+        siteAllowed = (await navigator.permissions?.query({ name: "geolocation" as PermissionName }))?.state === "granted";
+      } catch {
+        /* older browsers */
+      }
+      setLocIssue(err.code === 1 ? (siteAllowed ? "device-off" : "site-denied") : "unavailable");
+    };
+    id = navigator.geolocation.watchPosition(onFix, onFail, { enableHighAccuracy: true, maximumAge: 3000, timeout: 15000 });
     return () => navigator.geolocation.clearWatch(id);
   }, [target, en]);
+
+  // Without a live position the visitor can pick where they start from
+  const startFrom = (p: [number, number]) => {
+    manualRef.current = true;
+    setManual(true);
+    setPos(p);
+    setLocIssue(null);
+  };
 
   // Map
   useEffect(() => {
@@ -237,6 +268,9 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
       .addTo(map)
       .bindTooltip(target.name, { direction: "top", offset: [0, -28] });
     map.on("dragstart", () => setFollow(false));
+    map.on("click", (e: L.LeafletMouseEvent) => {
+      if (manualRef.current || !layersRef.current.me) startFrom([e.latlng.lat, e.latlng.lng]);
+    });
     mapRef.current = map;
     setTimeout(() => map.invalidateSize(), 300);
     return () => {
@@ -380,7 +414,12 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
           ) : (
             <p className="flex items-center gap-2 text-sm">
               <Loader2 className="size-4 animate-spin" />
-              {error || (pos ? (en ? "Finding the way…" : "أجهّز لك الطريق…") : en ? "Finding your location…" : "أحدد مكانك…")}
+              {error ||
+                (pos
+                  ? en ? "Finding the way…" : "أجهّز لك الطريق…"
+                  : locIssue
+                    ? en ? "Choose where you start from" : "اختر من وين تبدأ"
+                    : en ? "Finding your location…" : "أحدد مكانك…")}
             </p>
           )}
           <p className="truncate text-[11px] text-white/70">
@@ -422,6 +461,54 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
             {voice ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
           </button>
         </div>
+        {!pos && locIssue && (
+          <div className="absolute inset-x-3 top-3 z-[500] space-y-2 rounded-2xl bg-white/97 p-3 text-xs text-[#3a2a1c] shadow-lg">
+            <p className="font-bold text-[#6c3a1c]">
+              {locIssue === "device-off"
+                ? en
+                  ? "Your device's location service is off."
+                  : "خدمة تحديد الموقع مقفلة في جهازك."
+                : locIssue === "site-denied"
+                  ? en
+                    ? "Location access is blocked for this site."
+                    : "تحديد الموقع ممنوع لهذا الموقع في المتصفح."
+                  : en
+                    ? "Couldn't find your location."
+                    : "ما قدرت أحدد مكانك."}
+            </p>
+            <p className="leading-5 text-[#584535]">
+              {locIssue === "device-off"
+                ? en
+                  ? "Turn it on: Windows → Settings → Privacy & security → Location; iPhone → Settings → Privacy → Location Services → your browser; Android → Settings → Location."
+                  : "فعّلها من: ويندوز ← الإعدادات ← الخصوصية والأمان ← الموقع. آيفون ← الإعدادات ← الخصوصية ← خدمات الموقع ← المتصفح. أندرويد ← الإعدادات ← الموقع."
+                : locIssue === "site-denied"
+                  ? en
+                    ? "Tap the lock icon next to the address and allow Location, then reopen."
+                    : "اضغط على القفل جنب رابط الموقع واسمح بـ«الموقع»، وبعدين افتحها من جديد."
+                  : en
+                    ? "Try again outdoors, or choose where you start from:"
+                    : "جرّب برّا المبنى، أو اختر من وين تبدأ:"}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {START_POINTS.map((p) => (
+                <button
+                  key={p.ar}
+                  type="button"
+                  onClick={() => startFrom([p.lat, p.lng])}
+                  className="rounded-lg bg-[#94532d] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#78411f]"
+                >
+                  {en ? p.en : p.ar}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-[#786450]">{en ? "…or tap the map where you are." : "…أو اضغط على الخريطة في مكانك."}</p>
+          </div>
+        )}
+        {manual && route && (
+          <div className="absolute inset-x-3 top-3 z-[500] rounded-xl bg-white/95 px-3 py-2 text-[11px] font-bold text-[#6c3a1c] shadow">
+            {en ? "Route from the start point you chose (live tracking is off)." : "الطريق من نقطة البداية اللي اخترتها (بدون تتبّع مباشر)."}
+          </div>
+        )}
         {error && route && (
           <div className="absolute inset-x-3 top-3 z-[500] rounded-xl bg-white/95 px-3 py-2 text-xs font-bold text-[#6c3a1c] shadow">{error}</div>
         )}
