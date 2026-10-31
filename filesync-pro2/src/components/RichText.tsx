@@ -2,16 +2,41 @@ import React from "react";
 
 // Light formatting for the guide's answers: «**bold**» becomes bold and «* item» / «- item»
 // lines become bullets, so model markdown never shows as raw asterisks. Anything else is plain text.
+// Web addresses («qasab-tickets.pages.dev», «https://qasabcity.com») become tappable links kept
+// left-to-right, so they don't break apart inside Arabic text
+const LINK_RE = /((?:https?:\/\/)?(?:[a-z0-9-]+\.)+(?:com|dev|sa|org|net|app|gov\.sa)(?:\/[^\s)»،]*[^\s)»،.,!?؟])?)/gi;
+function links(text: string, keyBase: string) {
+  const parts = text.split(LINK_RE);
+  return parts.map((p, i) =>
+    i % 2 === 1 ? (
+      <a
+        key={`${keyBase}-l${i}`}
+        href={/^https?:/i.test(p) ? p : `https://${p}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        dir="ltr"
+        className="inline-block font-bold underline decoration-[#94532d]/40 underline-offset-2 hover:decoration-[#94532d]"
+      >
+        {p.replace(/^https?:\/\//i, "")}
+      </a>
+    ) : (
+      <React.Fragment key={`${keyBase}-t${i}`}>{p}</React.Fragment>
+    )
+  );
+}
+
 function inline(text: string, keyBase: string) {
   const parts = text.split(/(\*\*[^*\n]+\*\*)/g);
   return parts.map((p, i) =>
     /^\*\*[^*\n]+\*\*$/.test(p) ? (
       <strong key={`${keyBase}-${i}`} className="font-bold">
-        {p.slice(2, -2)}
+        {links(p.slice(2, -2), `${keyBase}-${i}`)}
       </strong>
     ) : (
       // Stray single asterisks or heading hashes left by the model
-      <React.Fragment key={`${keyBase}-${i}`}>{p.replace(/\*\*/g, "").replace(/(^|\s)\*(?=\S)|(?<=\S)\*(\s|$)/g, "$1$2")}</React.Fragment>
+      <React.Fragment key={`${keyBase}-${i}`}>
+        {links(p.replace(/\*\*/g, "").replace(/(^|\s)\*(?=\S)|(?<=\S)\*(\s|$)/g, "$1$2"), `${keyBase}-${i}`)}
+      </React.Fragment>
     )
   );
 }
@@ -21,6 +46,8 @@ export function RichText({ text, className = "" }: { text: string; className?: s
   const lines = text
     .replace(/\r/g, "")
     .replace(/([^\n])[ \t]+([0-9٠-٩]{1,2})[.)][ \t]+(?=\S)/g, "$1\n$2. ")
+    // …and so do dash bullets written inline after a colon or full stop («القصب: - الحالة: صافي. - الرياح…»)
+    .replace(/([:.،%)])[ \t]+[-•][ \t]+(?=\S)/g, "$1\n- ")
     .split("\n");
   return (
     <div className={className}>
