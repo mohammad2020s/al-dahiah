@@ -373,14 +373,19 @@ body {
 .night [class*="bg-white"] { background-color: rgba(42, 29, 20, 0.92); }
 .night [class*="bg-[#faf4ea]"], .night [class*="bg-[#fbf6ee]"], .night [class*="bg-[#fdfaf5]"],
 .night [class*="bg-[#f5eadb]"], .night [class*="bg-[#f3ebdf]"], .night [class*="bg-[#f8f2e9]"],
-.night [class*="bg-[#f1e8df]"], .night [class*="bg-[#eedbc1]"], .night .bg-emerald-50, .night .bg-amber-50 {
+.night [class*="bg-[#f1e8df]"], .night [class*="bg-[#eedbc1]"], .night .bg-emerald-50, .night .bg-amber-50,
+.night [class*="bg-[#fcf8f1]"], .night [class*="bg-[#fcf7ef]"], .night [class*="bg-[#f8efe2]"], .night [class*="bg-[#f6ecdd]"],
+.night [class*="bg-[#fbf5ec]"], .night [class*="bg-[#ede1ce]"], .night [class*="bg-[#eadbc6]"] {
   background-color: #3a281b;
 }
-.night [class*="from-amber-50"] { background-image: none; background-color: rgba(42, 29, 20, 0.92); }
+.night [class*="from-amber-50"], .night [class*="to-[#fbf5ec]"], .night [class*="to-[#f7f1e7]"] { background-image: none; background-color: rgba(42, 29, 20, 0.92); }
 .night [class*="text-[#3a2a1c]"], .night [class*="text-[#2e2218]"], .night [class*="text-[#584535]"],
-.night [class*="text-[#685140]"], .night [class*="text-[#5c331b]"], .night [class*="text-[#4a3626]"] { color: #f1e6d4; }
+.night [class*="text-[#685140]"], .night [class*="text-[#5c331b]"], .night [class*="text-[#4a3626]"],
+.night [class*="text-[#33251a]"], .night [class*="text-[#241515]"], .night [class*="text-[#4a2f2d]"], .night [class*="text-[#6d2520]"],
+.night .text-amber-900, .night .text-amber-800 { color: #f1e6d4; }
 .night [class*="text-[#786450]"], .night [class*="text-[#775c46]"], .night [class*="text-[#8d7259]"],
-.night [class*="text-[#947760]"], .night [class*="text-[#a8744a]"] { color: #cbb69c; }
+.night [class*="text-[#947760]"], .night [class*="text-[#a8744a]"], .night [class*="text-[#775d46]"],
+.night [class*="text-[#8a6866]"] { color: #cbb69c; }
 .night [class*="text-[#94532d]"], .night [class*="text-[#6c3a1c]"], .night [class*="text-[#844826]"],
 .night [class*="text-[#78411f]"], .night [class*="text-[#B2512F]"], .night .text-emerald-800 { color: #e6b07e; }
 .night [class*="border-[#e"], .night [class*="border-[#d9c09f]"], .night .border-amber-200, .night .border-emerald-200 { border-color: #4d3727; }
