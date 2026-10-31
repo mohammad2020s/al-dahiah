@@ -287,8 +287,13 @@ export const AL_QASAB_CAFES: CafePlace[] = [
 ];
 
 /** «الأماكن السياحية على الخريطة»: every place pinned, none highlighted */
-// Mosques from Google Maps whose names carry no family name (Rule 3); the main Friday mosque first
+// Mosques from Google Maps whose names carry no family name (Rule 3): the old town's first
+// (named by the site owner), then the rest of town
 export const AL_QASAB_MOSQUES = [
+  { id: "mosque_qasr", name: "جامع القصر (جنب قصر الزاحم)", nameEn: "Al-Qasr Mosque (by Al-Zahim palace)", lat: 25.2992415, lng: 45.5072446 },
+  { id: "mosque_libda", name: "مسجد لبده (في الديرة القديمة)", nameEn: "Libda Mosque (old town)", lat: 25.2983552, lng: 45.5062411 },
+  { id: "mosque_mashara", name: "مسجد مسهرة (في الديرة القديمة)", nameEn: "Mashara Mosque (old town)", lat: 25.297265, lng: 45.5060651 },
+  { id: "mosque_balwa", name: "مسجد بلوى (في الديرة القديمة)", nameEn: "Balwa Mosque (old town)", lat: 25.2964106, lng: 45.506785 },
   { id: "mosque_shuba", name: "مسجد الشعبة (جنب القرية التراثية)", nameEn: "Al-Shu'ba Mosque (by the heritage village)", lat: 25.2998375, lng: 45.5053516 },
   { id: "mosque_king_abdulaziz", name: "جامع الملك عبدالعزيز", nameEn: "King Abdulaziz Mosque", lat: 25.2914614, lng: 45.5279583 },
   { id: "mosque_baladiya", name: "مسجد البلدية", nameEn: "Municipality Mosque", lat: 25.2986898, lng: 45.5161801 },
@@ -318,6 +323,7 @@ export const RESTROOMS_LOCATION = {
   nameEn: "Nearest restrooms",
   coordinates: { lat: AL_QASAB_MOSQUES[0].lat, lng: AL_QASAB_MOSQUES[0].lng },
   pins: [
+    { id: "wc_qasr", name: "دورات مياه جامع القصر (جنب قصر الزاحم وأرض الموسم)", nameEn: "Al-Qasr Mosque facilities (by Al-Zahim palace and the season grounds)", lat: 25.2992415, lng: 45.5072446, kind: "wc" as const },
     { id: "wc_shuba", name: "دورات مياه مسجد الشعبة (جنب القرية التراثية)", nameEn: "Al-Shu'ba Mosque facilities (by the heritage village)", lat: 25.2998375, lng: 45.5053516, kind: "wc" as const },
     { id: "wc_baladiya", name: "دورات مياه مسجد البلدية", nameEn: "Municipality Mosque facilities", lat: 25.2986898, lng: 45.5161801, kind: "wc" as const },
     { id: "wc_akrashiya", name: "دورات مياه روضة العكرشية (رجال ونساء)", nameEn: "Rawdat Al-Akrashiya restrooms (men & women)", lat: AKRASHIYA_FACILITIES.lat, lng: AKRASHIYA_FACILITIES.lng, kind: "wc" as const },

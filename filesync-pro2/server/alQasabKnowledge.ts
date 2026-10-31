@@ -322,11 +322,11 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "mosques",
     titleAr: "المساجد في القَصَب",
     titleEn: "Mosques in Al-Qasab",
-    keywords: ["مسجد", "مساجد", "جامع", "اصلي", "صلاه", "مصلي العيد", "mosque", "pray"],
+    keywords: ["مسجد", "مساجد", "جامع", "اصلي", "صلاه", "مصلي العيد", "مسهره", "لبده", "بلوي", "mosque", "pray"],
     answerAr:
-      "أبشر، هذي أبرز مساجد القَصَب على الخريطة تحت (الدبابيس الخضراء):\n• مسجد الشعبة، جنب القرية التراثية وأرض الموسم، أقربها لك وأنت تتجول.\n• جامع الملك عبدالعزيز.\n• مسجد البلدية، ومسجد أبو بكر الصديق، ومسجد ابن باز، ومسجد الشيخ محمد بن عبدالوهاب، ومسجد الإحسان.\n• ومصلى العيد بمركز القَصَب.\nوإذا رحت روضة العكرشية فيها مسجد بعد. اضغط «خذني له» جنب أي مسجد.",
+      "أبشر، هذي أبرز مساجد القَصَب على الخريطة تحت (الدبابيس الخضراء):\n• في الديرة القديمة: جامع القصر جنب قصر الزاحم، ومسجد لبده، ومسجد مسهرة، ومسجد بلوى، ومسجد الشعبة، وهي أقربها لك وأنت تتجول في القرية التراثية وأرض الموسم.\n• جامع الملك عبدالعزيز.\n• مسجد البلدية، ومسجد أبو بكر الصديق، ومسجد ابن باز، ومسجد الشيخ محمد بن عبدالوهاب، ومسجد الإحسان.\n• ومصلى العيد بمركز القَصَب.\nوإذا رحت روضة العكرشية فيها مسجد بعد. اضغط «خذني له» جنب أي مسجد.",
     answerEn:
-      "Here are Al-Qasab's main mosques, pinned in green on the map below:\n• Al-Shu'ba Mosque, next to the heritage village and the season grounds, the nearest while you walk around.\n• King Abdulaziz Mosque.\n• The Municipality Mosque, Abu Bakr Al-Siddiq Mosque, Ibn Baz Mosque, Sheikh Muhammad bin Abdulwahhab Mosque and Al-Ihsan Mosque.\n• The Eid prayer ground.\nRawdat Al-Akrashiya also has a mosque. Tap «Take me there» next to any of them.",
+      "Here are Al-Qasab's main mosques, pinned in green on the map below:\n• In the old town: Al-Qasr Mosque by Al-Zahim palace, Libda, Mashara and Balwa mosques, and Al-Shu'ba Mosque, the nearest while you walk around the heritage village and the season grounds.\n• King Abdulaziz Mosque.\n• The Municipality Mosque, Abu Bakr Al-Siddiq Mosque, Ibn Baz Mosque, Sheikh Muhammad bin Abdulwahhab Mosque and Al-Ihsan Mosque.\n• The Eid prayer ground.\nRawdat Al-Akrashiya also has a mosque. Tap «Take me there» next to any of them.",
   },
   {
     id: "restrooms",
@@ -334,7 +334,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Restrooms",
     keywords: ["دوره مياه", "دورات مياه", "دورات المياه", "دوره المياه", "حمامات", "وين الحمام", "تواليت", "مرحاض", "toilet", "restroom", "bathroom", "wc"],
     answerAr:
-      "ما فيه دورات مياه عامة مسجّلة داخل البلد، بس أقرب شي لك دورات مياه المساجد: مسجد الشعبة جنب القرية التراثية وأرض الموسم، ومسجد البلدية. وفي روضة العكرشية دورات مياه للرجال والنساء. وأيام الموسم اسأل في منطقة التسجيل أو خيمة الضيافة عن أقرب دورات مياه. تلقاها على الخريطة تحت (الدبابيس الزرقاء).",
+      "ما فيه دورات مياه عامة مسجّلة داخل البلد، بس أقرب شي لك دورات مياه المساجد: جامع القصر جنب قصر الزاحم وأرض الموسم، ومسجد الشعبة جنب القرية التراثية، ومسجد البلدية. وفي روضة العكرشية دورات مياه للرجال والنساء. وأيام الموسم اسأل في منطقة التسجيل أو خيمة الضيافة عن أقرب دورات مياه. تلقاها على الخريطة تحت (الدبابيس الزرقاء).",
     answerEn:
       "There are no public toilets listed inside the town; the nearest are the mosque facilities: Al-Shu'ba Mosque next to the heritage village and the season grounds, and the Municipality Mosque. Rawdat Al-Akrashiya has men's and women's restrooms. During the Salt Season, ask at the registration area or the hospitality tent for the nearest ones. They're pinned in blue on the map below.",
   },
