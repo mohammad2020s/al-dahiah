@@ -877,7 +877,7 @@ registerProcessor('mic-processor', MicProcessor);`;
           <div>
             <h3 className="font-bold text-sm text-[#fbf5ec] flex items-center gap-2">
               {isEn ? "Live Voice Broadcast • Al-Dahiya" : "بث صوتي مباشر • الداهية"}
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-300 border border-amber-500/30">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[11px] text-amber-300 border border-amber-500/30">
                 <Sparkles className="size-3" />
                 Gemini Live Native Audio
               </span>
@@ -1017,7 +1017,7 @@ registerProcessor('mic-processor', MicProcessor);`;
                 >
                   {showcase.images[showcaseIndex]?.caption}
                   {showcase.images[showcaseIndex]?.credit && (
-                    <span className="mt-0.5 block text-[10px] font-normal text-white/70">{showcase.images[showcaseIndex].credit}</span>
+                    <span className="mt-0.5 block text-[11px] font-normal text-white/70">{showcase.images[showcaseIndex].credit}</span>
                   )}
                 </p>
                 <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1.5">

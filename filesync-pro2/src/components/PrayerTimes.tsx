@@ -129,7 +129,7 @@ export function PrayerTimes({ language = "ar", onAsk }: { language?: Language; o
           <Clock className="size-4 text-[#94532d]" />
           {en ? "Prayer times in Al-Qasab" : "أوقات الصلاة في القَصَب"}
         </span>
-        <span className="rounded-full border border-[#e4d2ba] bg-[#f3ebdf] px-2 py-0.5 text-[9px] font-bold text-[#94532d]">
+        <span className="rounded-full border border-[#e4d2ba] bg-[#f3ebdf] px-2 py-0.5 text-[11px] font-bold text-[#94532d]">
           {en ? "Umm Al-Qura" : "تقويم أم القرى"}
         </span>
       </div>
@@ -149,7 +149,7 @@ export function PrayerTimes({ language = "ar", onAsk }: { language?: Language; o
             }`}
           >
             <Icon className="mx-auto size-3.5 text-[#94532d]" />
-            <p className="mt-0.5 text-[10px] font-bold text-[#584535]">{en ? enName : ar}</p>
+            <p className="mt-0.5 text-[11px] font-bold text-[#584535]">{en ? enName : ar}</p>
             <p className="text-[11px] font-bold tabular-nums text-[#3a2a1c]">{fmtClock(times[key], en)}</p>
           </div>
         ))}

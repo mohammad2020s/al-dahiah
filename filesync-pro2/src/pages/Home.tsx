@@ -24,6 +24,12 @@ import {
   CornerDownLeft,
   Ticket,
   Navigation,
+  Moon,
+  Sun,
+  LocateFixed,
+  ChevronDown,
+  Landmark,
+  ScrollText,
 } from "lucide-react";
 import { MalhAlQasabLogo, TanmiahLogo } from "../components/BrandLogos";
 import { RichText } from "../components/RichText";
@@ -44,8 +50,11 @@ import { PLACE_TOPICS } from "../../server/alQasabKnowledge.ts";
 import { TourRoute } from "../components/TourRoute";
 import { PlaceGallery, type PlaceImage } from "../components/PlaceGallery";
 import { SeasonCountdown } from "../components/SeasonCountdown";
-import { BackgroundSlideshow } from "../components/BackgroundSlideshow";
-import { PrayerTimes } from "../components/PrayerTimes";
+import { BackgroundSlideshow, SLIDES } from "../components/BackgroundSlideshow";
+import { PrayerTimes, prayerTimes } from "../components/PrayerTimes";
+import { NearMe, openNearMe } from "../components/NearMe";
+import { WelcomeGrandpa } from "../components/WelcomeGrandpa";
+import { MobileBar, FloatingCall } from "../components/MobileBar";
 import { DidYouKnow } from "../components/DidYouKnow";
 import { SaltPassport } from "../components/SaltPassport";
 import { Language, translations } from "../i18n";
@@ -123,12 +132,12 @@ function WeatherCard({ weather, language = "ar" }: { weather: WeatherData; langu
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-xs font-bold text-[#3a2a1c]">{t.weatherCardTitle}</h3>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#94532d]/10 px-2 py-0.5 text-[10px] font-semibold text-[#94532d]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#94532d]/10 px-2 py-0.5 text-[11px] font-semibold text-[#94532d]">
                 <span className="size-1.5 rounded-full bg-[#94532d] animate-pulse" />
                 {weather.source === "fallback" ? t.weatherFallbackBadge : t.weatherLiveBadge}
               </span>
             </div>
-            <p className="mt-0.5 text-[10px] text-[#786450]">
+            <p className="mt-0.5 text-[11px] text-[#786450]">
               {weather.source === "fallback" ? t.weatherFallbackAttribution : t.weatherGoogleAttribution}
             </p>
           </div>
@@ -141,19 +150,19 @@ function WeatherCard({ weather, language = "ar" }: { weather: WeatherData; langu
 
       <div className="mt-3.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[10px] font-medium text-[#786450]">{t.weatherCondition}</p>
+          <p className="text-[11px] font-medium text-[#786450]">{t.weatherCondition}</p>
           <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.conditionText}</p>
         </div>
         <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[10px] font-medium text-[#786450]">{t.weatherFeelsLike}</p>
+          <p className="text-[11px] font-medium text-[#786450]">{t.weatherFeelsLike}</p>
           <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.feelsLike}° {t.celsius}</p>
         </div>
         <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[10px] font-medium text-[#786450]">{t.weatherHumidity}</p>
+          <p className="text-[11px] font-medium text-[#786450]">{t.weatherHumidity}</p>
           <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.humidity}%</p>
         </div>
         <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[10px] font-medium text-[#786450]">{t.weatherWindSpeed}</p>
+          <p className="text-[11px] font-medium text-[#786450]">{t.weatherWindSpeed}</p>
           <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.windSpeed} {t.weatherKmH}</p>
         </div>
       </div>
@@ -262,7 +271,7 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
               <button
                 type="button"
                 onClick={() => openNavigation({ lat: p.lat, lng: p.lng, name: language === "en" && p.nameEn ? p.nameEn : p.name })}
-                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2 py-1 text-[10px] font-bold text-white hover:bg-[#78411f]"
+                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2 py-1 text-[11px] font-bold text-white hover:bg-[#78411f]"
               >
                 <Navigation className="size-3" />
                 {language === "en" ? "Take me there" : "خذني له"}
@@ -284,12 +293,12 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
                   <div>
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-bold text-[#33251a]">{place.name}</span>
-                      <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[9px] font-extrabold text-amber-800">
+                      <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[11px] font-extrabold text-amber-800">
                         <Star className="size-2.5 fill-amber-500 text-amber-500" />
                         {place.rating} / 5
                       </span>
                     </div>
-                    <p className="mt-1 text-[10.5px] text-[#584535]">{place.description}</p>
+                    <p className="mt-1 text-[11px] text-[#584535]">{place.description}</p>
                   </div>
                   <button
                     type="button"
@@ -298,7 +307,7 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
                         ? openNavigation({ lat: place.coordinates.lat, lng: place.coordinates.lng, name: place.name })
                         : window.open(place.directionsUrl, "_blank", "noopener")
                     }
-                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2 py-1 text-[10px] font-bold text-white shadow-xs hover:bg-[#78411f]"
+                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2 py-1 text-[11px] font-bold text-white shadow-xs hover:bg-[#78411f]"
                   >
                     <Navigation className="size-3" />
                     <span>{language === "en" ? "Take me there" : "خذني له"}</span>
@@ -445,6 +454,24 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
   );
 }
 
+// Night look after Maghrib until sunrise in Al-Qasab (the season runs 4–11 pm), unless the
+// visitor picked day or night themselves
+function isNightInQasab() {
+  const now = new Date(Date.now() + 3 * 3600_000);
+  const h = now.getUTCHours() + now.getUTCMinutes() / 60;
+  const t = prayerTimes(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate());
+  return h >= t.maghrib || h < t.sunrise;
+}
+type ThemePick = "auto" | "day" | "night";
+function readTheme(): ThemePick {
+  try {
+    const v = localStorage.getItem("dahiah:theme");
+    return v === "day" || v === "night" ? v : "auto";
+  } catch {
+    return "auto";
+  }
+}
+
 export default function Home() {
   const [language, setLanguage] = useState<Language>("ar");
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
@@ -468,6 +495,36 @@ export default function Home() {
     return () => mq.removeEventListener?.("change", on);
   }, []);
   const photoInputRef = useRef<HTMLInputElement | null>(null);
+  const [slideIdx, setSlideIdx] = useState(0);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [themePick, setThemePick] = useState<ThemePick>(readTheme);
+  const [autoNight, setAutoNight] = useState(isNightInQasab);
+  useEffect(() => {
+    const id = setInterval(() => setAutoNight(isNightInQasab()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const night = themePick === "night" || (themePick === "auto" && autoNight);
+  const toggleTheme = () => {
+    const next: ThemePick = night ? "day" : "night";
+    // Going back to what the clock says means "auto" again
+    const pick: ThemePick = next === (autoNight ? "night" : "day") ? "auto" : next;
+    setThemePick(pick);
+    try {
+      localStorage.setItem("dahiah:theme", pick);
+    } catch {}
+  };
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    meta?.setAttribute("content", night ? "#1f1610" : "#94532d");
+  }, [night]);
+  const goToChat = () => {
+    document.getElementById("chat-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => textareaRef.current?.focus({ preventScroll: true }), 450);
+  };
+  const goToSeason = () => {
+    setMoreOpen(true);
+    setTimeout(() => document.getElementById("season-panel")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  };
 
   const messageEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -648,7 +705,7 @@ export default function Home() {
   return (
     <main
       dir={language === "ar" ? "rtl" : "ltr"}
-      className="soft-grid relative min-h-screen overflow-hidden bg-[#f8f2e9] text-[#2e2218]"
+      className={`soft-grid relative min-h-screen overflow-hidden bg-[#f8f2e9] text-[#2e2218] ${night ? "night" : ""}`}
     >
       <LanguageModal
         isOpen={isLanguageModalOpen}
@@ -666,6 +723,10 @@ export default function Home() {
 
       {/* In-site turn-by-turn directions, opened by every «خذني لها» button */}
       <NavigateSheet language={language} />
+      <NearMe language={language} />
+      <WelcomeGrandpa language={language} onCall={handleStartCall} />
+      <MobileBar language={language} onChat={goToChat} onCall={handleStartCall} onMore={goToSeason} />
+      <FloatingCall language={language} onCall={handleStartCall} />
 
       {isVoiceCallOpen && (
         <Suspense fallback={null}>
@@ -678,19 +739,19 @@ export default function Home() {
       )}
 
       {/* Photos of Al-Qasab drifting behind the page */}
-      <BackgroundSlideshow language={language} onAsk={(q) => askQuestion(q)} />
+      <BackgroundSlideshow language={language} onAsk={(q) => askQuestion(q)} onChange={setSlideIdx} />
 
-      <div className="relative z-[1] mx-auto flex min-h-screen max-w-[1480px] flex-col px-4 py-4 sm:px-6 lg:px-8">
+      <div className="relative z-[1] mx-auto flex min-h-screen max-w-[1480px] flex-col px-4 pt-4 pb-28 sm:px-6 lg:px-8 lg:pb-4">
         {/* Header Bar */}
         <header className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[#e6d5bd] bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur">
           {/* Logo & Name */}
           <div className="flex items-center gap-3">
             <MalhAlQasabLogo size="md" className="rounded-2xl" />
             <div>
-              <h1 className="font-['Alexandria'] text-xl sm:text-2xl font-bold leading-none text-[#78411f]">
+              <h1 className="font-kufi text-xl sm:text-2xl font-bold leading-none text-[#78411f]">
                 الداهية
               </h1>
-              <p className="mt-1 text-[10px] font-semibold text-[#a14e47]">
+              <p className="mt-1 text-[11px] font-semibold text-[#94532d]">
                 {t.tagline}
               </p>
             </div>
@@ -699,8 +760,8 @@ export default function Home() {
           {/* Sponsor Tag */}
           <div className="flex items-center gap-2.5 rounded-full border border-[#e6d5bd] bg-[#fdfaf5] px-4 py-1.5 shadow-xs">
             <div className="text-right leading-tight">
-              <p className="text-[9px] font-medium text-[#a8744a]">{t.sponsoredBy}</p>
-              <p className="mt-0.5 text-[11px] font-bold text-[#6a1914]">
+              <p className="text-[11px] font-medium text-[#a8744a]">{t.sponsoredBy}</p>
+              <p className="mt-0.5 text-[11px] font-bold text-[#5c331b]">
                 {t.sponsorName}
               </p>
             </div>
@@ -716,6 +777,15 @@ export default function Home() {
               <span>{t.onlineStatus}</span>
             </div>
 
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="grid size-8 place-items-center rounded-xl border border-[#e6d5bd] bg-[#fbf6ee] text-[#6c3a1c] shadow-xs hover:bg-[#f5eadb] transition"
+              title={night ? (language === "en" ? "Day look" : "الوضع النهاري") : language === "en" ? "Night look" : "الوضع الليلي"}
+              aria-label={night ? (language === "en" ? "Day look" : "الوضع النهاري") : language === "en" ? "Night look" : "الوضع الليلي"}
+            >
+              {night ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </button>
             <button
               onClick={() => setIsLanguageModalOpen(true)}
               className="inline-flex items-center gap-1.5 rounded-xl border border-[#e6d5bd] bg-[#fbf6ee] px-3 py-1.5 text-xs font-bold text-[#6c3a1c] shadow-xs hover:bg-[#f5eadb] transition"
@@ -733,18 +803,20 @@ export default function Home() {
             </button>
           </div>
         </header>
+        <div className="sadu-strip mx-8 rounded-b-lg opacity-90" aria-hidden="true" />
 
         {/* Two-column layout */}
         <section className="flex flex-col lg:flex-row gap-5 py-5 flex-1">
           {/* Sidebar */}
-          <aside className="w-full lg:w-[300px] shrink-0 flex flex-col gap-4">
-            {/* Top Red Gradient Card */}
-            <div className="relative overflow-hidden rounded-[1.7rem] bg-gradient-to-br from-[#801b13] via-[#844826] to-[#b32c21] p-5 text-white shadow-lg shadow-stone-950/20">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-bold">
+          <aside id="season-panel" className="order-2 w-full scroll-mt-4 lg:order-none lg:w-[300px] shrink-0 flex flex-col gap-4">
+            {/* Top card (desktop): earthy brown with a Sadu ribbon */}
+            <div className="relative hidden overflow-hidden rounded-[1.7rem] bg-gradient-to-br from-[#4a2814] via-[#6c3a1c] to-[#94532d] p-5 pt-6 text-white shadow-lg shadow-stone-950/20 lg:block">
+              <div className="sadu-strip absolute inset-x-0 top-0" aria-hidden="true" />
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-bold">
                 <Sparkles className="size-3" />
                 {t.specialtyBadge}
               </span>
-              <h2 className="mt-3 font-['Alexandria'] text-lg sm:text-xl font-bold leading-snug">
+              <h2 className="mt-3 font-kufi text-lg sm:text-xl font-bold leading-snug">
                 {t.guideTitle1} <br />
                 {t.guideTitle2}
               </h2>
@@ -757,6 +829,33 @@ export default function Home() {
 
             <DidYouKnow language={language} onAsk={(q) => askQuestion(q)} />
 
+            <button
+              type="button"
+              onClick={openNearMe}
+              className="flex items-center gap-3 rounded-[1.7rem] border border-[#e6d5bd] bg-white/95 p-4 text-start shadow-sm backdrop-blur transition hover:border-[#94532d] active:scale-[0.99]"
+            >
+              <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#f3ebdf] text-[#94532d]">
+                <LocateFixed className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="font-kufi block text-sm font-bold text-[#3a2a1c]">{language === "en" ? "Near me now" : "قريب مني الحين"}</span>
+                <span className="block text-xs text-[#786450]">{language === "en" ? "Nearest mosque, restroom and café" : "أقرب مسجد ودورة مياه ومقهى"}</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMoreOpen((v) => !v)}
+              className="flex items-center justify-between rounded-2xl border border-[#e6d5bd] bg-white/90 px-4 py-3 text-sm font-bold text-[#6c3a1c] shadow-sm lg:hidden"
+              aria-expanded={moreOpen}
+            >
+              {moreOpen
+                ? language === "en" ? "Show less" : "أخفِ التفاصيل"
+                : language === "en" ? "Tour route, salt passport, prayer times, weather" : "الجولة، جواز الملح، الصلاة، الطقس"}
+              <ChevronDown className={`size-4 transition ${moreOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            <div className={moreOpen ? "flex flex-col gap-4" : "hidden lg:flex lg:flex-col lg:gap-4"}>
             <TourRoute language={language} onAsk={askQuestion} />
 
             <SaltPassport language={language} />
@@ -767,7 +866,7 @@ export default function Home() {
             {weatherData && (
               <div className="rounded-[1.7rem] border border-[#e6d5bd] bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-[#faf4ea] border border-[#ede0cb] px-2 py-0.5 text-[9px] font-bold text-[#844826]">
+                  <span className="rounded-full bg-[#faf4ea] border border-[#ede0cb] px-2 py-0.5 text-[11px] font-bold text-[#844826]">
                     Google Weather
                   </span>
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
@@ -778,7 +877,7 @@ export default function Home() {
                 <div className="mt-3 flex items-center justify-between">
                   <button
                     onClick={() => askQuestion(language === "en" ? "What is the weather in Al-Qasab now?" : "ما هو طقس القصب الآن؟")}
-                    className="rounded-xl border border-[#e6d5bd] bg-[#faf4ea] px-3 py-1.5 text-[10px] font-bold text-[#6c3a1c] hover:bg-[#f5eadb] transition"
+                    className="rounded-xl border border-[#e6d5bd] bg-[#faf4ea] px-3 py-1.5 text-[11px] font-bold text-[#6c3a1c] hover:bg-[#f5eadb] transition"
                   >
                     {t.askAssistant}
                   </button>
@@ -795,13 +894,15 @@ export default function Home() {
               <BadgeCheck className="size-4 text-[#94532d] shrink-0" />
               <span>{t.scopeNotice}</span>
             </div>
+            </div>
           </aside>
 
           {/* Main Chat Container */}
-          <section className="flex-1 flex min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] border border-[#e6d5bd] bg-white/80 shadow-md backdrop-blur-sm">
+          <section id="chat-panel" className="order-1 scroll-mt-3 lg:order-none flex-1 flex min-h-[78vh] lg:min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] border border-[#e6d5bd] bg-white/80 shadow-md backdrop-blur-sm">
+            <div className="sadu-strip" aria-hidden="true" />
             {/* Top Bar inside Chat */}
             <div className="flex items-center justify-between border-b border-[#ede1cd] bg-white px-5 py-3.5">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-800">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
                 <Timer className="size-3 text-emerald-600 animate-pulse" />
                 <span>{t.sevenSecondBadge}</span>
               </div>
@@ -814,29 +915,58 @@ export default function Home() {
             {/* Chat Body */}
             <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-7">
               {messages.length === 0 ? (
-                /* Welcome Screen in the Center */
+                /* Welcome screen: the photo behind the visitor right now, then questions with icons */
                 <div className="mx-auto flex min-h-[400px] max-w-xl flex-col items-center justify-center text-center">
-                  <div className="mb-4 size-32 rounded-3xl border border-[#e6d5bd] shadow-md inline-flex items-center justify-center overflow-hidden bg-white p-1">
-                    <MalhAlQasabLogo size="xl" className="w-full h-full rounded-2xl" />
+                  <div className="mb-3 size-20 overflow-hidden rounded-3xl border border-[#e6d5bd] bg-white p-1 shadow-md">
+                    <MalhAlQasabLogo size="xl" className="h-full w-full rounded-2xl" />
                   </div>
-                  <h2 className="font-['Alexandria'] text-2xl sm:text-3xl font-bold text-[#3a2a1c]">
-                    {t.welcomeTitle}
-                  </h2>
-                  <p className="mt-2 text-xs sm:text-sm leading-6 text-[#685140] max-w-md">
-                    {t.welcomeDesc}
-                  </p>
+                  <h2 className="font-kufi text-2xl font-bold text-[#3a2a1c] sm:text-3xl">{t.welcomeTitle}</h2>
+                  <p className="mt-2 max-w-md text-sm leading-6 text-[#685140]">{t.welcomeDesc}</p>
 
-                  {/* 4 Suggested Question Cards */}
-                  <div className="mt-6 grid w-full gap-2.5 sm:grid-cols-2">
-                    {t.suggestedQuestions.slice(0, 4).map((q) => (
+                  {(() => {
+                    const slide = SLIDES[slideIdx] || SLIDES[0];
+                    return (
                       <button
-                        key={q}
+                        type="button"
+                        key={slide.src}
                         disabled={isStreaming}
-                        onClick={() => askQuestion(q)}
-                        className="group flex items-center justify-between rounded-2xl border border-[#e6d5bd] bg-white p-4 text-start text-xs font-medium text-[#3a2a1c] hover:border-[#94532d] hover:bg-[#faf4ea] transition shadow-xs"
+                        onClick={() => askQuestion(language === "en" ? slide.ask.en : slide.ask.ar)}
+                        className="ec-photo group relative mt-5 block aspect-[16/8] w-full overflow-hidden rounded-3xl border border-[#e6d5bd] bg-[#2a2016] text-start shadow-md"
                       >
-                        <span className="flex-1">{q}</span>
-                        <ArrowUpLeft className="size-4 text-[#94532d] shrink-0 transition-transform group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
+                        <img src={isNarrow ? slide.src.replace("/images/bg/", "/images/bg-sm/") : slide.src} alt={language === "en" ? slide.en : slide.ar} className="size-full object-cover transition duration-700 group-hover:scale-105" />
+                        <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-3.5 pt-12">
+                          <span>
+                            <span className="block text-[11px] font-semibold text-white/80">{language === "en" ? "Behind you right now" : "اللي وراك الحين"}</span>
+                            <span className="font-kufi block text-base font-bold text-white">{language === "en" ? slide.en : slide.ar}</span>
+                          </span>
+                          <span className="shrink-0 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#6c3a1c] shadow">
+                            {language === "en" ? "Tell me about it" : "علّمني عنه"}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })()}
+
+                  <div className="mt-4 grid w-full grid-cols-2 gap-2 sm:grid-cols-3">
+                    {[
+                      { Icon: Landmark, ar: "ممالح القَصَب", en: "The salt pans", q: t.suggestedQuestions[0] },
+                      { Icon: ScrollText, ar: "قصر الزاحم", en: "Al-Zahim palace", q: t.suggestedQuestions[1] },
+                      { Icon: Coffee, ar: "المقاهي والديوانيات", en: "Cafés & majlis", q: t.suggestedQuestions[2] },
+                      { Icon: MapPinned, ar: "وين الموسم؟", en: "Where's the season?", q: t.suggestedQuestions[3] },
+                      { Icon: Ticket, ar: "التذاكر والمواعيد", en: "Tickets & hours", q: language === "en" ? "How can I get tickets for the salt season?" : "كيف أحصل على تذكرة موسم ملح القصب؟" },
+                      { Icon: Sparkles, ar: "وش أسوي اليوم؟", en: "What to do today?", q: language === "en" ? "Plan my day in Al-Qasab" : "رتّب لي يومي في القصب" },
+                    ].map(({ Icon, ar, en: enLabel, q }) => (
+                      <button
+                        key={ar}
+                        type="button"
+                        disabled={isStreaming || !q}
+                        onClick={() => q && askQuestion(q)}
+                        className="group flex items-center gap-2.5 rounded-2xl border border-[#e6d5bd] bg-white p-3 text-start text-sm font-bold text-[#3a2a1c] shadow-xs transition hover:border-[#94532d] hover:bg-[#faf4ea] active:scale-[0.98]"
+                      >
+                        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#f3ebdf] text-[#94532d] transition group-hover:bg-[#94532d] group-hover:text-white">
+                          <Icon className="size-4.5" />
+                        </span>
+                        <span className="min-w-0 leading-tight">{language === "en" ? enLabel : ar}</span>
                       </button>
                     ))}
                   </div>
@@ -1028,7 +1158,7 @@ export default function Home() {
                     )}
                   </button>
                 </div>
-                <p className="mt-2 text-center text-[10px] text-[#8d7259]">
+                <p className="mt-2 text-center text-[11px] text-[#8d7259]">
                   {t.iphoneNotice}
                 </p>
               </form>
@@ -1036,7 +1166,7 @@ export default function Home() {
           </section>
         </section>
 
-        <footer className="pb-2 text-center text-[10px] text-[#8d7259]">
+        <footer className="pb-2 text-center text-[11px] text-[#8d7259]">
           {t.footerText}
         </footer>
       </div>

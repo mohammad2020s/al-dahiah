@@ -543,7 +543,7 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
               <div key={i} className={`flex items-center gap-2 text-xs ${i === 0 ? "font-bold text-[#3a2a1c]" : "text-[#584535]"}`}>
                 <StepIcon step={s} className="size-4 shrink-0 text-[#94532d]" />
                 <span className="min-w-0 flex-1 truncate">{instruction(s, en)}</span>
-                <span className="shrink-0 text-[10px] text-[#786450]">{fmtDistance(s.distance, en)}</span>
+                <span className="shrink-0 text-[11px] text-[#786450]">{fmtDistance(s.distance, en)}</span>
               </div>
             ))}
           </div>

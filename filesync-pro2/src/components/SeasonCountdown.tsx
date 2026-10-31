@@ -86,7 +86,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
             <CalendarDays className="size-4 text-[#B2512F]" />
             {isEn ? "Salt Season countdown" : "باقي على موسم ملح القَصَب"}
           </span>
-          <span className="mt-1 inline-block rounded-full border border-[#e4d2ba] bg-[#f3ebdf] px-2 py-0.5 text-[9px] font-bold text-[#B2512F]">
+          <span className="mt-1 inline-block rounded-full border border-[#e4d2ba] bg-[#f3ebdf] px-2 py-0.5 text-[11px] font-bold text-[#B2512F]">
             {isEn ? "4th edition · official" : "النسخة الرابعة · رسمي"}
           </span>
         </div>
@@ -94,9 +94,9 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
       </div>
       <div className="relative mt-3 grid grid-cols-4 gap-1.5" dir={isEn ? "ltr" : "rtl"}>
         {units.map(([value, ar, en]) => (
-          <div key={en} className="rounded-2xl bg-gradient-to-b from-[#D18372] to-[#B2512F] px-1 py-2 text-center text-white shadow-sm">
+          <div key={en} className="rounded-2xl bg-gradient-to-b from-[#b07a4f] to-[#7a4322] px-1 py-2 text-center text-white shadow-sm">
             <span key={value} className="sc-tick block text-xl font-bold leading-none tabular-nums">{num(value)}</span>
-            <span className="mt-1 block text-[10px] text-white/80">{isEn ? en : ar}</span>
+            <span className="mt-1 block text-[11px] text-white/80">{isEn ? en : ar}</span>
           </div>
         ))}
       </div>

@@ -178,7 +178,7 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
     <>
       <div className="rounded-[1.7rem] border border-[#e6d5bd] bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between">
-          <span className="rounded-full bg-[#faf4ea] border border-[#ede0cb] px-2 py-0.5 text-[10px] font-bold text-[#844826]">
+          <span className="rounded-full bg-[#faf4ea] border border-[#ede0cb] px-2 py-0.5 text-[11px] font-bold text-[#844826]">
             {fmtNum(count, en)} / {fmtNum(total, en)}
           </span>
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">

@@ -133,9 +133,9 @@ export function TourRoute({ language = "ar", onAsk }: { language?: Language; onA
         <ol className="mt-3 space-y-1.5">
           {stops.map((s) => (
             <li key={s.landmarkId} className="flex items-center gap-2 text-[11px] text-[#4a2f2d]">
-              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-[#94532d] text-[10px] font-bold text-white">{s.index}</span>
+              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-[#94532d] text-[11px] font-bold text-white">{s.index}</span>
               <span className="font-semibold">{s.title}</span>
-              <span className="ms-auto shrink-0 text-[10px] text-[#947760]">{isEn ? s.timeEn : s.timeAr}</span>
+              <span className="ms-auto shrink-0 text-[11px] text-[#947760]">{isEn ? s.timeEn : s.timeAr}</span>
             </li>
           ))}
         </ol>

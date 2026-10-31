@@ -330,10 +330,10 @@ body {
 @keyframes bgs-kb-a { from { transform: scale(1.12) translate(1.5%, 1%); } to { transform: scale(1) translate(0, 0); } }
 @keyframes bgs-kb-b { from { transform: scale(1) translate(-1%, 0); } to { transform: scale(1.12) translate(1%, -1%); } }
 .bgs-veil {
-  /* Lighter at the edges so the photos read, a touch denser in the middle behind the text */
+  /* Light touch: the photos read clearly at the edges; the cards carry their own backgrounds */
   background:
-    radial-gradient(ellipse at 50% 45%, rgba(248, 242, 233, 0.5) 0%, rgba(248, 242, 233, 0.22) 70%),
-    linear-gradient(180deg, rgba(248, 242, 233, 0.2) 0%, rgba(248, 242, 233, 0.45) 100%);
+    radial-gradient(ellipse at 50% 40%, rgba(248, 242, 233, 0.38) 0%, rgba(248, 242, 233, 0.08) 75%),
+    linear-gradient(180deg, rgba(248, 242, 233, 0.05) 0%, rgba(248, 242, 233, 0.3) 100%);
 }
 .bgs-caption { animation: bgs-cap 0.9s ease both; }
 @keyframes bgs-cap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -342,3 +342,49 @@ body {
   .bgs-slide { transition: none; }
   .bgs-caption, .dyk-fade { animation: none; }
 }
+
+/* ---------- Heritage touches ---------- */
+.font-kufi { font-family: "Reem Kufi", "Alexandria", system-ui, sans-serif; letter-spacing: 0; }
+
+/* Sadu weave ribbon (Najdi tent-weaving pattern) */
+.sadu-strip {
+  height: 10px;
+  flex-shrink: 0;
+  background-repeat: repeat-x;
+  background-size: 32px 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='10' viewBox='0 0 32 10'%3E%3Crect width='32' height='10' fill='%236c3a1c'/%3E%3Crect width='32' height='1.6' fill='%232b1a10'/%3E%3Crect y='8.4' width='32' height='1.6' fill='%232b1a10'/%3E%3Cpath d='M0 8.4 4 1.6 8 8.4zM16 8.4 20 1.6 24 8.4z' fill='%23eadcc4'/%3E%3Cpath d='M8 1.6 12 8.4 16 1.6zM24 1.6 28 8.4 32 1.6z' fill='%23b2512f'/%3E%3Cpath d='M4 4.2 5.2 5.6 4 7 2.8 5.6zM20 4.2 21.2 5.6 20 7 18.8 5.6z' fill='%232b1a10'/%3E%3C/svg%3E");
+}
+
+/* First-visit welcome card and the empty-chat photo */
+.wg-in { animation: wg-in 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes wg-in { from { opacity: 0; transform: translateY(24px) scale(0.97); } }
+.ec-photo { animation: bgs-cap 0.9s ease both; }
+.fab-call { animation: wg-in 700ms 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@media (prefers-reduced-motion: reduce) { .wg-in, .ec-photo, .fab-call { animation: none; } }
+
+/* ---------- Night look (after Maghrib, or picked by the visitor) ---------- */
+.night { background-color: #1b130d; color: #efe3d0; }
+.night .soft-grid, .night.soft-grid { background-image: none; }
+.night .bgs-veil {
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(22, 14, 9, 0.55) 0%, rgba(22, 14, 9, 0.3) 75%),
+    linear-gradient(180deg, rgba(22, 14, 9, 0.25) 0%, rgba(22, 14, 9, 0.6) 100%);
+}
+.night [class*="bg-white"] { background-color: rgba(42, 29, 20, 0.92); }
+.night [class*="bg-[#faf4ea]"], .night [class*="bg-[#fbf6ee]"], .night [class*="bg-[#fdfaf5]"],
+.night [class*="bg-[#f5eadb]"], .night [class*="bg-[#f3ebdf]"], .night [class*="bg-[#f8f2e9]"],
+.night [class*="bg-[#f1e8df]"], .night [class*="bg-[#eedbc1]"], .night .bg-emerald-50, .night .bg-amber-50 {
+  background-color: #3a281b;
+}
+.night [class*="from-amber-50"] { background-image: none; background-color: rgba(42, 29, 20, 0.92); }
+.night [class*="text-[#3a2a1c]"], .night [class*="text-[#2e2218]"], .night [class*="text-[#584535]"],
+.night [class*="text-[#685140]"], .night [class*="text-[#5c331b]"], .night [class*="text-[#4a3626]"] { color: #f1e6d4; }
+.night [class*="text-[#786450]"], .night [class*="text-[#775c46]"], .night [class*="text-[#8d7259]"],
+.night [class*="text-[#947760]"], .night [class*="text-[#a8744a]"] { color: #cbb69c; }
+.night [class*="text-[#94532d]"], .night [class*="text-[#6c3a1c]"], .night [class*="text-[#844826]"],
+.night [class*="text-[#78411f]"], .night [class*="text-[#B2512F]"], .night .text-emerald-800 { color: #e6b07e; }
+.night [class*="border-[#e"], .night [class*="border-[#d9c09f]"], .night .border-amber-200, .night .border-emerald-200 { border-color: #4d3727; }
+.night [class*="border-[#94532d]"], .night [class*="border-[#B2512F]"] { border-color: #c98a57; }
+.night textarea, .night input { color: #f1e6d4; }
+.night textarea::placeholder { color: #a8927a; }
+.night .leaflet-container [class*="bg-white"] { background-color: #fff; }

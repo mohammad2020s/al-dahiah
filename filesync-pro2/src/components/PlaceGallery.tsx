@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronLeft, ChevronRight, Expand, Images, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand, Images, Share2, X } from "lucide-react";
+import { sharePlace } from "./share";
 import type { Language } from "../i18n";
 
 export type PlaceImage = { src: string; caption: string; credit?: string };
@@ -50,8 +51,18 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
           <Images className="size-4 text-[#94532d]" />
           {isEn ? "Real photos" : "صور حقيقية من المكان"}
         </span>
-        <span dir="ltr" className="text-[11px] font-medium text-[#947760] tabular-nums">
-          {active + 1} / {count}
+        <span className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => sharePlace({ title: current.caption, image: current.src, en: isEn })}
+            className="inline-flex items-center gap-1 rounded-full border border-[#e6d5bd] bg-[#fdfaf5] px-2.5 py-1 text-[11px] font-bold text-[#6c3a1c] hover:bg-[#f3ebdf] active:scale-95"
+          >
+            <Share2 className="size-3.5" />
+            {isEn ? "Share" : "شارك"}
+          </button>
+          <span dir="ltr" className="text-[11px] font-medium text-[#947760] tabular-nums">
+            {active + 1} / {count}
+          </span>
         </span>
       </div>
 
@@ -78,7 +89,7 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
         />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-3 pt-10 text-start">
           <p className="text-sm font-semibold text-white drop-shadow">{current.caption}</p>
-          {current.credit && <p className="mt-0.5 text-[10px] text-white/70">{current.credit}</p>}
+          {current.credit && <p className="mt-0.5 text-[11px] text-white/70">{current.credit}</p>}
         </div>
         <span className="absolute top-2.5 end-2.5 flex size-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm opacity-80 group-hover:opacity-100 transition">
           <Expand className="size-4" />
