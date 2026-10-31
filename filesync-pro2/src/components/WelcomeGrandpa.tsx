@@ -34,7 +34,10 @@ export function WelcomeGrandpa({ language = "ar", onCall }: { language?: Languag
 
   useEffect(() => {
     if (readLS(SEEN_KEY)) return;
-    const id = setTimeout(() => setShow(true), 1800);
+    const id = setTimeout(() => {
+      setShow(true);
+      writeLS(SEEN_KEY, "1"); // once per visitor, even if they never close it
+    }, 1800);
     return () => clearTimeout(id);
   }, []);
 
