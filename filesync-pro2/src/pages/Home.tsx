@@ -240,7 +240,7 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
         points={mapPoints}
         activeId={activeId}
         fitIds={servicePins ? servicePins.map((p) => p.id) : multiPin ? CAFE_PIN_IDS : undefined}
-        zoom={17}
+        zoom={15}
       />
       <div className="flex items-center justify-between gap-2 border-t border-[#ebdfcc] px-3 py-2.5">
         <span className="min-w-0 truncate text-xs font-bold text-[#33251a]">
