@@ -4,7 +4,8 @@ import { createServer } from "http";
 import path from "path";
 import fs from "fs";
 import { setupLiveAudio } from "./server/live-audio.ts";
-import { apiRouter } from "./server/api.ts";
+import { apiRouter, buildSpeechPrompt } from "./server/api.ts";
+import { schedulePronLab } from "./server/pronLab.ts";
 import { STATS_PAGE_HTML } from "./server/statsPage.ts";
 import { STAMPS_PAGE_HTML } from "./server/stampsPage.ts";
 
@@ -75,6 +76,8 @@ async function startServer() {
 
   server.listen(PORT, HOST, () => {
     console.log(`[Server] Running on http://${HOST}:${PORT}/`);
+    // Production only: a one-shot pronunciation test whose results go to the log
+    if (process.env.NODE_ENV === "production") schedulePronLab(buildSpeechPrompt);
   });
 }
 
