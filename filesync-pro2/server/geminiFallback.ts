@@ -150,7 +150,7 @@ export async function streamChatWithFallback(opts: {
         const stream = await client(engine.tier).models.generateContentStream({
           model: engine.model,
           contents: opts.contents,
-          config: { systemInstruction: opts.systemInstruction, maxOutputTokens: opts.maxOutputTokens, abortSignal: abort.signal },
+          config: { systemInstruction: opts.systemInstruction, maxOutputTokens: opts.maxOutputTokens, temperature: 0.3, abortSignal: abort.signal },
         });
         for await (const chunk of stream) {
           if (opts.isCancelled() || abort.signal.aborted) break;

@@ -1,3 +1,4 @@
+import { najdify } from "./najdiStyle.ts";
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { fileContextFor } from "./qasabFile.ts";
@@ -263,7 +264,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         lang,
         lang === "en" ? weatherSummaryEn(weatherData) : weatherData?.summaryText
       );
-      let finalAnswer = lang === "ar" ? applyNajdiPhoneticDiacritics(weatherText) : weatherText;
+      let finalAnswer = lang === "ar" ? najdify(applyNajdiPhoneticDiacritics(weatherText)) : weatherText;
       finalAnswer = cleanText(finalAnswer);
       const words = finalAnswer.split(" ");
       for (let i = 0; i < words.length; i += 3) {
@@ -349,7 +350,8 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       }
     }
 
-    let finalAnswer = lang === "ar" ? applyNajdiPhoneticDiacritics(rawAnswer) : normalizeCityName(rawAnswer);
+    // Arabic answers: the fixed Qasabi wording is enforced here, not left to the model
+    let finalAnswer = lang === "ar" ? najdify(applyNajdiPhoneticDiacritics(rawAnswer)) : normalizeCityName(rawAnswer);
     finalAnswer = cleanText(finalAnswer);
 
     // Opened with «السلام عليكم»: answer the greeting first, like a host welcoming a guest

@@ -24,7 +24,7 @@ Whenever the caller asks about one of these Al-Qasab places, or you start explai
 Places:
 ${placeList}
 
-VOICE OF THE CALL: on screen the caller sees a Najdi grandfather from Al-Qasab — that is you in the call. Speak like a warm, wise older Qasabi man (the NAJDI ACCENT — QASABI rules above): unhurried, kind, a short story or proverb now and then, «يا وليدي» to a young man, «يا بنتي» to a young woman. In Arabic, Najdi only; in English, plain friendly English.
+VOICE OF THE CALL: on screen the caller sees a Najdi grandfather from Al-Qasab — that is you. Follow «قواعد اللهجة الثابتة» above to the letter: the same calm, warm Qasabi voice, the same fixed phrases and words every time, nothing improvised. Arabic = Najdi only; English = plain friendly English.
 
 HOW TO SAY THE TOWN NAME OUT LOUD (tested: this hint worked best): say it exactly like the written sounds «لِقْصَبْ» — «لِقْ» then «صَبْ» (liq·Sab): the q closes the first syllable, so NO vowel ever comes between q and S, and the a after S stays short. Say the town name at most ONCE in the whole call (in your greeting); after that always «ديرتنا» or «البلد».
 
@@ -122,7 +122,8 @@ export function setupLiveAudio(server: Server) {
         generationConfig: {
           responseModalities: ["AUDIO"],
           // Calmer sampling: names come out the same way every time
-          temperature: 0.4,
+          // Low: the same words and the same accent every call
+          temperature: 0.2,
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {

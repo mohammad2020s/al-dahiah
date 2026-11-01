@@ -246,3 +246,11 @@ test("Al-Muqhim salt pan has its own photos with a credit", () => {
   assert.equal(imgs.length, 5);
   assert.ok(imgs.every(i => i.credit && i.caption));
 });
+
+test("najdify enforces the fixed Qasabi wording and leaves quotes alone", async () => {
+  const { najdify } = await import("./najdiStyle.ts");
+  assert.equal(najdify("ماذا تريد الآن؟"), "وش تبي الحين؟");
+  assert.equal(najdify("لا يوجد شي، ولكن أين الموسم؟"), "ما فيه شي، وبس وين الموسم؟");
+  assert.equal(najdify("قال «ماذا أقول الآن» فقط"), "قال «ماذا أقول الآن» بس");
+  assert.equal(najdify("الآنية"), "الآنية");
+});
