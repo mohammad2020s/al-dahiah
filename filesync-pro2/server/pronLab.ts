@@ -8,7 +8,8 @@ import { GoogleGenAI, Modality } from "@google/genai";
 import { liveSystemInstruction } from "./live-audio.ts";
 import { voiceKeys } from "./geminiFallback.ts";
 
-const PRON_LAB_RUN = "2026-11-01-qsab-1";
+const PRON_LAB_RUN = "2026-11-01-qsab-2";
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function wav(pcm: Buffer, rate = 24000) {
   const h = Buffer.alloc(44);
@@ -64,16 +65,14 @@ function liveSay(key: string, instruction: string, prompt: string): Promise<Buff
 // Extra lines added to the call instructions, one variant per run, to see which one the voice follows
 export const LIVE_VARIANTS: Record<string, string> = {
   base: "",
-  li: "\nHOW TO SAY THE TOWN NAME OUT LOUD: say it exactly like the written sounds «لِقْصَبْ» — «لِقْ» then «صَبْ» (liq·Sab): the q closes the first syllable, so NO vowel ever comes between q and S. «في القْصَب» = «فِلْقْصَبْ», «أهل القْصَب» = «أهلِ لْقْصَبْ».",
-  spell: "\nHOW TO SAY THE TOWN NAME OUT LOUD: it is one beat, «ل-ق-ص» with no vowel between ق and ص: «اِلْقْصَبْ» like Najdi «اِلْبْلاد». Before you say it, picture it written «لِقْصَبْ».",
+  li: "\nHOW TO SAY THE TOWN NAME OUT LOUD: say it exactly like the written sounds «لِقْصَبْ» — «لِقْ» then «صَبْ» (liq·Sab): the q closes the first syllable, so NO vowel ever comes between q and S.",
+  latin: "\nHOW TO SAY THE TOWN NAME OUT LOUD: it sounds exactly like the Latin letters \"il-qSab\": i-l-q-S-a-b, the q pressed straight against the S with no vowel at all between them, one quick beat, like \"il-qSab\" not \"al-qa-Sab\".",
+  split: "\nHOW TO SAY THE TOWN NAME OUT LOUD: say «إلْقْ» and «صَبْ» joined fast: «إلْقْ-صَبْ». Never a vowel after the q.",
 };
 
-const LIVE_PROMPTS = [
-  "رحّب بزائر جديد بجملة وحدة وقل له اسم ديرتك.",
-  "قل الجملة هذي بالضبط بصوتك: حيّاك الله في القْصَب، ومملحة القْصَب مشهورة.",
-];
+const LIVE_PROMPTS = ["قل الجملة هذي بالضبط بصوتك وبس: حيّاك الله في القْصَب، ومملحة القْصَب مشهورة."];
 
-const TTS_SPELLINGS = ["حيّاك الله في القْصَب", "حيّاك الله في لِقْصَبْ", "حيّاك الله في القْصْبْ", "حيّاك الله فِلْقْصَبْ", "حيّاك الله في اِلْقْصَبْ"];
+const TTS_SPELLINGS = ["حيّاك الله في القْصَب", "حيّاك الله في لِقْصَبْ", "حيّاك الله في إلْقْ صَبْ", "حيّاك الله في إلقْصبْ", "Hayyak Allah fi il-qSab"];
 
 export function schedulePronLab(buildSpeechPrompt: (t: string) => string) {
   if (!PRON_LAB_RUN) return;
@@ -87,6 +86,7 @@ export function schedulePronLab(buildSpeechPrompt: (t: string) => string) {
     for (const [name, extra] of Object.entries(LIVE_VARIANTS)) {
       for (const prompt of LIVE_PROMPTS) {
         for (let rep = 1; rep <= 2; rep++) {
+          await wait(30_000); // stay under the free per-minute limit
           try {
             const pcm = await liveSay(key, base + extra, prompt);
             console.log(`[PronLab] LIVE ${name} #${rep} "${prompt.slice(0, 22)}" → ${await listen(ai, pcm)}`);
@@ -97,7 +97,8 @@ export function schedulePronLab(buildSpeechPrompt: (t: string) => string) {
       }
     }
     for (const text of TTS_SPELLINGS) {
-      for (let rep = 1; rep <= 2; rep++) {
+      for (let rep = 1; rep <= 1; rep++) {
+        await wait(20_000);
         try {
           const r = await ai.models.generateContent({
             model: "gemini-3.1-flash-tts-preview",
