@@ -9,6 +9,16 @@ const CODES: Record<string, string> = {
   heritage_village: "qry-6t1z",
   ibn_zahim_palace: "zhm-2w5r",
   al_marqab: "mrq-9p4v",
+  burdan_lake: "brd-5h8k",
+  muqhim_pan: "mqh-7c3n",
+  obaidi_souq: "obd-2r6j",
+  rashid_house: "rsd-8v1m",
+  art_club: "art-4x9d",
+  king_salman_park: "kslm-6b2q",
+  akrashiya: "akr-3n7t",
+  birds_museum: "tyr-9k4f",
+  nafud: "nfd-1z8w",
+  shafei_park: "shf-5m3p",
 };
 
 export const stopForCode = (code: string) => {

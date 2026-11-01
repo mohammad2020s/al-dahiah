@@ -1,6 +1,6 @@
 // Draws the «زرت القصب» / «مستكشف القصب» card (1080×1350, Instagram/WhatsApp friendly)
 // from the visitor's salt-passport stamps, and shares or downloads it.
-import { PASSPORT_STOPS } from "../../server/saltPassport.ts";
+import { BONUS_STOPS, CORE_STOPS } from "../../server/saltPassport.ts";
 
 const W = 1080;
 const H = 1350;
@@ -61,8 +61,9 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  const done = PASSPORT_STOPS.filter((s) => opts.stamps[s.id]);
-  const complete = done.length === PASSPORT_STOPS.length;
+  const done = CORE_STOPS.filter((s) => opts.stamps[s.id]);
+  const complete = done.length === CORE_STOPS.length;
+  const bonus = BONUS_STOPS.filter((s) => opts.stamps[s.id]).length;
 
   // Background + red header
   ctx.fillStyle = "#f3ebdf";
@@ -128,7 +129,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   const cellW = 470;
   const cellH = 205;
   const R = 56;
-  PASSPORT_STOPS.forEach((stop, i) => {
+  CORE_STOPS.forEach((stop, i) => {
     const col = i % 2;
     const row = Math.floor(i / 2);
     // RTL: first stamp on the right
@@ -172,8 +173,8 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   ctx.fillStyle = BRAND;
   ctx.font = '700 36px Alexandria, sans-serif';
   const progress = en
-    ? `${done.length} of ${PASSPORT_STOPS.length} stamps`
-    : `${digits(done.length, false)} من ${digits(PASSPORT_STOPS.length, false)} أختام`;
+    ? `${done.length} of ${CORE_STOPS.length} stamps${bonus ? ` + ${bonus} bonus` : ""}`
+    : `${digits(done.length, false)} من ${digits(CORE_STOPS.length, false)} أختام${bonus ? ` + ${digits(bonus, false)} إضافية` : ""}`;
   ctx.fillText(progress, W / 2, H - 112);
   // Official season logo in the corner
   const seasonLogo = await loadImage("/images/salt-season-logo.png");

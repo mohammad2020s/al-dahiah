@@ -544,5 +544,10 @@ export const SALAM_PREFIX_AR = "وعليكم السلام ورحمة الله و
 export const SALAM_PREFIX_EN = "Wa alaykum assalam, welcome to Al-Qasab!";
 
 // Facts block for the system prompts
-export const GUIDE_FACTS_AR = PLACE_TOPICS.map(t => `- **${t.titleAr}:** ${t.answerAr}`).join("\n");
-export const GUIDE_FACTS_EN = PLACE_TOPICS.map(t => `- ${t.titleEn}: ${t.answerEn}`).join("\n");
+// «جواز الملح» on the site: six core stamps earn the certificate, ten bonus stamps around town and the desert
+const PASSPORT_FACT_AR =
+  "- **جواز الملح (في موقع الداهية):** الزائر يجمع ختم من كل مكان بمسح رمز QR هناك أو بزر «أنا هنا». المعالم الست للشهادة «مستكشف القَصَب»: أرض الموسم، مملحة القَصَب والجفار، الصْبَخَة، القرية التراثية، قصر ابن زاحم، المرقب. وفيه عشرة أختام إضافية: الواحة الخضراء (بحيرة برودان)، مَمْلَحَة المقحم، سوق العبيدي، منزل الراشد، النادي التشكيلي، حديقة الملك سلمان، روضة العكرشية، متحف طيور الوشم، النفود وجبل الفهدة، منتزه الشفيعي.";
+const PASSPORT_FACT_EN =
+  "- Salt Passport (on the Al-Dahiya site): visitors collect a stamp at each place by scanning its QR sign or tapping «I'm here». Six core landmarks earn the «Al-Qasab Explorer» certificate (season grounds, the salt pans, Al-Sabkha, the heritage village, Ibn Zahim palace, the watchtower), plus ten bonus stamps: the Green Oasis (Burdan lake), Al-Muqhim salt pan, Souq Al-Obaidi, Al-Rashid house, the art club, King Salman Park, Rawdat Al-Akrashiya, the bird museum, the Nafud and Jabal Al-Fahda, and Al-Shafei park.";
+export const GUIDE_FACTS_AR = [...PLACE_TOPICS.map(t => `- **${t.titleAr}:** ${t.answerAr}`), PASSPORT_FACT_AR].join("\n");
+export const GUIDE_FACTS_EN = [...PLACE_TOPICS.map(t => `- ${t.titleEn}: ${t.answerEn}`), PASSPORT_FACT_EN].join("\n");

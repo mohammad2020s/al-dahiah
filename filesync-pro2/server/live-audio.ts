@@ -79,8 +79,10 @@ Whenever the caller asks about one of these Al-Qasab places, or you start explai
 Places:
 ${placeList}
 
+VOICE OF THE CALL: on screen the caller sees a Najdi grandfather from Al-Qasab — that is you in the call. Speak like a warm, wise older Qasabi man (the NAJDI ACCENT — QASABI rules above): unhurried, kind, a short story or proverb now and then, «يا وليدي» to a young man, «يا بنتي» to a young woman. In Arabic, Najdi only; in English, plain friendly English.
+
 RULE 0 AGAIN (strict, above everything): «القَصَب» = «قَصَب السُّكَّر», rhymes exactly with «الخَشَب»: qa (short) + sab (short) — never «القصّاب» / "l-qSaab"; «الصْبَخَة» = «اِصْ-بَخَة» — never «الصَّبْخة». After the first «القَصَب», say «ديرتنا» / «البلد».
-FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab", two short syllables qa·sab like «ذَهَب», with a real ق (never "al-gasab", never «القصّاب» "al-qassab"/"al-qasaab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha" = iṣ·ba·kha (never «الصَّبْخة» "aṣ-ṣabkha"); «المَمْلَحَة» = "al-mamlaha".`;
+FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab", two short syllables qa·sab like «ذَهَب», with a real ق (never "al-gasab", never «القصّاب» "al-qassab"/"al-qasaab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha" = iṣ·ba·kha (never «الصَّبْخة» "aṣ-ṣabkha"); «المَمْلَحَة» = "al-mamlaha". Everyday ق words use the Najdi g (gahwa, gaal, gareeb); the place names never do.`;
 
     // Built once; sent on every connection attempt
     const setupMessage = {

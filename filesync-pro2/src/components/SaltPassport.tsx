@@ -5,7 +5,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Award, Check, Loader2, MapPin, Navigation, Share2, Stamp, X } from "lucide-react";
-import { PASSPORT_STOPS, isNearStop, type PassportStop } from "../../server/saltPassport.ts";
+import { BONUS_STOPS, CORE_STOPS, PASSPORT_STOPS, isNearStop, type PassportStop } from "../../server/saltPassport.ts";
 import { openNavigation } from "./NavigateSheet";
 import { drawShareCard, shareOrDownload } from "./shareCard";
 import type { Language } from "../i18n";
@@ -49,8 +49,10 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
   const [card, setCard] = useState<{ url: string; blob: Blob } | null>(null);
   const [making, setMaking] = useState(false);
 
-  const count = PASSPORT_STOPS.filter((s) => saved.stamps[s.id]).length;
-  const total = PASSPORT_STOPS.length;
+  // The certificate needs the six core stops; the rest are bonus stamps
+  const count = CORE_STOPS.filter((s) => saved.stamps[s.id]).length;
+  const total = CORE_STOPS.length;
+  const bonus = BONUS_STOPS.filter((s) => saved.stamps[s.id]).length;
   const complete = count === total;
   const name = (s: PassportStop) => (en ? s.en : s.ar);
 
@@ -160,8 +162,8 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
   };
 
   const dots = (
-    <div className="flex items-center gap-1.5" aria-hidden>
-      {PASSPORT_STOPS.map((s) => (
+    <div className="flex flex-wrap items-center gap-1.5" aria-hidden>
+      {CORE_STOPS.map((s) => (
         <span
           key={s.id}
           className={`grid size-6 place-items-center rounded-full border-2 ${
@@ -171,6 +173,9 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
           {saved.stamps[s.id] && <Check className="size-3.5" strokeWidth={3} />}
         </span>
       ))}
+      <span className="ms-1 rounded-full border border-[#e4d2ba] bg-[#faf4ea] px-2 py-0.5 text-[11px] font-bold text-[#844826]">
+        {en ? `+${bonus}/${BONUS_STOPS.length} bonus` : `+${fmtNum(bonus, en)} من ${fmtNum(BONUS_STOPS.length, en)} إضافية`}
+      </span>
     </div>
   );
 
@@ -189,7 +194,9 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
         <p className="mt-2 text-[11px] leading-5 text-[#786450]">
           {complete
             ? en ? "You're an Al-Qasab Explorer! Share your certificate." : "صرت مستكشف القَصَب! شارك شهادتك."
-            : en ? "Collect a stamp at each landmark and get the Al-Qasab Explorer certificate." : "اجمع ختم من كل معلم، وخذ شهادة «مستكشف القَصَب» في الأخير."}
+            : en
+              ? "Stamp the six landmarks for the Al-Qasab Explorer certificate, plus bonus stamps around town and in the desert."
+              : "اختم المعالم الست وخذ شهادة «مستكشف القَصَب»، وفيه أختام إضافية مثل بحيرة برودان والنفود."}
         </p>
         <div className="mt-3">{dots}</div>
         <button
@@ -228,7 +235,7 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
                 {/* Progress */}
                 <div className="rounded-2xl bg-[#fcf7ef] border border-[#ede1ce] p-3">
                   <div className="flex items-center justify-between text-xs font-bold text-[#3a2a1c]">
-                    <span>{complete ? (en ? "All stamps collected!" : "جمعت كل الأختام!") : en ? "Your stamps" : "أختامك"}</span>
+                    <span>{complete ? (en ? "All six landmarks stamped!" : "ختمت المعالم الست كلها!") : en ? "Your stamps" : "أختامك"}</span>
                     <span className="text-[#94532d]">
                       {fmtNum(count, en)} {en ? "of" : "من"} {fmtNum(total, en)}
                     </span>
@@ -250,8 +257,18 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
                 )}
 
                 {/* Stops */}
+                {[
+                  { key: "core", stops: CORE_STOPS, title: en ? "The six landmarks (for the certificate)" : "المعالم الست (للشهادة)" },
+                  {
+                    key: "bonus",
+                    stops: BONUS_STOPS,
+                    title: en ? `Bonus stamps · ${bonus} of ${BONUS_STOPS.length}` : `أختام إضافية · ${fmtNum(bonus, en)} من ${fmtNum(BONUS_STOPS.length, en)}`,
+                  },
+                ].map(({ key, stops: group, title }) => (
+                  <div key={key} className="space-y-2">
+                    <p className="px-1 pt-1 text-xs font-bold text-[#94532d]">{title}</p>
                 <ul className="space-y-2">
-                  {PASSPORT_STOPS.map((s) => {
+                  {group.map((s) => {
                     const at = saved.stamps[s.id];
                     return (
                       <li key={s.id} className={`flex items-center gap-3 rounded-2xl border p-3 ${at ? "border-[#e1c8a7] bg-[#fcf8f1]" : "border-[#e7d8c2] bg-white"}`}>
@@ -295,6 +312,8 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
                     );
                   })}
                 </ul>
+                  </div>
+                ))}
 
                 {/* Share card */}
                 <div className="rounded-2xl border border-[#e6d5bd] p-3 space-y-2.5">

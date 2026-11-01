@@ -10,11 +10,13 @@ export interface PassportStop {
   en: string;
   /** How close (metres) the phone must be for the «أنا هنا» stamp */
   radius: number;
+  /** The six core stops earn the «مستكشف القَصَب» certificate; the others are bonus stamps */
+  core: boolean;
   lat: number;
   lng: number;
 }
 
-const STOPS: Omit<PassportStop, "lat" | "lng">[] = [
+const STOPS: Omit<PassportStop, "lat" | "lng" | "core">[] = [
   { id: "festival", ar: "أرض موسم الملح", en: "Salt Season grounds", radius: 400 },
   { id: "salt_flat", ar: "مملحة القصب والجفار", en: "Salt pans (Al-Jifar)", radius: 1000 },
   { id: "sabkha", ar: "صْبَخَة القَصَب", en: "Al-Sabkha", radius: 1500 },
@@ -23,10 +25,27 @@ const STOPS: Omit<PassportStop, "lat" | "lng">[] = [
   { id: "al_marqab", ar: "مرقب القصب", en: "The watchtower", radius: 350 },
 ];
 
-export const PASSPORT_STOPS: PassportStop[] = STOPS.map((s) => {
+// Bonus stamps: more of Al-Qasab and its surroundings (coordinates from the official city guide
+// and Google Maps). Nature spots far out of town get a wide radius.
+const EXTRA_STOPS: Omit<PassportStop, "core">[] = [
+  { id: "burdan_lake", ar: "الواحة الخضراء (بحيرة برودان)", en: "The Green Oasis (Burdan lake)", radius: 1200, lat: 25.189667, lng: 45.62025 },
+  { id: "muqhim_pan", ar: "مَمْلَحَة المقحم النموذجية", en: "Al-Muqhim model salt pan", radius: 600, lat: 25.260929, lng: 45.548462 },
+  { id: "obaidi_souq", ar: "سوق العبيدي", en: "Souq Al-Obaidi", radius: 150, lat: 25.2991872, lng: 45.5063997 },
+  { id: "rashid_house", ar: "منزل الراشد التراثي", en: "Al-Rashid heritage house", radius: 150, lat: 25.2978335, lng: 45.5067437 },
+  { id: "art_club", ar: "النادي التشكيلي (السريالي)", en: "The art club (Surrealist)", radius: 150, lat: 25.2989471, lng: 45.5053567 },
+  { id: "king_salman_park", ar: "حديقة الملك سلمان", en: "King Salman Park", radius: 450, lat: 25.3037518, lng: 45.5331749 },
+  { id: "akrashiya", ar: "روضة العكرشية", en: "Rawdat Al-Akrashiya", radius: 1500, lat: 25.3407898, lng: 45.3647892 },
+  { id: "birds_museum", ar: "متحف ومحمية طيور الوشم", en: "Al-Washm bird museum", radius: 450, lat: 25.2546554, lng: 45.4738085 },
+  { id: "nafud", ar: "نفود القَصَب وجبل الفهدة", en: "The Nafud dunes & Jabal Al-Fahda", radius: 3000, lat: 25.191118, lng: 45.520565 },
+  { id: "shafei_park", ar: "منتزه الشفيعي", en: "Al-Shafei park", radius: 1500, lat: 25.4049078, lng: 45.5720615 },
+];
+
+export const CORE_STOPS: PassportStop[] = STOPS.map((s) => {
   const lm = AL_QASAB_LANDMARKS.find((l) => l.id === s.id)!;
-  return { ...s, lat: lm.coordinates.lat, lng: lm.coordinates.lng };
+  return { ...s, core: true, lat: lm.coordinates.lat, lng: lm.coordinates.lng };
 });
+export const BONUS_STOPS: PassportStop[] = EXTRA_STOPS.map((s) => ({ ...s, core: false }));
+export const PASSPORT_STOPS: PassportStop[] = [...CORE_STOPS, ...BONUS_STOPS];
 
 /** Distance in metres between two points. */
 export function distanceMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
