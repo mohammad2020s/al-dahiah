@@ -4,7 +4,7 @@ export async function sharePlace({ title, image, en }: { title: string; image?: 
   const url = "https://al-dahiah.onrender.com";
   const text = en
     ? `${title} — discover Al-Qasab and its salt season with Al-Dahiya, the smart guide:`
-    : `${title} — اكتشف القَصَب وموسم الملح مع «الداهية» الدليل الذكي:`;
+    : `${title} — اكتشف القْصَب وموسم الملح مع «الداهية» الدليل الذكي:`;
   try {
     if (image && navigator.canShare) {
       const blob = await fetch(image).then((r) => r.blob());

@@ -379,7 +379,7 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
                 parts: [{
                   text: isEn
                     ? "I just turned on my camera. Tell me what you see, and if it's an Al-Qasab landmark, tell me about it."
-                    : "شغلت الكاميرا الحين، قل لي وش تشوف قدامي، وإذا هو من معالم القَصَب علّمني عنه.",
+                    : "شغلت الكاميرا الحين، قل لي وش تشوف قدامي، وإذا هو من معالم القْصَب علّمني عنه.",
                 }],
               }],
               turnComplete: true,

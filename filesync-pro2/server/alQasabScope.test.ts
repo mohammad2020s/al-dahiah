@@ -40,7 +40,7 @@ test("identifies greetings and salam correctly", () => {
   // A greeting alone gets the self-introduction and the three options
   for (const r of [replyAr, getInstantSalamReply("ar", "هلا")]) {
     assert.match(r, /«الداهية»/);
-    assert.match(r, /موسم ملح القَصَب/);
+    assert.match(r, /موسم ملح القْصَب/);
     assert.match(r, /الأماكن التراثية/);
     assert.match(r, /الخريطة التفاعلية/);
   }
@@ -103,10 +103,10 @@ test("answers ticket inquiries with the free online registration ticket", () => 
 test("speech prompt carries pronunciation notes only for words in the text", async () => {
   const { buildSpeechPrompt } = await import("./api.ts").catch(() => ({ buildSpeechPrompt: null as any }));
   if (!buildSpeechPrompt) return; // api.ts needs server deps that may be missing locally
-  const p = buildSpeechPrompt("حيّاك الله في القَصَب والصْبَخَة");
+  const p = buildSpeechPrompt("حيّاك الله في القْصَب والصْبَخَة");
   assert.match(p, /never «القصّاب»|Never «القصّاب»/);
   assert.match(p, /«الصَّبْخة»/);
-  assert.match(p, /#### TRANSCRIPT\nحيّاك الله في القَصَب والصْبَخَة$/);
+  assert.match(p, /#### TRANSCRIPT\nحيّاك الله في القْصَب والصْبَخَة$/);
   assert.equal(buildSpeechPrompt("hello"), "hello");
 });
 
@@ -124,16 +124,16 @@ test("strictly blocks questions about families, lineages, and tribes with polite
   assert.equal(fallbackAnswer, FORBIDDEN_FAMILY_REPLY_AR);
 });
 
-test("applies text cleaning and Najdi phonetic diacritics and corrects القصيب to القَصَب", () => {
+test("applies text cleaning and Najdi phonetic diacritics and corrects القصيب to القْصَب", () => {
   const cleaned = cleanText("  يا هلا  يا هلا   بالقصب  ");
   assert.equal(cleaned, "يا هلا بالقصب");
 
   const withDiacritics = applyNajdiPhoneticDiacritics("مدينة القصب وموسم ملح القصب");
-  assert.equal(withDiacritics, "مدينة القَصَب وموسم ملح القَصَب");
+  assert.equal(withDiacritics, "مدينة القْصَب وموسم ملح القْصَب");
 
   const correctedName = applyNajdiPhoneticDiacritics("أهلاً بك في القصيب عاصمة الملح");
   assert.equal(correctedName.includes("القصيب"), false);
-  assert.equal(correctedName.includes("القَصَب"), true);
+  assert.equal(correctedName.includes("القْصَب"), true);
 });
 
 test("verifies core landmark, cafe, and route databases", () => {
@@ -142,11 +142,11 @@ test("verifies core landmark, cafe, and route databases", () => {
   assert.equal(AL_QASAB_ROUTES.length >= 4, true);
 });
 
-test("normalizeCityName corrects القصيب to القَصَب in all forms", () => {
-  assert.equal(normalizeCityName("وش تاريخ القصيب؟"), "وش تاريخ القَصَب؟");
-  assert.equal(normalizeCityName("ساكن بالقصيب"), "ساكن بالقَصَب");
-  assert.equal(normalizeCityName("رايح للقصيب"), "رايح للقَصَب");
-  assert.equal(normalizeCityName("القُصَيْب"), "القَصَب");
+test("normalizeCityName corrects القصيب to القْصَب in all forms", () => {
+  assert.equal(normalizeCityName("وش تاريخ القصيب؟"), "وش تاريخ القْصَب؟");
+  assert.equal(normalizeCityName("ساكن بالقصيب"), "ساكن بالقْصَب");
+  assert.equal(normalizeCityName("رايح للقصيب"), "رايح للقْصَب");
+  assert.equal(normalizeCityName("القُصَيْب"), "القْصَب");
   assert.equal(normalizeCityName("القصب"), "القصب");
   assert.ok(!applyNajdiPhoneticDiacritics("أهلاً في القصيب").includes("قصيب"));
 });
@@ -165,7 +165,7 @@ test("family/tribe guard catches indirect phrasings without false positives", ()
 test("system prompts enforce dialect, city name and family red line", () => {
   for (const mode of ["ar", "en", "auto"] as const) {
     const prompt = buildAlQasabSystemPrompt(undefined, mode);
-    assert.ok(prompt.includes("القَصَب"), mode);
+    assert.ok(prompt.includes("القْصَب"), mode);
     assert.ok(prompt.includes(FORBIDDEN_FAMILY_REPLY_AR), mode);
     assert.ok(/نجد|Najdi/.test(prompt), mode);
     // «القصيب» may only appear inside the "never say it" instruction lines
@@ -192,7 +192,7 @@ test("prompts carry the pronunciation and camera rules", () => {
   for (const mode of ["ar", "en", "auto"] as const) {
     const prompt = buildAlQasabSystemPrompt(undefined, mode);
     assert.ok(prompt.includes("الصْبَخَة") && prompt.includes("المَمْلَحَة") && prompt.includes("المَمَالح"), mode);
-    assert.ok(prompt.includes("مملحة القَصَب"), mode);
+    assert.ok(prompt.includes("مملحة القْصَب"), mode);
     assert.ok(/CAMERA|الكاميرا/.test(prompt), mode);
   }
 });
@@ -222,7 +222,7 @@ test("salam is answered like a host", () => {
   for (let i = 0; i < 10; i++) {
     const r = getInstantSalamReply("ar");
     assert.ok(r.startsWith("وعليكم السلام"));
-    assert.ok(r.includes("القَصَب"));
+    assert.ok(r.includes("القْصَب"));
   }
   const prompt = buildAlQasabSystemPrompt(undefined, "ar");
   assert.ok(prompt.includes("مرشد سياحي"));
@@ -238,7 +238,7 @@ test("place words get their dictionary vowels", () => {
   assert.equal(normalizePlaceWords("زرت الممالح"), "زرت المَمَالح");
   assert.equal(normalizePlaceWords("مملحتها"), "مملحتها");
   const out = applyNajdiPhoneticDiacritics("السبخة جنب المملحة والجفار في القصيب");
-  assert.ok(out.includes("الصْبَخَة") && out.includes("المَمْلَحَة") && out.includes("الجِفار") && out.includes("القَصَب"), out);
+  assert.ok(out.includes("الصْبَخَة") && out.includes("المَمْلَحَة") && out.includes("الجِفار") && out.includes("القْصَب"), out);
 });
 
 test("Al-Muqhim salt pan has its own photos with a credit", () => {

@@ -50,7 +50,7 @@ export function setupLiveAudio(server: Server) {
       ownerKey && reqUrl.searchParams.get("key") === ownerKey && /^[A-Z][a-z]{2,15}$/.test(reqUrl.searchParams.get("voice") || "")
         ? String(reqUrl.searchParams.get("voice"))
         : "";
-    // Charon: in recorded tests it said «القَصَب» with two short syllables, where Puck often stretched it to «القصّاب»
+    // Charon: in recorded tests it said «القْصَب» with two short syllables, where Puck often stretched it to «القصّاب»
     const voiceName = testVoice || process.env.LIVE_VOICE || "Charon";
 
     // Free key first; the paid key (GEMINI_PAID_API_KEY) only if the free one is refused
@@ -81,8 +81,8 @@ ${placeList}
 
 VOICE OF THE CALL: on screen the caller sees a Najdi grandfather from Al-Qasab — that is you in the call. Speak like a warm, wise older Qasabi man (the NAJDI ACCENT — QASABI rules above): unhurried, kind, a short story or proverb now and then, «يا وليدي» to a young man, «يا بنتي» to a young woman. In Arabic, Najdi only; in English, plain friendly English.
 
-RULE 0 AGAIN (strict, above everything): «القَصَب» = «قَصَب السُّكَّر», rhymes exactly with «الخَشَب»: qa (short) + sab (short) — never «القصّاب» / "l-qSaab"; «الصْبَخَة» = «اِصْ-بَخَة» — never «الصَّبْخة». After the first «القَصَب», say «ديرتنا» / «البلد».
-FINAL REMINDER before every sentence you speak: «القَصَب» = "al-qasab", two short syllables qa·sab like «ذَهَب», with a real ق (never "al-gasab", never «القصّاب» "al-qassab"/"al-qasaab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha" = iṣ·ba·kha (never «الصَّبْخة» "aṣ-ṣabkha"); «المَمْلَحَة» = "al-mamlaha". Everyday ق words use the Najdi g (gahwa, gaal, gareeb); the place names never do.`;
+RULE 0 AGAIN (strict, above everything): «القْصَب» = «اِلْ-قْصَبْ» "il-qṣab": NO vowel on ق, short a after ص — never «القَصَب» "al-qaṣab", never «القصّاب» / "al-qṣaab"; «الصْبَخَة» = «اِصْ-بَخَة» — never «الصَّبْخة». After the first «القْصَب», say «ديرتنا» / «البلد».
+FINAL REMINDER before every sentence you speak: «القْصَب» = "il-qṣab" (no vowel on ق, short a after ص, a real ق — never "il-gṣab", never "al-qaṣab", never «القصّاب» "al-qṣaab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha" = iṣ·ba·kha (never «الصَّبْخة» "aṣ-ṣabkha"); «المَمْلَحَة» = "al-mamlaha". Everyday ق words use the Najdi g (gahwa, gaal, gareeb); the place names never do.`;
 
     // Built once; sent on every connection attempt
     const setupMessage = {

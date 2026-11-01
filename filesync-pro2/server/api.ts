@@ -168,7 +168,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
 
   const requestStartTime = Date.now();
   try {
-    // Correct «القصيب» → «القَصَب» before anything (guards, Gemini) sees the message
+    // Correct «القصيب» → «القْصَب» before anything (guards, Gemini) sees the message
     // «صوّر واسأل»: an optional photo (JPEG/PNG/WebP, base64) sent with the question
     const rawImage = req.body?.image;
     const photo =
@@ -310,7 +310,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
                 text:
                   (lang === "en"
                     ? "[The visitor sent this photo from Al-Qasab. Use the visual guide to Al-Qasab; name a landmark only if the signs are clear, otherwise say what you see and that you are not sure.] "
-                    : "[الزائر أرسل هذي الصورة. استخدم دليل التعرف على معالم القَصَب، ولا تسمّي معلَم إلا إذا العلامات واضحة، وإذا مو متأكد قلها بصراحة.] ") + userPrompt,
+                    : "[الزائر أرسل هذي الصورة. استخدم دليل التعرف على معالم القْصَب، ولا تسمّي معلَم إلا إذا العلامات واضحة، وإذا مو متأكد قلها بصراحة.] ") + userPrompt,
               },
             ]
           : [{ text: userPrompt }],
@@ -458,7 +458,7 @@ export function buildSpeechPrompt(transcript: string): string {
   const notes: string[] = [];
   if (/قصب/.test(plain)) {
     notes.push(
-      `«القَصَب» is "al-qasab", said exactly like «الخَشَب» (al-kha-shab): two short syllables qa·sab, both vowels short, single ص, a deep Arabic ق. Never «القصّاب» / "al-qassab" / "al-qasaab".`
+      `«القْصَب» is "il-qṣab" = «اِلْ-قْصَبْ»: the ق has NO vowel and runs straight into «صَبْ» (short a, silent ب), the way the people of Al-Qasab say it. A deep Arabic ق, never "g". Never «القَصَب» "al-qaṣab" (vowel after ق) and never «القصّاب» / "al-qṣaab" (long a).`
     );
   }
   if (/صبخ/.test(plain)) {
@@ -614,7 +614,7 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
       const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
       const response = await ai.models.generateContent({
         model: "gemini-3.1-flash-tts-preview",
-        // Same Najdi corrections as the chat («القَصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
+        // Same Najdi corrections as the chat («القْصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
         contents: [{ parts: [{ text: buildSpeechPrompt(applyNajdiPhoneticDiacritics(String(text)).slice(0, 400)) }] }],
         config: {
           responseModalities: [Modality.AUDIO],

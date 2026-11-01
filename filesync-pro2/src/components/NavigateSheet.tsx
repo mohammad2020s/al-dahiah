@@ -45,8 +45,8 @@ const BRAND = "#94532d";
 // Where a visitor without location can start from
 const START_POINTS = [
   { ar: "من بوابة الموسم", en: "From the season gate", lat: 25.2983509, lng: 45.5072574 },
-  { ar: "من وسط القَصَب", en: "From the town centre", lat: 25.2914614, lng: 45.5279583 },
-  { ar: "من مدخل القَصَب (طريق ٥٤٦)", en: "From the town entrance (road 546)", lat: 25.3015, lng: 45.5287 },
+  { ar: "من وسط القْصَب", en: "From the town centre", lat: 25.2914614, lng: 45.5279583 },
+  { ar: "من مدخل القْصَب (طريق ٥٤٦)", en: "From the town entrance (road 546)", lat: 25.3015, lng: 45.5287 },
 ];
 const ROUTER = (mode: Mode) =>
   `https://routing.openstreetmap.de/routed-${mode}/route/v1/${mode === "car" ? "driving" : "foot"}`;

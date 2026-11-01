@@ -949,7 +949,7 @@ export default function Home() {
 
                   <div className="mt-4 grid w-full grid-cols-2 gap-2 sm:grid-cols-3">
                     {[
-                      { Icon: Landmark, ar: "ممالح القَصَب", en: "The salt pans", q: t.suggestedQuestions[0] },
+                      { Icon: Landmark, ar: "ممالح القْصَب", en: "The salt pans", q: t.suggestedQuestions[0] },
                       { Icon: ScrollText, ar: "قصر الزاحم", en: "Al-Zahim palace", q: t.suggestedQuestions[1] },
                       { Icon: Coffee, ar: "المقاهي والديوانيات", en: "Cafés & majlis", q: t.suggestedQuestions[2] },
                       { Icon: MapPinned, ar: "وين الموسم؟", en: "Where's the season?", q: t.suggestedQuestions[3] },

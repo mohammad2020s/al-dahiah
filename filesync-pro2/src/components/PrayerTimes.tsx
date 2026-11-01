@@ -127,7 +127,7 @@ export function PrayerTimes({ language = "ar", onAsk }: { language?: Language; o
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
           <Clock className="size-4 text-[#94532d]" />
-          {en ? "Prayer times in Al-Qasab" : "أوقات الصلاة في القَصَب"}
+          {en ? "Prayer times in Al-Qasab" : "أوقات الصلاة في القْصَب"}
         </span>
         <span className="rounded-full border border-[#e4d2ba] bg-[#f3ebdf] px-2 py-0.5 text-[11px] font-bold text-[#94532d]">
           {en ? "Umm Al-Qura" : "تقويم أم القرى"}

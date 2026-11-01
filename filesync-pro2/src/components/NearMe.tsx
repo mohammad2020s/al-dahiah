@@ -138,7 +138,7 @@ export function NearMe({ language = "ar" }: { language?: Language }) {
             {fromVillage === "far"
               ? en
                 ? "You seem to be outside Al-Qasab, so distances are from the heritage village."
-                : "يبان إنك برّا القَصَب، فحسبت المسافات من القرية التراثية."
+                : "يبان إنك برّا القْصَب، فحسبت المسافات من القرية التراثية."
               : en
                 ? "Location is off, so distances are from the heritage village. Turn location on for exact ones."
                 : "الموقع مقفل، فحسبت المسافات من القرية التراثية. شغّل الموقع عشان تطلع لك بالضبط."}

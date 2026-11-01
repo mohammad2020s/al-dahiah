@@ -7,7 +7,7 @@ import type { Language } from "../i18n";
 // "Ken Burns" zoom, then cross-fades into the next. A sand-coloured veil keeps every card
 // readable. Only the current and the next photo are loaded at any time.
 export const SLIDES: { src: string; ar: string; en: string; ask: { ar: string; en: string } }[] = [
-  { src: "/images/bg/mamlaha-harvest.jpg", ar: "مَمَالح القَصَب (الجِفار)", en: "Al-Qasab salt pans (Al-Jifar)", ask: { ar: "حدثني عن ممالح القصب", en: "Tell me about the Al-Qasab salt pans" } },
+  { src: "/images/bg/mamlaha-harvest.jpg", ar: "مَمَالح القْصَب (الجِفار)", en: "Al-Qasab salt pans (Al-Jifar)", ask: { ar: "حدثني عن ممالح القصب", en: "Tell me about the Al-Qasab salt pans" } },
   { src: "/images/bg/village-gate-season.jpg", ar: "بوابة القرية التراثية أيام الموسم", en: "The heritage village gate during the season", ask: { ar: "وش محطات الموسم؟", en: "What are the season's stations?" } },
   { src: "/images/bg/mamlaha-salt-heaps.jpg", ar: "تلال الذهب الأبيض", en: "Hills of white gold", ask: { ar: "كيف يستخرجون الملح؟", en: "How is the salt made?" } },
   { src: "/images/bg/souq-street.jpg", ar: "سوق العبيدي", en: "Souq Al-Obaidi", ask: { ar: "وش سوق العبيدي؟", en: "What is Souq Al-Obaidi?" } },

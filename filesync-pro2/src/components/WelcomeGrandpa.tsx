@@ -9,7 +9,7 @@ const SEEN_KEY = "dahiah:welcomed";
 const AUDIO_KEY = "dahiah:welcome-audio";
 
 const TEXT_AR =
-  "يا هلا والله ومسهّلا! أنا الداهية، دليلك في القَصَب وموسم الملح. اسألني عن الممالح والبلدة القديمة والقهاوي، أو اتصل علي وأسولف معك بالصوت.";
+  "يا هلا والله ومسهّلا! أنا الداهية، دليلك في القْصَب وموسم الملح. اسألني عن الممالح والبلدة القديمة والقهاوي، أو اتصل علي وأسولف معك بالصوت.";
 const TEXT_EN =
   "Welcome! I'm Al-Dahiya, your guide to Al-Qasab and its salt season. Ask me about the salt pans, the old town and the cafés, or call me and we'll talk.";
 

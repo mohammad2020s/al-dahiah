@@ -10,7 +10,7 @@ export interface PassportStop {
   en: string;
   /** How close (metres) the phone must be for the «أنا هنا» stamp */
   radius: number;
-  /** The six core stops earn the «مستكشف القَصَب» certificate; the others are bonus stamps */
+  /** The six core stops earn the «مستكشف القْصَب» certificate; the others are bonus stamps */
   core: boolean;
   lat: number;
   lng: number;
@@ -19,7 +19,7 @@ export interface PassportStop {
 const STOPS: Omit<PassportStop, "lat" | "lng" | "core">[] = [
   { id: "festival", ar: "أرض موسم الملح", en: "Salt Season grounds", radius: 400 },
   { id: "salt_flat", ar: "مملحة القصب والجفار", en: "Salt pans (Al-Jifar)", radius: 1000 },
-  { id: "sabkha", ar: "صْبَخَة القَصَب", en: "Al-Sabkha", radius: 1500 },
+  { id: "sabkha", ar: "صْبَخَة القْصَب", en: "Al-Sabkha", radius: 1500 },
   { id: "heritage_village", ar: "القرية التراثية", en: "Heritage village", radius: 300 },
   { id: "ibn_zahim_palace", ar: "قصر ابن زاحم", en: "Ibn Zahim palace", radius: 200 },
   { id: "al_marqab", ar: "مرقب القصب", en: "The watchtower", radius: 350 },
@@ -36,7 +36,7 @@ const EXTRA_STOPS: Omit<PassportStop, "core">[] = [
   { id: "king_salman_park", ar: "حديقة الملك سلمان", en: "King Salman Park", radius: 450, lat: 25.3037518, lng: 45.5331749 },
   { id: "akrashiya", ar: "روضة العكرشية", en: "Rawdat Al-Akrashiya", radius: 1500, lat: 25.3407898, lng: 45.3647892 },
   { id: "birds_museum", ar: "متحف ومحمية طيور الوشم", en: "Al-Washm bird museum", radius: 450, lat: 25.2546554, lng: 45.4738085 },
-  { id: "nafud", ar: "نفود القَصَب وجبل الفهدة", en: "The Nafud dunes & Jabal Al-Fahda", radius: 3000, lat: 25.191118, lng: 45.520565 },
+  { id: "nafud", ar: "نفود القْصَب وجبل الفهدة", en: "The Nafud dunes & Jabal Al-Fahda", radius: 3000, lat: 25.191118, lng: 45.520565 },
   { id: "shafei_park", ar: "منتزه الشفيعي", en: "Al-Shafei park", radius: 1500, lat: 25.4049078, lng: 45.5720615 },
 ];
 

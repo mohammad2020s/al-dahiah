@@ -193,10 +193,10 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
         </div>
         <p className="mt-2 text-[11px] leading-5 text-[#786450]">
           {complete
-            ? en ? "You're an Al-Qasab Explorer! Share your certificate." : "صرت مستكشف القَصَب! شارك شهادتك."
+            ? en ? "You're an Al-Qasab Explorer! Share your certificate." : "صرت مستكشف القْصَب! شارك شهادتك."
             : en
               ? "Stamp the six landmarks for the Al-Qasab Explorer certificate, plus bonus stamps around town and in the desert."
-              : "اختم المعالم الست وخذ شهادة «مستكشف القَصَب»، وفيه أختام إضافية مثل بحيرة برودان والنفود."}
+              : "اختم المعالم الست وخذ شهادة «مستكشف القْصَب»، وفيه أختام إضافية مثل بحيرة برودان والنفود."}
         </p>
         <div className="mt-3">{dots}</div>
         <button
@@ -318,7 +318,7 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
                 {/* Share card */}
                 <div className="rounded-2xl border border-[#e6d5bd] p-3 space-y-2.5">
                   <p className="text-xs font-bold text-[#3a2a1c]">
-                    {complete ? (en ? "Your Al-Qasab Explorer certificate" : "شهادة «مستكشف القَصَب»") : en ? "«I visited Al-Qasab» card" : "بطاقة «زرت القَصَب»"}
+                    {complete ? (en ? "Your Al-Qasab Explorer certificate" : "شهادة «مستكشف القْصَب»") : en ? "«I visited Al-Qasab» card" : "بطاقة «زرت القْصَب»"}
                   </p>
                   <label className="block text-[11px] text-[#786450]">
                     {en ? "Name on the card (optional)" : "الاسم على البطاقة (اختياري)"}

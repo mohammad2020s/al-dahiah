@@ -46,7 +46,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
       <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
         <div className="flex items-center gap-2 text-sm font-bold text-[#5c331b]">
           <PartyPopper className="size-5 text-amber-600" />
-          {isEn ? "Al-Qasab Salt Season is on now!" : "موسم ملح القَصَب انطلق، حيّاكم!"}
+          {isEn ? "Al-Qasab Salt Season is on now!" : "موسم ملح القْصَب انطلق، حيّاكم!"}
         </div>
         <button
           onClick={() => onAsk(isEn ? "What's on at the Salt Season?" : "وش فعاليات موسم الملح؟")}
@@ -84,7 +84,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
         <div>
           <span className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
             <CalendarDays className="size-4 text-[#B2512F]" />
-            {isEn ? "Salt Season countdown" : "باقي على موسم ملح القَصَب"}
+            {isEn ? "Salt Season countdown" : "باقي على موسم ملح القْصَب"}
           </span>
           <span className="mt-1 inline-block rounded-full border border-[#e4d2ba] bg-[#f3ebdf] px-2 py-0.5 text-[11px] font-bold text-[#B2512F]">
             {isEn ? "4th edition · official" : "النسخة الرابعة · رسمي"}

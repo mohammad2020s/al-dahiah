@@ -101,12 +101,12 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
 
   // Title
   ctx.fillStyle = "#fff";
-  const title = complete ? (en ? "Al-Qasab Explorer" : "مستكشف القَصَب") : en ? "I visited Al-Qasab" : "زرت القَصَب";
+  const title = complete ? (en ? "Al-Qasab Explorer" : "مستكشف القْصَب") : en ? "I visited Al-Qasab" : "زرت القْصَب";
   fitText(ctx, title, W - 120, 800, 84);
   ctx.fillText(title, W / 2, 290);
   ctx.font = '600 34px Alexandria, sans-serif';
   ctx.fillStyle = "#f3ebdf";
-  ctx.fillText(en ? "Al-Qasab Salt Season · Salt Passport" : "موسم ملح القَصَب · جواز الملح", W / 2, 375);
+  ctx.fillText(en ? "Al-Qasab Salt Season · Salt Passport" : "موسم ملح القْصَب · جواز الملح", W / 2, 375);
 
   // Name / certificate line
   const y = 530;
@@ -118,7 +118,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
     ctx.fillText(line1, W / 2, y);
     ctx.font = '600 32px Alexandria, sans-serif';
     ctx.fillStyle = MUTED;
-    ctx.fillText(en ? "visited all six landmarks of Al-Qasab" : "زار معالم القَصَب الست كلها", W / 2, y + 56);
+    ctx.fillText(en ? "visited all six landmarks of Al-Qasab" : "زار معالم القْصَب الست كلها", W / 2, y + 56);
   } else if (name) {
     fitText(ctx, name, W - 140, 700, 48);
     ctx.fillText(name, W / 2, y + 20);

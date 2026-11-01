@@ -26,7 +26,7 @@ const STOPS: Stop[] = [
     landmarkId: "salt_flat",
     timeAr: "الصبح بدري",
     timeEn: "Early morning",
-    titleAr: "مَمْلَحَة القَصَب والجِفار",
+    titleAr: "مَمْلَحَة القْصَب والجِفار",
     titleEn: "Al-Qasab salt pans",
     tipAr: "شوف أحواض الماء المالح وأكوام الملح الأبيض مثل التلال، والشمس الهادية تخلي الصور تجنن. ومملحة المقحم النموذجية مكان ثاني قريب منها، فيها ممشى خشبي وأكواخ خوص.",
     tipEn: "See the brine basins and hills of white salt in the soft light. The Al-Muqhim model salt pan, with its wooden walkway and reed huts, is a separate place nearby.",
@@ -59,9 +59,9 @@ const STOPS: Stop[] = [
     landmarkId: "al_marqab",
     timeAr: "المغرب",
     timeEn: "Sunset",
-    titleAr: "مرقب القَصَب",
+    titleAr: "مرقب القْصَب",
     titleEn: "Al-Qasab watchtower",
-    tipAr: "اطلع للمرقب وقت الغروب وشوف القَصَب كلها من فوق.",
+    tipAr: "اطلع للمرقب وقت الغروب وشوف القْصَب كلها من فوق.",
     tipEn: "Climb up at sunset for a view over the whole town.",
     askAr: "وش قصة المرقب؟",
     askEn: "Tell me about the watchtower",
@@ -128,7 +128,7 @@ export function TourRoute({ language = "ar", onAsk }: { language?: Language; onA
       <div className="sc-card rounded-[1.7rem] border border-[#e6d5bd] bg-white p-4 shadow-sm">
         <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
           <Footprints className="size-4 text-[#94532d]" />
-          {isEn ? "Your day in Al-Qasab" : "جولتك في القَصَب"}
+          {isEn ? "Your day in Al-Qasab" : "جولتك في القْصَب"}
         </div>
         <ol className="mt-3 space-y-1.5">
           {stops.map((s) => (
@@ -158,7 +158,7 @@ export function TourRoute({ language = "ar", onAsk }: { language?: Language; onA
             >
               <div className="flex items-center justify-between border-b border-[#ede1cd] px-5 py-3.5">
                 <div>
-                  <p className="text-sm font-bold text-[#3a2a1c]">{isEn ? "Your day in Al-Qasab" : "جولتك في القَصَب"}</p>
+                  <p className="text-sm font-bold text-[#3a2a1c]">{isEn ? "Your day in Al-Qasab" : "جولتك في القْصَب"}</p>
                   <p className="text-[11px] text-[#786450]">{isEn ? "A half-day route, best started early" : "جولة نص يوم، والأفضل تبدأها بدري"}</p>
                 </div>
                 <button onClick={() => setOpen(false)} className="grid size-9 place-items-center rounded-full bg-[#faf4ea] text-[#6c3a1c] hover:bg-[#f5eadb]" title={isEn ? "Close" : "إغلاق"}>
