@@ -1,5 +1,5 @@
 import { najdify, speakableTownName, OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
-import { parseTeach, teach, forget, taughtList, applyTaught, taughtRulesAr } from "./pronMemory.ts";
+import { parseTeach, teach, forget, taughtList, applyTaught, taughtRulesAr, addRule, removeRule, rulesList } from "./pronMemory.ts";
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { fileContextFor } from "./qasabFile.ts";
@@ -179,6 +179,26 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
   // The owner teaches a pronunciation: «انطق X كذا: Y» → saved for every chat, call and read-aloud
   if (isOwner(req)) {
     const raw = String(req.body?.message || "").trim();
+    // Standing instructions: «قاعدة: …» saves, «وش قواعدي؟» lists, «احذف قاعدة ٢» removes
+    const ruleM = raw.match(/^(?:قاعدة|تعليمة|تعليمات)\s*[:：]\s*([\s\S]+)$/);
+    const delRuleM = raw.match(/^(?:احذف|امسح|شيل)\s+(?:ال)?قاعدة\s*(?:رقم\s*)?([0-9٠-٩]+)$/);
+    if (ruleM || delRuleM || /^(?:وش|ايش)\s+(?:قواعدي|تعليماتي)/.test(raw)) {
+      let answer: string;
+      if (ruleM) {
+        const r = await addRule(ruleM[1]);
+        answer = r ? `أبشر، حفظت القاعدة وبمشي عليها في الدردشة والمكالمة مع كل الزوار: «${r.text}»` : "ما وصلتني القاعدة، اكتبها كذا: قاعدة: …";
+      } else if (delRuleM) {
+        const n = Number(delRuleM[1].replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d))));
+        const r = await removeRule(n);
+        answer = r ? `أبشر، حذفت القاعدة ${n}: «${r.text}»` : `ما فيه قاعدة رقم ${n}.`;
+      } else {
+        const list = rulesList();
+        answer = list.length ? "قواعدك اللي حفظتها:\n" + list.map((r, i) => `${i + 1}) ${r.text}`).join("\n") : "ما حفظت لك ولا قاعدة للحين.";
+      }
+      sendEvent({ type: "chunk", content: answer });
+      sendEvent({ type: "done", answer });
+      return res.end();
+    }
     const forgetM = raw.match(/^(?:انس|انسى|احذف)\s+(?:نطق\s+)?«?([^«»\n]+?)»?$/);
     const taughtM = parseTeach(raw);
     if (forgetM || taughtM || /^(?:وش|ايش)\s+(?:علمتك|علّمتك)/.test(raw)) {

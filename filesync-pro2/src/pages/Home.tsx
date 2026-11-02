@@ -738,6 +738,7 @@ export default function Home() {
             isOpen={isVoiceCallOpen}
             onClose={() => setIsVoiceCallOpen(false)}
             language={language}
+            chatContext={messages.map((m) => ({ role: m.role, content: m.content }))}
           />
         </Suspense>
       )}

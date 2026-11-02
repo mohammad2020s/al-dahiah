@@ -1,4 +1,4 @@
-import { taughtRulesAr } from "./pronMemory.ts";
+import { taughtRulesAr, ownerRulesAr } from "./pronMemory.ts";
 import { OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
 import { isFileTopic, matchFileSections } from "./qasabFile.ts";
 import { cleanQuestion } from "./questionInsights.ts";
@@ -933,7 +933,8 @@ export function buildAlQasabSystemPrompt(
 ): string {
   // Words the owner taught come first, above every rule
   const taught = taughtRulesAr();
-  return (taught ? taught + "\n\n" : "") + buildBasePrompt(weatherSummary, language);
+  const rules = ownerRulesAr();
+  return (taught ? taught + "\n\n" : "") + (rules ? rules + "\n\n" : "") + buildBasePrompt(weatherSummary, language);
 }
 
 function buildBasePrompt(

@@ -94,3 +94,62 @@ export function parseTeach(msg: string): { word: string; say: string } | null {
     msg.match(/«([^«»]+)»\s*(?:تنطقها|تنطقه|انطقها|انطقه|تنقال)\s*«([^«»]+)»/);
   return m ? { word: m[1].trim(), say: m[2].trim() } : null;
 }
+
+// ───────────── the owner's standing instructions (any rule, not only pronunciation) ─────────────
+export type Rule = { id: string; text: string; at: number };
+const RULES_HASH = "dahiah:rules";
+const rules = new Map<string, Rule>();
+
+export async function loadRules() {
+  if (!redis) return;
+  try {
+    const arr = (await redis.command(["HGETALL", RULES_HASH])) as string[] | null;
+    if (!Array.isArray(arr)) return;
+    for (let i = 0; i + 1 < arr.length; i += 2) {
+      try {
+        rules.set(arr[i], JSON.parse(arr[i + 1]));
+      } catch {}
+    }
+  } catch {}
+}
+loadRules();
+setInterval(loadRules, 5 * 60_000).unref?.();
+
+export const rulesList = () => [...rules.values()].sort((a, b) => a.at - b.at);
+
+export async function addRule(text: string): Promise<Rule | null> {
+  const clean = text.trim().slice(0, 500);
+  if (!clean) return null;
+  const r: Rule = { id: String(Date.now()), text: clean, at: Date.now() };
+  rules.set(r.id, r);
+  if (redis) {
+    try {
+      await redis.command(["HSET", RULES_HASH, r.id, JSON.stringify(r)]);
+    } catch {}
+  }
+  console.log(`[Pron] rule added: ${clean.slice(0, 80)}`);
+  return r;
+}
+
+/** Remove rule number n (1-based, in the order «وش قواعدي» lists them) */
+export async function removeRule(n: number): Promise<Rule | null> {
+  const r = rulesList()[n - 1];
+  if (!r) return null;
+  rules.delete(r.id);
+  if (redis) {
+    try {
+      await redis.command(["HDEL", RULES_HASH, r.id]);
+    } catch {}
+  }
+  return r;
+}
+
+/** The owner's standing instructions, for every chat and call prompt */
+export function ownerRulesAr(): string {
+  const list = rulesList();
+  if (!list.length) return "";
+  return (
+    "تعليمات صاحب الموقع (كتبها بنفسه؛ أعلى أولوية بعد قواعد الأمان، تطبّقها في الدردشة والمكالمة حرفياً):\n" +
+    list.map((r, i) => `${i + 1}) ${r.text}`).join("\n")
+  );
+}

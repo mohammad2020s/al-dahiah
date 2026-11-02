@@ -43,6 +43,8 @@ interface VoiceCallProps {
   isOpen: boolean;
   onClose: () => void;
   language?: "ar" | "en";
+  /** The text chat so far: the call carries on from it (and follows what was asked there) */
+  chatContext?: { role: "user" | "assistant"; content: string }[];
 }
 
 // Downsample float audio buffer to 16kHz 16-bit PCM Mono for Gemini Live API
@@ -87,7 +89,10 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   isOpen,
   onClose,
   language = "ar",
+  chatContext = [],
 }) => {
+  const chatContextRef = useRef(chatContext);
+  chatContextRef.current = chatContext;
   const isEn = language === "en";
   const [status, setStatus] = useState<"idle" | "connecting" | "listening" | "user_speaking" | "speaking" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -745,6 +750,22 @@ registerProcessor('mic-processor', MicProcessor);`;
             console.log("[Client] setupComplete received from Gemini Live API");
             await stopAllPlayback();
             if (!isSessionActiveRef.current) return;
+            // The text chat so far, as context only (no reply yet): instructions written there apply in the call too
+            const ctx = chatContextRef.current.filter((m) => m.content?.trim()).slice(-10);
+            if (ctx.length && wsRef.current?.readyState === WebSocket.OPEN) {
+              const note = isEn
+                ? "[Context: this is what the caller wrote in the text chat just before calling. Follow any instruction they gave there in this call too.]"
+                : "[سياق: هذا اللي كتبه المتصل في الدردشة النصية قبل ما يتصل. أي تعليمات أو طلبات كتبها هناك طبّقها في المكالمة بعد.]";
+              wsRef.current.send(JSON.stringify({
+                clientContent: {
+                  turns: [
+                    { role: "user", parts: [{ text: note }] },
+                    ...ctx.map((m) => ({ role: m.role === "user" ? "user" : "model", parts: [{ text: m.content.slice(0, 1500) }] })),
+                  ],
+                  turnComplete: false,
+                },
+              }));
+            }
             await startCapture();
             return;
           }
