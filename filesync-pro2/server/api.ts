@@ -472,7 +472,7 @@ export function buildSpeechPrompt(transcript: string): string {
   if (/مملح/.test(plain)) notes.push(`«المَمْلَحَة» is "al-mamlaha".`);
   // Every reading gets the Qasabi Najdi accent; the place-name rules come first when they apply
   const accent =
-    "Accent: a warm, calm older man from Al-Qasab in Najd (Al-Washm), Saudi Arabia. Najdi melody, unhurried, statements falling at the end, greetings drawn out a little («هلا والله»). Always say ق as the deep Arabic ق (never \"g\"), ج as \"j\", and keep ث and ذ. No Fusha news-reader tone, no Egyptian, Levantine or Hijazi accent.";
+    "Accent: an older man from Al-Qasab in Najd (Al-Washm), Saudi Arabia, talking calmly in his majlis. Low, deep, steady pitch, slow and measured, every statement falling at its end; NO Egyptian sing-song. ج = \"j\" (never the Egyptian hard g). Everyday ق = the Najdi \"g\" (قال gaal, قهوة gahwa), never a glottal stop; only the town name «القْصَب» keeps a deep q. ث = \"th\", ذ = \"dh\" (never s/z). Short clipped Najdi vowels: the first short vowel drops (جْمَل jmal, قْصَب qSab).";
   if (!/[\u0600-\u06FF]/.test(plain)) return transcript;
   return [
     notes.length

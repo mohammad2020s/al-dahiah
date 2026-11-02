@@ -29,7 +29,7 @@ VOICE OF THE CALL: on screen the caller sees a Najdi grandfather from Al-Qasab �
 HOW TO SAY THE TOWN NAME OUT LOUD (tested: this hint worked best): say it exactly like the written sounds «لِقْصَبْ» — «لِقْ» then «صَبْ» (liq·Sab): the q closes the first syllable, so NO vowel ever comes between q and S, and the a after S stays short. Say the town name at most ONCE in the whole call (in your greeting); after that always «ديرتنا» or «البلد».
 
 RULE 0 AGAIN (strict, above everything): «القْصَب» = «اِلْ-قْصَبْ» "il-qṣab": NO vowel on ق, short a after ص — never «القَصَب» "al-qaṣab", never «القصّاب» / "al-qṣaab"; «الصْبَخَة» = «اِصْ-بَخَة» — never «الصَّبْخة». After the first «القْصَب», say «ديرتنا» / «البلد».
-FINAL REMINDER before every sentence you speak: «القْصَب» = "il-qṣab" (no vowel on ق, short a after ص, a real ق — never "il-gṣab", never "al-qaṣab", never «القصّاب» "al-qṣaab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha" = iṣ·ba·kha (never «الصَّبْخة» "aṣ-ṣabkha"); «المَمْلَحَة» = "al-mamlaha". ق is always the deep Arabic ق, never "g".`;
+FINAL REMINDER before every sentence you speak: «القْصَب» = "il-qṣab" (no vowel on ق, short a after ص, a real ق — never "il-gṣab", never "al-qaṣab", never «القصّاب» "al-qṣaab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha" = iṣ·ba·kha (never «الصَّبْخة» "aṣ-ṣabkha"); «المَمْلَحَة» = "al-mamlaha". Najdi sounds: ج = "j", everyday ق = "g" (gaal, gahwa) but «القْصَب» with a deep q, ث/ذ kept; low steady falling Najdi melody, never Egyptian.`;
 }
 
 export function setupLiveAudio(server: Server) {

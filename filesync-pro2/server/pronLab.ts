@@ -8,7 +8,7 @@ import { GoogleGenAI, Modality } from "@google/genai";
 import { liveSystemInstruction } from "./live-audio.ts";
 import { voiceKeys } from "./geminiFallback.ts";
 
-const PRON_LAB_RUN = ""; // off (last run: 2026-11-01-qsab-2)
+const PRON_LAB_RUN = "2026-11-02-accent-1";
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function wav(pcm: Buffer, rate = 24000) {
@@ -18,6 +18,17 @@ function wav(pcm: Buffer, rate = 24000) {
   h.writeUInt32LE(rate * 2, 28); h.writeUInt16LE(2, 32); h.writeUInt16LE(16, 34); h.write("data", 36);
   h.writeUInt32LE(pcm.length, 40);
   return Buffer.concat([h, pcm]);
+}
+
+async function judgeAccent(ai: GoogleGenAI, pcm: Buffer) {
+  const t = await ai.models.generateContent({
+    model: "gemini-3.5-flash-lite",
+    contents: [{ parts: [
+      { inlineData: { mimeType: "audio/wav", data: wav(pcm).toString("base64") } },
+      { text: "You are a dialectologist. Judge ONLY the ACCENT of this Arabic speech (pronunciation and intonation), not the word choice. Answer in ONE line: DIALECT=<Najdi/Saudi | Gulf | Egyptian | Levantine | MSA-like> ; JIM=<j | hard g | y> ; QAF=<g | q | glottal stop> in everyday words ; TOWN=<the town name written القصب, in strict phonetic Latin> ; MELODY=<flat-falling | sing-song> ; SCORE=<0-10 how convincingly Najdi a Saudi from Najd would find it>." },
+    ] }],
+  });
+  return (t.text || "").trim().replace(/\s+/g, " ");
 }
 
 async function listen(ai: GoogleGenAI, pcm: Buffer) {
@@ -32,7 +43,7 @@ async function listen(ai: GoogleGenAI, pcm: Buffer) {
 }
 
 /** One spoken turn from the call model, as 24 kHz PCM */
-function liveSay(key: string, instruction: string, prompt: string): Promise<Buffer> {
+function liveSay(key: string, instruction: string, prompt: string, voice = "Charon"): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${key}`);
     const chunks: Buffer[] = [];
@@ -41,7 +52,7 @@ function liveSay(key: string, instruction: string, prompt: string): Promise<Buff
       ws.send(JSON.stringify({
         setup: {
           model: "models/gemini-3.8-live",
-          generationConfig: { responseModalities: ["AUDIO"], temperature: 0.4, speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: process.env.LIVE_VOICE || "Charon" } } } },
+          generationConfig: { responseModalities: ["AUDIO"], temperature: 0.4, speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
           systemInstruction: { parts: [{ text: instruction }] },
         },
       }));
@@ -63,16 +74,13 @@ function liveSay(key: string, instruction: string, prompt: string): Promise<Buff
 }
 
 // Extra lines added to the call instructions, one variant per run, to see which one the voice follows
-export const LIVE_VARIANTS: Record<string, string> = {
-  base: "",
-  li: "\nHOW TO SAY THE TOWN NAME OUT LOUD: say it exactly like the written sounds «لِقْصَبْ» — «لِقْ» then «صَبْ» (liq·Sab): the q closes the first syllable, so NO vowel ever comes between q and S.",
-  latin: "\nHOW TO SAY THE TOWN NAME OUT LOUD: it sounds exactly like the Latin letters \"il-qSab\": i-l-q-S-a-b, the q pressed straight against the S with no vowel at all between them, one quick beat, like \"il-qSab\" not \"al-qa-Sab\".",
-  split: "\nHOW TO SAY THE TOWN NAME OUT LOUD: say «إلْقْ» and «صَبْ» joined fast: «إلْقْ-صَبْ». Never a vowel after the q.",
-};
+export const LIVE_VARIANTS: Record<string, string> = { base: "" };
+const LIVE_VOICES = ["Charon", "Gacrux", "Algenib", "Orus"];
 
-const LIVE_PROMPTS = ["قل الجملة هذي بالضبط بصوتك وبس: حيّاك الله في القْصَب، ومملحة القْصَب مشهورة."];
+const LIVE_PROMPTS = ["قل الجملة هذي بالضبط بصوتك وبس: يا هلا ومسهلا، حيّاك الله في القْصَب. قال لي جدي: القهوة جاهزة والجو زين، تبي ثلاث فناجيل؟"];
 
-const TTS_SPELLINGS = ["حيّاك الله في القْصَب", "حيّاك الله في لِقْصَبْ", "حيّاك الله في إلْقْ صَبْ", "حيّاك الله في إلقْصبْ", "Hayyak Allah fi il-qSab"];
+const TTS_SPELLINGS = ["يا هلا ومسهلا، حيّاك الله في القْصَب. قال لي جدي: القهوة جاهزة والجو زين، تبي ثلاث فناجيل؟"];
+const TTS_VOICES = ["Charon", "Gacrux"];
 
 export function schedulePronLab(buildSpeechPrompt: (t: string) => string) {
   if (!PRON_LAB_RUN) return;
@@ -83,34 +91,29 @@ export function schedulePronLab(buildSpeechPrompt: (t: string) => string) {
     const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
     console.log(`[PronLab] run ${PRON_LAB_RUN} start`);
     const base = liveSystemInstruction();
-    for (const [name, extra] of Object.entries(LIVE_VARIANTS)) {
-      for (const prompt of LIVE_PROMPTS) {
-        for (let rep = 1; rep <= 2; rep++) {
-          await wait(30_000); // stay under the free per-minute limit
-          try {
-            const pcm = await liveSay(key, base + extra, prompt);
-            console.log(`[PronLab] LIVE ${name} #${rep} "${prompt.slice(0, 22)}" → ${await listen(ai, pcm)}`);
-          } catch (e: any) {
-            console.log(`[PronLab] LIVE ${name} #${rep} error: ${String(e?.message || e).slice(0, 160)}`);
-          }
+    for (const voice of LIVE_VOICES) {
+      for (let rep = 1; rep <= 2; rep++) {
+        await wait(30_000); // stay under the free per-minute limit
+        try {
+          const pcm = await liveSay(key, base, LIVE_PROMPTS[0], voice);
+          console.log(`[PronLab] LIVE ${voice} #${rep} → ${await judgeAccent(ai, pcm)}`);
+        } catch (e: any) {
+          console.log(`[PronLab] LIVE ${voice} #${rep} error: ${String(e?.message || e).slice(0, 160)}`);
         }
       }
     }
-    for (const text of TTS_SPELLINGS) {
-      for (let rep = 1; rep <= 1; rep++) {
-        await wait(20_000);
-        try {
-          const r = await ai.models.generateContent({
-            model: "gemini-3.1-flash-tts-preview",
-            contents: [{ parts: [{ text: buildSpeechPrompt(text) }] }],
-            config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } } },
-          });
-          const part: any = r.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data);
-          if (!part) { console.log(`[PronLab] TTS "${text}" no audio`); continue; }
-          console.log(`[PronLab] TTS "${text}" #${rep} → ${await listen(ai, Buffer.from(part.inlineData.data, "base64"))}`);
-        } catch (e: any) {
-          console.log(`[PronLab] TTS "${text}" error: ${String(e?.message || e).slice(0, 160)}`);
-        }
+    for (const voice of TTS_VOICES) {
+      await wait(20_000);
+      try {
+        const r = await ai.models.generateContent({
+          model: "gemini-3.1-flash-tts-preview",
+          contents: [{ parts: [{ text: buildSpeechPrompt(TTS_SPELLINGS[0]) }] }],
+          config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
+        });
+        const part: any = r.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data);
+        console.log(`[PronLab] TTS ${voice} → ${part ? await judgeAccent(ai, Buffer.from(part.inlineData.data, "base64")) : "no audio"}`);
+      } catch (e: any) {
+        console.log(`[PronLab] TTS ${voice} error: ${String(e?.message || e).slice(0, 160)}`);
       }
     }
     console.log(`[PronLab] run ${PRON_LAB_RUN} done`);
