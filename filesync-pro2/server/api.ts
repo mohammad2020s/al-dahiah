@@ -1,4 +1,4 @@
-import { najdify, speakableTownName } from "./najdiStyle.ts";
+import { najdify, speakableTownName, OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { fileContextFor } from "./qasabFile.ts";
@@ -466,6 +466,7 @@ export function buildSpeechPrompt(transcript: string): string {
   return [
     "اقرأ النص بصوت شايب نجدي من أهل القْصَب في الوشم، يسولف بهدوء في مجلسه: صوت واطي وعميق وثابت، كلام موزون، وآخر الجملة ينزل، بدون تلحين مصري.",
     "الأصوات: الجيم معطّشة (مو «گ» المصرية)، والقاف في الكلام العادي «گ» نجدية (قال = گال، قهوة = گَهْوة) إلا اسم «القْصَب» بقاف فصيحة، والثاء ثاء والذال ذال، والحركة الأولى القصيرة تنحذف (جْمَل، كْتاب)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة وبعد الياء (خير، كبير)، ضربة وحدة بدون ترديد.",
+    OWNER_PRONUNCIATIONS_AR,
     ...(notes.length ? ["أسماء الأماكن (قاعدة صارمة فوق كل شي، قلها أبطأ وأوضح):", ...notes.map((n) => `- ${n}`)] : []),
     "",
     "#### النص",

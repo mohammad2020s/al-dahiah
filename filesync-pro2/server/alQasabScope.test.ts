@@ -255,3 +255,10 @@ test("najdify enforces the fixed Qasabi wording and leaves quotes alone", async 
   assert.equal(najdify("قال «ماذا أقول الآن» فقط"), "قال «ماذا أقول الآن» بس");
   assert.equal(najdify("الآنية"), "الآنية");
 });
+
+test("owner pronunciations are written into everything an AI voice reads", async () => {
+  const { speakableTownName } = await import("./najdiStyle.ts");
+  assert.equal(speakableTownName("أنا الداهية"), "أنا الدَّاهِيِة");
+  assert.equal(speakableTownName("تبي أعرفك؟"), "تبي اعَرَّفْك؟");
+  assert.equal(speakableTownName("حيّاك الله في القْصَبْ"), "حيّاك الله في ديرتنا");
+});
