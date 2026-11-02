@@ -2,7 +2,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "http";
 import "dotenv/config";
 import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE } from "./alQasabScope.ts";
-import { QASAB_FILE_FULL } from "./qasabFile.ts";
+import { QASAB_FILE_INDEX, fileContextFor } from "./qasabFile.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { createLimiter, clientIp } from "./rateLimit.ts";
 import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
@@ -11,13 +11,12 @@ import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
 // the start of the instructions most closely) and a reminder at the end.
 export function liveSystemInstruction(): string {
   const placeList = PLACE_TOPICS.map((t) => `${t.id} = ${t.titleAr} / ${t.titleEn}`).join("\n");
-  return `مكالمة صوتية — اقرأ هذا أول شي.
-${PRONUNCIATION_GUIDE}
+  return `مكالمة صوتية — اقرأ هذا أول شي. ردودك في المكالمة قصيرة: جملتين أو ثلاث، وبعدها اسأل المتصل.
 
 ${buildAlQasabSystemPrompt(undefined, "auto")}
 
-OFFICIAL SALT SEASON FILE (verified; it overrides anything above that disagrees). Use its facts, names, dates, numbers, poems and proverbs exactly as written when the caller asks; keep spoken answers short and offer more:
-${QASAB_FILE_FULL}
+OFFICIAL SALT SEASON FILE: the details (poems, poets, proverbs, people, dates, numbers, season stations, events, history) are NOT written here. When the caller asks for something like that, call the tool lookup_info with a short Arabic query FIRST, then answer from what it returns (it is verified and overrides anything above). Its sections:
+${QASAB_FILE_INDEX}
 
 VOICE CALL — SHOWING PLACES ON THE CALLER'S SCREEN:
 Whenever the caller asks about one of these Al-Qasab places, or you start explaining one, FIRST call the tool show_place with its id (their screen then shows its real photos, or an info card), THEN explain it like a tour guide in 2–4 short sentences from the guide knowledge, and offer to tell more. Call it once per place, not again while you keep talking about the same place.
@@ -111,6 +110,15 @@ export function setupLiveAudio(server: Server) {
           {
             functionDeclarations: [
               {
+                name: "lookup_info",
+                description: "Look up verified details from the official Al-Qasab salt season file (poems, poets, proverbs, people, dates, numbers, season stations, events, history). Call it before answering such a question.",
+                parameters: {
+                  type: "OBJECT",
+                  properties: { query: { type: "STRING", description: "Short Arabic query, e.g. «قصيدة حميدان الشويعر» or «محطات الموسم»" } },
+                  required: ["query"],
+                },
+              },
+              {
                 name: "show_place",
                 description: "Show the caller photos or an info card of an Al-Qasab place on their call screen. Call it right before explaining that place.",
                 parameters: {
@@ -194,8 +202,33 @@ export function setupLiveAudio(server: Server) {
       });
 
       ws.on("message", (data) => {
-        const text = data.toString();
+        let text = data.toString();
         if (!setupDone && text.includes("setupComplete")) setupDone = true;
+        // lookup_info is answered here from the season file; other tool calls go on to the page
+        if (text.includes("toolCall") && text.includes("lookup_info")) {
+          try {
+            const msg = JSON.parse(text);
+            const calls: any[] = msg.toolCall?.functionCalls || [];
+            const look = calls.filter((c) => c.name === "lookup_info");
+            const rest = calls.filter((c) => c.name !== "lookup_info");
+            if (look.length) {
+              ws.send(JSON.stringify({
+                toolResponse: {
+                  functionResponses: look.map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                    response: { result: fileContextFor(String(c.args?.query || ""), "", 3500) || "ما فيه معلومة عن هذا في الملف الرسمي." },
+                  })),
+                },
+              }));
+            }
+            if (!rest.length) return;
+            msg.toolCall.functionCalls = rest;
+            text = JSON.stringify(msg);
+          } catch {
+            /* not JSON: forward as is */
+          }
+        }
         logSpokenNames(text);
         if (clientWs.readyState === WebSocket.OPEN) clientWs.send(text);
       });
