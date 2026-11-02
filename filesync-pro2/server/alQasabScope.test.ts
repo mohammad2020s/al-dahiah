@@ -129,7 +129,8 @@ test("applies text cleaning and Najdi phonetic diacritics and corrects القص�
   assert.equal(cleaned, "يا هلا بالقصب");
 
   const withDiacritics = applyNajdiPhoneticDiacritics("مدينة القصب وموسم ملح القصب");
-  assert.equal(withDiacritics, "مدينة القْصَب وموسم ملح القْصَب");
+  assert.equal(withDiacritics, "مدينة القْصَبْ وموسم ملح القْصَبْ");
+  assert.equal(applyNajdiPhoneticDiacritics("رايح للقصب"), "رايح للقْصَبْ");
 
   const correctedName = applyNajdiPhoneticDiacritics("أهلاً بك في القصيب عاصمة الملح");
   assert.equal(correctedName.includes("القصيب"), false);
