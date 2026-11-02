@@ -8,7 +8,7 @@ import { GoogleGenAI, Modality } from "@google/genai";
 import { liveSystemInstruction } from "./live-audio.ts";
 import { voiceKeys } from "./geminiFallback.ts";
 
-const PRON_LAB_RUN = "2026-11-02-accent-ar";
+const PRON_LAB_RUN = ""; // off (last run: 2026-11-02-accent-ar)
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function wav(pcm: Buffer, rate = 24000) {
