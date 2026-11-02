@@ -73,3 +73,13 @@ export function najdify(text: string): string {
     .replace(EMOJI, "")
     .replace(/[ \t]{2,}/g, " ");
 }
+
+/** For anything spoken by an AI voice: the town name becomes «ديرتنا» (the voices cannot say «القْصَبْ»
+ *  with a vowel-less ق, so they never say it wrong). Keeps the attached و/ف/ب/ل. */
+export function speakableTownName(text: string): string {
+  const M = "[\\u064B-\\u065F\\u0670]*";
+  return text.replace(
+    new RegExp(`(?<![\\p{L}\\p{M}])((?:[وف]${M})?)((?:[بكل]${M})?)(?:ا${M}ل${M}|ل${M})ق${M}ص${M}ب${M}(?![\\p{L}\\p{M}])`, "gu"),
+    (_m, w: string, p: string) => `${w}${p}ديرتنا`
+  );
+}

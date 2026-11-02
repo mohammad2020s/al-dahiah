@@ -1,4 +1,4 @@
-import { najdify } from "./najdiStyle.ts";
+import { najdify, speakableTownName } from "./najdiStyle.ts";
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { fileContextFor } from "./qasabFile.ts";
@@ -604,7 +604,7 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
       const ttsCall = (model: string) => ai.models.generateContent({
         model,
         // Same Najdi corrections as the chat («القْصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
-        contents: [{ parts: [{ text: buildSpeechPrompt(applyNajdiPhoneticDiacritics(String(text)).slice(0, 400)) }] }],
+        contents: [{ parts: [{ text: buildSpeechPrompt(speakableTownName(applyNajdiPhoneticDiacritics(String(text))).slice(0, 400)) }] }],
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } },
