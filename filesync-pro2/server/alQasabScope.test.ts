@@ -260,5 +260,6 @@ test("owner pronunciations are written into everything an AI voice reads", async
   const { speakableTownName } = await import("./najdiStyle.ts");
   assert.equal(speakableTownName("أنا الداهية"), "أنا الدَّاهِيِة");
   assert.equal(speakableTownName("تبي أعرفك؟"), "تبي اعَرَّفْك؟");
-  assert.equal(speakableTownName("حيّاك الله في القْصَبْ"), "حيّاك الله في ديرتنا");
+  assert.equal(speakableTownName("حيّاك الله في القْصَبْ"), "حيّاك الله في الگْصَبْ");
+  assert.equal(speakableTownName("رايح للقْصَبْ"), "رايح للگْصَبْ");
 });
