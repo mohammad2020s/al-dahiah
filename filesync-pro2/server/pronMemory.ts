@@ -32,6 +32,7 @@ export async function loadTaught() {
     console.warn("[Pron] could not load taught words:", (e as Error).message);
   }
 }
+console.log(`[Pron] taught words stored in ${redis ? "Key Value (permanent)" : "memory (lost on restart)"}`);
 loadTaught();
 setInterval(loadTaught, 5 * 60_000).unref?.();
 

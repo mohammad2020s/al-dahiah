@@ -512,7 +512,7 @@ export function applyNajdiPhoneticDiacritics(text: string): string {
   // قصب -> قْصَبْ with every attached prefix (و، ف، ب، ك، ل، ال، لل): «للقْصَبْ»، «والقْصَبْ»، «بالقْصَبْ»…
   const M = "[\\u064B-\\u065F\\u0670]*";
   s = s.replace(
-    new RegExp(`(?<![\\p{L}\\p{M}])((?:[وف]${M})?(?:(?:[بكل]${M})?ا${M}ل${M}|ل${M}ل${M}|[بكل]${M})?)ق${M}ص${M}ب${M}(?![\\p{L}\\p{M}])`, "gu"),
+    new RegExp(`(?<![\\p{L}\\p{M}])((?:[وف]${M})?(?:(?:[بكل]${M})?ا${M}ل${M}|ل${M}ل${M}|[بكل]${M})?)[قگ]${M}ص${M}ب${M}(?![\\p{L}\\p{M}])`, "gu"),
     (_m, pre: string) => {
       const bare = pre.replace(new RegExp(M.replace("*", "+"), "g"), "");
       return (bare.startsWith("لل") || bare.endsWith("لل") ? bare : bare) + "قْصَبْ";
