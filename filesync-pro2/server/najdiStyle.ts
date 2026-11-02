@@ -78,6 +78,8 @@ export function najdify(text: string): string {
  *  with a vowel-less ق, so they never say it wrong). Keeps the attached و/ف/ب/ل. */
 export function speakableTownName(text: string): string {
   const M = "[\\u064B-\\u065F\\u0670]*";
+  // The guide's own name, with the vowels the owner gave: «الدَاهِيِة»
+  text = text.replace(new RegExp(`(?<![\\p{L}\\p{M}])((?:[وف]${M})?(?:[بكل]${M})?)(ا${M}ل${M})?د${M}ا${M}ه${M}ي${M}[ةه]${M}(?![\\p{L}\\p{M}])`, "gu"), (_m, pre: string, al?: string) => `${pre}${al ? "ال" : ""}دَاهِيِة`);
   return text.replace(
     new RegExp(`(?<![\\p{L}\\p{M}])((?:[وف]${M})?)((?:[بكل]${M})?)(?:ا${M}ل${M}|ل${M})ق${M}ص${M}ب${M}(?![\\p{L}\\p{M}])`, "gu"),
     (_m, w: string, p: string) => `${w}${p}ديرتنا`
