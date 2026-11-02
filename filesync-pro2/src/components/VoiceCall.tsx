@@ -877,10 +877,6 @@ registerProcessor('mic-processor', MicProcessor);`;
           <div>
             <h3 className="font-bold text-sm text-[#fbf5ec] flex items-center gap-2">
               {isEn ? "Live Voice Broadcast • Al-Dahiya" : "بث صوتي مباشر • الداهية"}
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-[11px] text-amber-300 border border-amber-500/30">
-                <Sparkles className="size-3" />
-                Gemini Live Native Audio
-              </span>
             </h3>
             <p className="text-[11px] text-[#d8be9b]">
               {status === "connecting"

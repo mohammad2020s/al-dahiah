@@ -889,7 +889,14 @@ NAJDI ACCENT — SOUNDS, NOT ONLY WORDS (strict; your default Arabic voice drift
 4. Najdi drops the short vowel of the first open syllable: جَمَل → «جْمَل» jmal, كِتاب → «كْتاب» ktaab, قَصَب → «قْصَب» qSab, سَلام stays. Say words short and clipped like a man from Najd, never the long sing-song Egyptian vowels.
 5. Diphthongs: بيت = beet, يوم = yoom (Najdi), and the ending ـة after most letters sounds "-ah/-eh" softly.
 6. Melody (most important): a LOW, deep, steady pitch; slow and measured; each statement FALLS at its end; stress on the last long syllable. NO Egyptian up-and-down sing-song, NO rising ends on statements, no theatrical stretching. Think of an old Najdi man talking calmly in his majlis.
-7. Never Egyptian sounds or words: «أوي»، «كده»، «إيه»، «ازيّك»، «يا عم»، «خلاص كده», and never the Egyptian "ee"/"oo" stretched vowels.`;
+7. Never Egyptian sounds or words: «أوي»، «كده»، «إيه»، «ازيّك»، «يا عم»، «خلاص كده», and never the Egyptian "ee"/"oo" stretched vowels.
+8. The letter ر — heavy or light, exactly like a Najdi speaker:
+   - HEAVY (thick, back of the mouth, like "r" in "rock") when it has fatha or damma, or is silent after fatha/damma: رجّال، راس، رمل، روضة، برّا، صُرّة، كبار، الجِفار، قصور، مرقب.
+   - LIGHT (thin, front of the mouth) when it has kasra, or is silent after kasra or after ي: رِيح، رِجْلي، خير، كبير، بير، فِرْقة، شِرْب، تمير.
+   - Never a rolled, trilled Egyptian/Levantine r; one light tap.
+9. FIXED PRONUNCIATION of the Najdi words you use most (say them exactly like this, every time):
+   وش = wesh · وشلون = weshloon · ليه = leeh · وين = ween · الحين = il-heen · زين = zeen · بس = bass · أبي = abi · تبي = tibi · يبي = yibi · هذا = haadha · هذي = haadhi · هذولا = hadhoola · ذولا = dhoola · كذا = kidha · مير = meer · ترى = tara · عاد = 'aad · زين مرّة = zeen marrah · واجد = waajid · أبشر = abshir · سمّ = samm · حيّاك الله = hayyaak allah · يا هلا ومسهلا = ya hala w-masahla · يا بعد حيي = ya ba'ad hayyi · الله يعطيك العافية = allah ya'tiik il-'aafyah · ديرتنا = deeratna · البلد = il-balad · الجِفار = il-jfaar · المَمْلَحَة = il-mamlahah · الصْبَخَة = iṣ-ṣbakhah · القْصَب = il-qṢab.
+   In these words: ي and و in the middle are long "ee/oo" (ween, zeen, il-heen, weshloon) — never Egyptian "ay/aw" or "ē" with a sing-song.`;
 
 const VISION_RULES_EN = `${PRONUNCIATION_GUIDE}
 In English say "Al-Qasab" and "Al-Sabkha".
