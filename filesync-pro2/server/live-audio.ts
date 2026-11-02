@@ -32,6 +32,13 @@ ${placeList}
 تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف في الكلام العادي «گ» نجدية (گال، گَهْوة) إلا «القْصَب» بقاف فصيحة، والثاء والذال بأصواتها، والكلام قصير ومقطّع، والنبرة واطية ثابتة تنزل آخر الجملة، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.`;
 }
 
+// Variants tried by the owner from the browser before one is made the default
+const LAB_VARIANTS: Record<string, string> = {
+  li: "\n\nاسم البلد بصوتك: انطقه كأنه مكتوب «إلْقِصْبْ» بسرعة: لام ساكنة ثم قاف بدون أي فتحة بعدها، وتلتصق القاف بالصاد، والفتحة الوحيدة قصيرة على الصاد: «اِلْ-قْصَبْ». أبداً لا تقول «قَـ» بعد اللام.",
+  sbakha: "\n\nاسم البلد بصوتك يجي على نفس وزن «الصْبَخَة» و«الجْمَل» و«الكْتاب» في نطق أهل نجد: الحرف الأول ساكن ملزوق بالثاني. «القْصَبْ» = «اِلقْصَبْ»، مثل ما تقول «اِلصْبَخَة».",
+  never: "\n\nقاعدة صوتية للاسم: بين القاف والصاد في «القْصَبْ» ما فيه أي صوت حركة أبداً، لا فتحة ولا كسرة ولا ضمة. لو حسّيت إنك بتقول «قَصَب» وقف وقلها «قْصَب».",
+};
+
 export function setupLiveAudio(server: Server) {
   const wss = new WebSocketServer({ noServer: true });
 
@@ -77,6 +84,8 @@ export function setupLiveAudio(server: Server) {
         : "";
     // Charon: in recorded tests it said «القْصَب» with two short syllables, where Puck often stretched it to «القصّاب»
     const voiceName = testVoice || process.env.LIVE_VOICE || "Charon";
+    // Owner-only pronunciation variants (?variant=…&key=STATS_KEY): extra lines appended to the instructions
+    const variantId = ownerKey && reqUrl.searchParams.get("key") === ownerKey ? reqUrl.searchParams.get("variant") || "" : "";
 
     // Free key first; the paid key (GEMINI_PAID_API_KEY) only if the free one is refused
     const keys = voiceKeys("live");
@@ -89,7 +98,7 @@ export function setupLiveAudio(server: Server) {
 
     // Bilingual prompt: the caller may switch language mid-call (English → English, Arabic → Najdi only)
     // In a call he can put a place on the caller's screen: show it first, then explain
-    const systemInstruction = liveSystemInstruction();
+    const systemInstruction = liveSystemInstruction() + (LAB_VARIANTS[variantId] || "");
 
     // Built once; sent on every connection attempt
     const setupMessage = {
