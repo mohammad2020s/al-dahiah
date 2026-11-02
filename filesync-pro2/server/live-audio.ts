@@ -3,6 +3,7 @@ import type { Server } from "http";
 import "dotenv/config";
 import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE } from "./alQasabScope.ts";
 import { QASAB_FILE_INDEX, fileContextFor } from "./qasabFile.ts";
+import { teach } from "./pronMemory.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { createLimiter, clientIp } from "./rateLimit.ts";
 import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
@@ -24,6 +25,8 @@ Places:
 ${placeList}
 
 صوت المكالمة: المتصل يشوف على الشاشة شايب نجدي من أهل القْصَب، وهو أنت. امشِ على «قواعد اللهجة الثابتة» و«النطق النجدي بالأصوات» فوق بالحرف: نفس الصوت الهادي الدافي ونفس العبارات كل مرة، بدون اجتهاد. بالعربي نجدي بس، وبالإنجليزي إنجليزي بسيط ودود.
+
+تعلّم النطق من المتصل: إذا صحّح لك المتصل نطق كلمة أو قالها بطريقة ثانية، اسمع نطقه بدقة وقلّده بالضبط (نفس الحركات والقاف والراء والمدّ) في باقي المكالمة كلها، إلا إذا خالف «قاموس النطق المعتمد من صاحب الموقع».
 
 اسم البلد بصوتك (قاعدة صارمة جداً): اسم البلد «القصَب» ينقال بالقاف النجدية «گ» مثل قاف «قريب» (= «گريب»): «الگْصَبْ»: اللام ساكنة، ثم «گ» ساكنة ملزوقة في «صَبْ»، ثم فتحة قصيرة على الصاد، والباء ساكنة. غلط: القاف الفصيحة «القَصَب»، و«القصّاب» و«القصاب» (مدّ أو تشديد)، و«الجصب». قل الاسم في الترحيب مرة، وبعدها «ديرتنا» أو «البلد» عادي.
 
@@ -89,7 +92,12 @@ export function setupLiveAudio(server: Server) {
 
     // Bilingual prompt: the caller may switch language mid-call (English → English, Arabic → Najdi only)
     // In a call he can put a place on the caller's screen: show it first, then explain
-    const systemInstruction = liveSystemInstruction();
+    const isOwnerCall = !!ownerKey && reqUrl.searchParams.get("key") === ownerKey;
+    const systemInstruction =
+      liveSystemInstruction() +
+      (isOwnerCall
+        ? "\n\nالمتصل الحين هو صاحب الموقع (المعلّم). إذا علّمك نطق كلمة («قل كذا»، «انطقها كذا»، «لا، تنقال …»): اسمع نطقه بدقة، واكتب الكلمة بإملائها العادي، واكتب نطقها بالحروف العربية والحركات بالضبط مثل ما سمعته (استخدم «گ» للقاف النجدية، والسكون والشدة مثل ما قالها)، واستدعِ الأداة learn_pronunciation، وبعدها قل الكلمة بنطقه مرة وحدة وقل: «حفظتها». ولو قال «لا، غلط» عدّلها واستدعِ الأداة مرة ثانية بالنطق الجديد."
+        : "");
 
     // Built once; sent on every connection attempt
     const setupMessage = {
@@ -101,6 +109,22 @@ export function setupLiveAudio(server: Server) {
         tools: [
           {
             functionDeclarations: [
+              ...(isOwnerCall
+                ? [
+                    {
+                      name: "learn_pronunciation",
+                      description: "Save how the site owner pronounces a word, for every chat, call and read-aloud from now on. Call it when the owner teaches you a pronunciation.",
+                      parameters: {
+                        type: "OBJECT",
+                        properties: {
+                          word: { type: "STRING", description: "The word in normal Arabic spelling, e.g. «القصب»" },
+                          say: { type: "STRING", description: "Exactly how the owner said it, in Arabic letters with full vowel marks (fatha/kasra/damma/sukoon/shadda), «گ» for the Najdi g, e.g. «الگْصَبْ»" },
+                        },
+                        required: ["word", "say"],
+                      },
+                    },
+                  ]
+                : []),
               {
                 name: "lookup_info",
                 description: "Look up verified details from the official Al-Qasab salt season file (poems, poets, proverbs, people, dates, numbers, season stations, events, history). Call it before answering such a question.",
@@ -193,16 +217,21 @@ export function setupLiveAudio(server: Server) {
         ws.send(JSON.stringify(setupMessage));
       });
 
-      ws.on("message", (data) => {
+      ws.on("message", async (data) => {
         let text = data.toString();
         if (!setupDone && text.includes("setupComplete")) setupDone = true;
         // lookup_info is answered here from the season file; other tool calls go on to the page
-        if (text.includes("toolCall") && text.includes("lookup_info")) {
+        if (text.includes("toolCall") && (text.includes("lookup_info") || text.includes("learn_pronunciation"))) {
           try {
             const msg = JSON.parse(text);
             const calls: any[] = msg.toolCall?.functionCalls || [];
             const look = calls.filter((c) => c.name === "lookup_info");
-            const rest = calls.filter((c) => c.name !== "lookup_info");
+            const learn = calls.filter((c) => c.name === "learn_pronunciation");
+            const rest = calls.filter((c) => c.name !== "lookup_info" && c.name !== "learn_pronunciation");
+            for (const c of learn) {
+              const t = isOwnerCall ? await teach(String(c.args?.word || ""), String(c.args?.say || ""), "من مكالمة") : null;
+              ws.send(JSON.stringify({ toolResponse: { functionResponses: [{ id: c.id, name: c.name, response: { result: t ? `saved: ${t.word} = ${t.say}` : "not saved" } }] } }));
+            }
             if (look.length) {
               ws.send(JSON.stringify({
                 toolResponse: {

@@ -1,4 +1,5 @@
 import { najdify, speakableTownName, OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
+import { parseTeach, teach, forget, taughtList, applyTaught, taughtRulesAr } from "./pronMemory.ts";
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { fileContextFor } from "./qasabFile.ts";
@@ -81,6 +82,13 @@ apiRouter.get("/location", (req, res) => {
 });
 
 /** Owner pages (stats, stamp signs): the request must carry STATS_KEY. Answers itself when it doesn't. */
+/** True when the request carries the owner's key (no response written). */
+function isOwner(req: Request): boolean {
+  const expected = process.env.STATS_KEY || "";
+  const given = String(req.headers["x-stats-key"] || "");
+  return expected.length > 0 && given.length === expected.length && timingSafeEqual(Buffer.from(given), Buffer.from(expected));
+}
+
 function ownerOnly(req: Request, res: Response): boolean {
   const expected = process.env.STATS_KEY || "";
   const given = String(req.query.key || req.headers["x-stats-key"] || "");
@@ -168,6 +176,30 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
   };
 
   const requestStartTime = Date.now();
+  // The owner teaches a pronunciation: «انطق X كذا: Y» → saved for every chat, call and read-aloud
+  if (isOwner(req)) {
+    const raw = String(req.body?.message || "").trim();
+    const forgetM = raw.match(/^(?:انس|انسى|احذف)\s+(?:نطق\s+)?«?([^«»\n]+?)»?$/);
+    const taughtM = parseTeach(raw);
+    if (forgetM || taughtM || /^(?:وش|ايش)\s+(?:علمتك|علّمتك)/.test(raw)) {
+      let answer: string;
+      if (forgetM) {
+        await forget(forgetM[1]);
+        answer = `أبشر، نسيت نطق «${forgetM[1].trim()}» اللي علّمتني إياه، وبرجع لقواعدي.`;
+      } else if (taughtM) {
+        const t = await teach(taughtM.word, taughtM.say);
+        answer = t
+          ? `أبشر، حفظتها: «${t.word}» أنطقها «${t.say}» من الحين، في المحادثة والمكالمة والاستماع، مع كل الزوار.`
+          : "ما فهمت الكلمة أو النطق، اكتبها كذا: انطق «الكلمة» كذا: «النطق بالحركات».";
+      } else {
+        const list = taughtList();
+        answer = list.length ? "الكلمات اللي علّمتني نطقها:\n" + list.map((t) => `- «${t.word}» = «${t.say}»`).join("\n") : "ما علّمتني ولا كلمة للحين.";
+      }
+      sendEvent({ type: "chunk", content: answer });
+      sendEvent({ type: "done", answer });
+      return res.end();
+    }
+  }
   try {
     // Correct «القصيب» → «القْصَب» before anything (guards, Gemini) sees the message
     // «صوّر واسأل»: an optional photo (JPEG/PNG/WebP, base64) sent with the question
@@ -466,6 +498,7 @@ export function buildSpeechPrompt(transcript: string): string {
   return [
     "اقرأ النص بصوت شايب نجدي من أهل القْصَب في الوشم، يسولف بهدوء في مجلسه: صوت واطي وعميق وثابت، كلام موزون، وآخر الجملة ينزل، بدون تلحين مصري.",
     "الأصوات: الجيم معطّشة (مو «گ» المصرية)، والقاف في الكلام العادي «گ» نجدية (قال = گال، قهوة = گَهْوة)، واسم البلد بعد «الگْصَبْ»، والثاء ثاء والذال ذال، والحركة الأولى القصيرة تنحذف (جْمَل، كْتاب)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة وبعد الياء (خير، كبير)، ضربة وحدة بدون ترديد.",
+    taughtRulesAr(),
     OWNER_PRONUNCIATIONS_AR,
     ...(notes.length ? ["أسماء الأماكن (قاعدة صارمة فوق كل شي، قلها أبطأ وأوضح):", ...notes.map((n) => `- ${n}`)] : []),
     "",
@@ -605,7 +638,7 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
       const ttsCall = (model: string) => ai.models.generateContent({
         model,
         // Same Najdi corrections as the chat («القْصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
-        contents: [{ parts: [{ text: buildSpeechPrompt(speakableTownName(applyNajdiPhoneticDiacritics(String(text))).slice(0, 400)) }] }],
+        contents: [{ parts: [{ text: buildSpeechPrompt(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text)))).slice(0, 400)) }] }],
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } },

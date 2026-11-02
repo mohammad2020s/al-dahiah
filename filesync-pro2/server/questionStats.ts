@@ -18,7 +18,7 @@ const MAX_MEMORY_QUESTIONS = 3000;
 const today = () => new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 10); // Riyadh date
 
 // ───────────── tiny Redis client (no dependency): HINCRBY / HGETALL ─────────────
-class MiniRedis {
+export class MiniRedis {
   private socket: net.Socket | null = null;
   private buffer = Buffer.alloc(0);
   private queue: { resolve: (v: unknown) => void; reject: (e: Error) => void }[] = [];

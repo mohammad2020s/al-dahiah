@@ -728,7 +728,11 @@ registerProcessor('mic-processor', MicProcessor);`;
 
     try {
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const ws = new WebSocket(`${protocol}//${window.location.host}/live?lang=${language}`);
+      let ownerKey = "";
+      try {
+        ownerKey = localStorage.getItem("dahiah:ownerKey") || "";
+      } catch {}
+      const ws = new WebSocket(`${protocol}//${window.location.host}/live?lang=${language}${ownerKey ? `&key=${encodeURIComponent(ownerKey)}` : ""}`);
       wsRef.current = ws;
 
       ws.onmessage = async (event) => {

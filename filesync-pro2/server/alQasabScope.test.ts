@@ -263,3 +263,13 @@ test("owner pronunciations are written into everything an AI voice reads", async
   assert.equal(speakableTownName("حيّاك الله في القْصَبْ"), "حيّاك الله في الگْصَبْ");
   assert.equal(speakableTownName("رايح للقْصَبْ"), "رايح للگْصَبْ");
 });
+
+test("owner teaching: commands are understood and taught words reach the voice text", async () => {
+  const { parseTeach, applyTaught, teach, forget } = await import("./pronMemory.ts");
+  assert.deepEqual(parseTeach("انطق الوشم كذا: الوِشِم"), { word: "الوشم", say: "الوِشِم" });
+  assert.deepEqual(parseTeach("«طويق» تنطقها «طْوَيْگ»"), { word: "طويق", say: "طْوَيْگ" });
+  assert.equal(parseTeach("وش أشوف في القصب؟"), null);
+  await teach("شقراء", "شَگْرا");
+  assert.equal(applyTaught("رحت شقراء وبشقراء"), "رحت شَگْرا وبشَگْرا");
+  await forget("شقراء");
+});

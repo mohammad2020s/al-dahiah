@@ -609,9 +609,13 @@ export default function Home() {
     let accumulated = "";
 
     try {
+      let ownerKey = "";
+      try {
+        ownerKey = localStorage.getItem("dahiah:ownerKey") || "";
+      } catch {}
       const res = await fetch("/api/chat/stream", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(ownerKey ? { "x-stats-key": ownerKey } : {}) },
         body: JSON.stringify({
           message: text,
           // Text only: earlier photos are not sent again
