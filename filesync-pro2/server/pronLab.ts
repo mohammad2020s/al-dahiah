@@ -8,7 +8,7 @@ import { GoogleGenAI, Modality } from "@google/genai";
 import { liveSystemInstruction } from "./live-audio.ts";
 import { voiceKeys } from "./geminiFallback.ts";
 
-const PRON_LAB_RUN = "2026-11-02-accent-1";
+const PRON_LAB_RUN = "2026-11-02-accent-ar";
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function wav(pcm: Buffer, rate = 24000) {
@@ -75,7 +75,7 @@ function liveSay(key: string, instruction: string, prompt: string, voice = "Char
 
 // Extra lines added to the call instructions, one variant per run, to see which one the voice follows
 export const LIVE_VARIANTS: Record<string, string> = { base: "" };
-const LIVE_VOICES = ["Charon", "Gacrux", "Algenib", "Orus"];
+const LIVE_VOICES = ["Charon", "Gacrux", "Orus"];
 
 const LIVE_PROMPTS = ["قل الجملة هذي بالضبط بصوتك وبس: يا هلا ومسهلا، حيّاك الله في القْصَب. قال لي جدي: القهوة جاهزة والجو زين، تبي ثلاث فناجيل؟"];
 
@@ -106,7 +106,7 @@ export function schedulePronLab(buildSpeechPrompt: (t: string) => string) {
       await wait(20_000);
       try {
         const r = await ai.models.generateContent({
-          model: "gemini-3.1-flash-tts-preview",
+          model: "gemini-3.8-flash-tts",
           contents: [{ parts: [{ text: buildSpeechPrompt(TTS_SPELLINGS[0]) }] }],
           config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
         });

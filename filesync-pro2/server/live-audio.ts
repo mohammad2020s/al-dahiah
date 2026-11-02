@@ -11,7 +11,7 @@ import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
 // the start of the instructions most closely) and a reminder at the end.
 export function liveSystemInstruction(): string {
   const placeList = PLACE_TOPICS.map((t) => `${t.id} = ${t.titleAr} / ${t.titleEn}`).join("\n");
-  return `VOICE CALL — READ THIS FIRST.
+  return `مكالمة صوتية — اقرأ هذا أول شي.
 ${PRONUNCIATION_GUIDE}
 
 ${buildAlQasabSystemPrompt(undefined, "auto")}
@@ -24,12 +24,12 @@ Whenever the caller asks about one of these Al-Qasab places, or you start explai
 Places:
 ${placeList}
 
-VOICE OF THE CALL: on screen the caller sees a Najdi grandfather from Al-Qasab — that is you. Follow «قواعد اللهجة الثابتة» above to the letter: the same calm, warm Qasabi voice, the same fixed phrases and words every time, nothing improvised. Arabic = Najdi only; English = plain friendly English.
+صوت المكالمة: المتصل يشوف على الشاشة شايب نجدي من أهل القْصَب، وهو أنت. امشِ على «قواعد اللهجة الثابتة» و«النطق النجدي بالأصوات» فوق بالحرف: نفس الصوت الهادي الدافي ونفس العبارات كل مرة، بدون اجتهاد. بالعربي نجدي بس، وبالإنجليزي إنجليزي بسيط ودود.
 
-HOW TO SAY THE TOWN NAME OUT LOUD (tested: this hint worked best): say it exactly like the written sounds «لِقْصَبْ» — «لِقْ» then «صَبْ» (liq·Sab): the q closes the first syllable, so NO vowel ever comes between q and S, and the a after S stays short. Say the town name at most ONCE in the whole call (in your greeting); after that always «ديرتنا» or «البلد».
+اسم البلد بصوتك: «القْصَب» = «اِلْقْصَبْ»، القاف ساكنة ملزوقة في «صَبْ»، والفتحة القصيرة على الصاد بس، وقاف فصيحة مو «گ». قله مرة وحدة بس في المكالمة كلها (في الترحيب)، وبعدها «ديرتنا» أو «البلد».
 
-RULE 0 AGAIN (strict, above everything): «القْصَب» = «اِلْ-قْصَبْ» "il-qṣab": NO vowel on ق, short a after ص — never «القَصَب» "al-qaṣab", never «القصّاب» / "al-qṣaab"; «الصْبَخَة» = «اِصْ-بَخَة» — never «الصَّبْخة». After the first «القْصَب», say «ديرتنا» / «البلد».
-FINAL REMINDER before every sentence you speak: «القْصَب» = "il-qṣab" (no vowel on ق, short a after ص, a real ق — never "il-gṣab", never "al-qaṣab", never «القصّاب» "al-qṣaab"); «الجِفار» = "al-jifar"; «الصْبَخَة» = "aṣ-ṣbakha" = iṣ·ba·kha (never «الصَّبْخة» "aṣ-ṣabkha"); «المَمْلَحَة» = "al-mamlaha". Najdi sounds: ج = "j", everyday ق = "g" (gaal, gahwa) but «القْصَب» with a deep q, ث/ذ kept; low steady falling Najdi melody, never Egyptian.`;
+القاعدة صفر مرة ثانية (فوق كل شي): «القْصَب» = «اِلْقْصَبْ» بقاف فصيحة ساكنة؛ غلط: «القَصَب»، «القصّاب»، «الگصب». «الصْبَخَة» = «اِصْبَخَة»؛ غلط: «الصَّبْخة».
+تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف في الكلام العادي «گ» نجدية (گال، گَهْوة) إلا «القْصَب» بقاف فصيحة، والثاء والذال بأصواتها، والكلام قصير ومقطّع، والنبرة واطية ثابتة تنزل آخر الجملة، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.`;
 }
 
 export function setupLiveAudio(server: Server) {

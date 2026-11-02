@@ -456,32 +456,19 @@ ${context}`;
  * in the text are added, so a short answer stays a short prompt. The notes are not read aloud.
  */
 export function buildSpeechPrompt(transcript: string): string {
-  const plain = transcript.replace(/[ً-ٰٟ]/g, "");
-  const notes: string[] = [];
-  if (/قصب/.test(plain)) {
-    notes.push(
-      `«القْصَب» is "il-qṣab" = «اِلْ-قْصَبْ»: the ق has NO vowel and runs straight into «صَبْ» (short a, silent ب), the way the people of Al-Qasab say it. A deep Arabic ق, never "g". Never «القَصَب» "al-qaṣab" (vowel after ق) and never «القصّاب» / "al-qṣaab" (long a).`
-    );
-  }
-  if (/صبخ/.test(plain)) {
-    notes.push(
-      `«الصْبَخَة» is "aṣ-ṣbakha" = «اِصْ-بَخَة» (iṣ·ba·kha): no vowel on ص, the first vowel comes after ب (like the end of «شَبَكَة»). Never «الصَّبْخة» / "aṣ-ṣabkha".`
-    );
-  }
-  if (/جفار/.test(plain)) notes.push(`«الجِفار» is "al-jifar" with ج.`);
-  if (/مملح/.test(plain)) notes.push(`«المَمْلَحَة» is "al-mamlaha".`);
-  // Every reading gets the Qasabi Najdi accent; the place-name rules come first when they apply
-  const accent =
-    "Accent: an older man from Al-Qasab in Najd (Al-Washm), Saudi Arabia, talking calmly in his majlis. Low, deep, steady pitch, slow and measured, every statement falling at its end; NO Egyptian sing-song. ج = \"j\" (never the Egyptian hard g). Everyday ق = the Najdi \"g\" (قال gaal, قهوة gahwa), never a glottal stop; only the town name «القْصَب» keeps a deep q. ث = \"th\", ذ = \"dh\" (never s/z). Short clipped Najdi vowels: the first short vowel drops (جْمَل jmal, قْصَب qSab). ر is heavy with fatha/damma (راس، رمل، كبار) and light with kasra or after ي (خير، كبير، بير), one light tap, never trilled. Najdi words: وش wesh, وين ween, الحين il-heen, زين zeen, تبي tibi, أبشر abshir, هذولا hadhoola.";
+  const plain = transcript.replace(/[ً-ٰٟ]/g, "");
   if (!/[\u0600-\u06FF]/.test(plain)) return transcript;
+  const notes: string[] = [];
+  if (/قصب/.test(plain)) notes.push("«القْصَب» تنقال «اِلْقْصَبْ»: القاف فصيحة ساكنة ملزوقة في «صَبْ»، والفتحة القصيرة على الصاد بس. غلط: «القَصَب»، «القصّاب»، «الگصب».");
+  if (/صبخ/.test(plain)) notes.push("«الصْبَخَة» تنقال «اِصْبَخَة»: الصاد ساكنة. غلط: «الصَّبْخة».");
+  if (/جفار/.test(plain)) notes.push("«الجِفار» بجيم معطّشة مكسورة.");
+  if (/مملح/.test(plain)) notes.push("«المَمْلَحَة» بفتح الميم الأولى وسكون الثانية.");
   return [
-    notes.length
-      ? "Read the transcript aloud. STRICT RULE, above everything else: pronounce these place names exactly as described, a little slower and clearer than the rest:"
-      : "Read the transcript aloud.",
-    ...notes.map((n) => `- ${n}`),
-    accent,
+    "اقرأ النص بصوت شايب نجدي من أهل القْصَب في الوشم، يسولف بهدوء في مجلسه: صوت واطي وعميق وثابت، كلام موزون، وآخر الجملة ينزل، بدون تلحين مصري.",
+    "الأصوات: الجيم معطّشة (مو «گ» المصرية)، والقاف في الكلام العادي «گ» نجدية (قال = گال، قهوة = گَهْوة) إلا اسم «القْصَب» بقاف فصيحة، والثاء ثاء والذال ذال، والحركة الأولى القصيرة تنحذف (جْمَل، كْتاب)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة وبعد الياء (خير، كبير)، ضربة وحدة بدون ترديد.",
+    ...(notes.length ? ["أسماء الأماكن (قاعدة صارمة فوق كل شي، قلها أبطأ وأوضح):", ...notes.map((n) => `- ${n}`)] : []),
     "",
-    "#### TRANSCRIPT",
+    "#### النص",
     transcript,
   ].join("\n");
 }
@@ -614,8 +601,8 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   for (const { tier, key } of keys) {
     try {
       const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-tts-preview",
+      const ttsCall = (model: string) => ai.models.generateContent({
+        model,
         // Same Najdi corrections as the chat («القْصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
         contents: [{ parts: [{ text: buildSpeechPrompt(applyNajdiPhoneticDiacritics(String(text)).slice(0, 400)) }] }],
         config: {
@@ -623,6 +610,14 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } },
         },
       });
+      // The newest TTS model first; the old preview (retiring 17 Nov 2026) only if it refuses
+      let response: any;
+      try {
+        response = await ttsCall("gemini-3.8-flash-tts");
+      } catch (e: any) {
+        console.warn("[TTS] gemini-3.8-flash-tts failed, falling back:", String(e?.message || e).slice(0, 120));
+        response = await ttsCall("gemini-3.1-flash-tts-preview");
+      }
       const audioPart = response.candidates?.[0]?.content?.parts?.find(
         (p: any) => p.inlineData?.mimeType?.startsWith("audio/")
       );
