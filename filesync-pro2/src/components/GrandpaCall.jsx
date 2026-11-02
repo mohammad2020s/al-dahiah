@@ -3,7 +3,7 @@ import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { GRANDPA_FRAMES as FRAMES } from './grandpaFrames';
 
-// «الداهية» as a realistic 2D Najdi grandfather for the live call (replaces the salt bag).
+// «الداهية» as a 2D cartoon Najdi grandfather for the live call (portrait drawn with Gemini).
 // Three pixel-aligned paintings of the same portrait: mouth closed / mouth open / eyes closed.
 // The shader shows the base and blends in only the mouth area (with the voice level) and only
 // the eye area (for blinks), so the rest of the picture never ghosts.
@@ -35,26 +35,26 @@ const fragmentShader = `
 
   const float SIZE = 768.0;
   // Mouth + beard region that moves when he talks
-  const vec2 MOUTH_C = vec2(390.0, 429.0);
-  const vec2 MOUTH_R = vec2(113.2, 113.2);
+  const vec2 MOUTH_C = vec2(388.0, 392.0);
+  const vec2 MOUTH_R = vec2(105.0, 105.0);
   // Jaw: the upper lip stays, everything from the lower lip to the beard's tip drops by JAW_DROP
   // px between the closed and the open painting (measured on the two images)
-  const float UPPER_LIP_Y = 372.0;
-  const float LOWER_LIP_Y = 408.0;
-  const float BEARD_END_Y = 485.0;
-  const float NECK_Y = 515.0;
-  const float JAW_DROP = 28.0;
-  const float JAW_HALF_W = 92.0;
+  const float UPPER_LIP_Y = 377.0;
+  const float LOWER_LIP_Y = 398.0;
+  const float BEARD_END_Y = 478.0;
+  const float NECK_Y = 505.0;
+  const float JAW_DROP = 22.0;
+  const float JAW_HALF_W = 88.0;
   // Eyes
-  const vec2 EYE_L = vec2(325.5, 247.5);
-  const vec2 EYE_R = vec2(450.8, 248.2);
-  const vec2 EYE_RAD = vec2(42.0, 27.0);
+  const vec2 EYE_L = vec2(339.0, 277.0);
+  const vec2 EYE_R = vec2(433.0, 277.0);
+  const vec2 EYE_RAD = vec2(32.0, 19.0);
 
-  const vec2 NECK = vec2(384.0, 520.0);   // the head turns around this point
-  const vec2 HEAD_C = vec2(384.0, 250.0);
+  const vec2 NECK = vec2(386.0, 505.0);   // the head turns around this point
+  const vec2 HEAD_C = vec2(386.0, 280.0);
   const vec2 HEAD_R = vec2(250.0, 300.0);
-  const vec2 BROW_C = vec2(384.0, 212.0);
-  const vec2 BROW_R = vec2(150.0, 42.0);
+  const vec2 BROW_C = vec2(386.0, 250.0);
+  const vec2 BROW_R = vec2(110.0, 30.0);
 
   float ell(vec2 px, vec2 c, vec2 r) {
     float d = length((px - c) / r);
@@ -271,7 +271,7 @@ export default function GrandpaCall({
         overflow: 'hidden',
         position: 'relative',
         // Shown while the paintings load
-        background: 'url(/images/shayeb/base.jpg) center 2% / 113% no-repeat, #8a4a32',
+        background: 'url(/images/shayeb/base.jpg) center 2% / 113% no-repeat, #d9b483',
         boxShadow: '0 25px 60px rgba(0,0,0,0.55)',
         ...style,
       }}
