@@ -379,7 +379,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
   return (
     <div className={`flex flex-col ${isUser ? "items-start" : "items-start w-full"}`}>
       {isUser ? (
-        <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-[#94532d] px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-stone-950/10">
+        <div className="najdi-carve max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-[#a35e33] to-[#7a4322] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-stone-950/15 ring-1 ring-[#d6a84a]/30">
           {message.photo && (
             <img
               src={message.photo}
@@ -393,8 +393,8 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
         <div className="w-full space-y-2.5">
           <div className="flex items-center justify-between pr-0.5">
             <div className="flex items-center gap-2">
-              <MalhAlQasabLogo size="sm" className="rounded-xl" />
-              <span className="text-xs font-bold text-[#3a2a1c]">{t.appName}</span>
+              <span className="dahiah-avatar size-9 shrink-0 rounded-full" aria-hidden="true" />
+              <span className="font-kufi text-sm font-bold text-[#3a2a1c]">{t.appName}</span>
             </div>
 
             <div className="flex items-center gap-1.5">
@@ -433,7 +433,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
           </div>
 
           <div
-            className={`rounded-[1.4rem] border px-5 py-4 text-sm leading-7 shadow-sm sm:px-6 sm:py-5 ${
+            className={`heritage-frame rounded-[1.4rem] border-s-4 !border-s-[#b8893d] px-5 py-4 text-sm leading-7 sm:px-6 sm:py-5 ${
               message.guarded
                 ? "border-[#e8d5bb] bg-[#fcf7ef] text-[#6d2520]"
                 : "border-[#e6d5bd] bg-white text-[#241515]"
@@ -748,7 +748,8 @@ export default function Home() {
 
       <div className="relative z-[1] mx-auto flex min-h-screen max-w-[1480px] flex-col px-4 pt-4 pb-28 sm:px-6 lg:px-8 lg:pb-4">
         {/* Header Bar */}
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-[#e6d5bd] bg-white/95 px-4 py-2.5 shadow-sm backdrop-blur">
+        <div className="merlons mx-10 -mb-px opacity-90" aria-hidden="true" />
+        <header className="heritage-frame flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-white/95 px-4 py-2.5 backdrop-blur">
           {/* Logo & Name */}
           <div className="flex items-center gap-3">
             <MalhAlQasabLogo size="md" className="rounded-2xl" />
@@ -815,7 +816,7 @@ export default function Home() {
           {/* Sidebar */}
           <aside id="season-panel" className="order-2 w-full scroll-mt-4 lg:order-none lg:w-[300px] shrink-0 flex flex-col gap-4">
             {/* Top card (desktop): earthy brown with a Sadu ribbon */}
-            <div className="relative hidden overflow-hidden rounded-[1.7rem] bg-gradient-to-br from-[#4a2814] via-[#6c3a1c] to-[#94532d] p-5 pt-6 text-white shadow-lg shadow-stone-950/20 lg:block">
+            <div className="najdi-carve relative hidden overflow-hidden rounded-[1.7rem] bg-gradient-to-br from-[#4a2814] via-[#6c3a1c] to-[#94532d] p-5 pt-6 text-white shadow-lg shadow-stone-950/20 ring-1 ring-[#d6a84a]/40 ring-inset lg:block">
               <div className="sadu-strip absolute inset-x-0 top-0" aria-hidden="true" />
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-bold">
                 <Sparkles className="size-3" />
@@ -903,7 +904,7 @@ export default function Home() {
           </aside>
 
           {/* Main Chat Container */}
-          <section id="chat-panel" className="order-1 scroll-mt-3 lg:order-none flex-1 flex min-h-[78vh] lg:min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] border border-[#e6d5bd] bg-white/80 shadow-md backdrop-blur-sm">
+          <section id="chat-panel" className="order-1 scroll-mt-3 lg:order-none flex-1 flex min-h-[78vh] lg:min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] heritage-frame bg-white/80 backdrop-blur-sm">
             <div className="sadu-strip" aria-hidden="true" />
             {/* Top Bar inside Chat */}
             <div className="flex items-center justify-between border-b border-[#ede1cd] bg-white px-5 py-3.5">
@@ -922,10 +923,11 @@ export default function Home() {
               {messages.length === 0 ? (
                 /* Welcome screen: the photo behind the visitor right now, then questions with icons */
                 <div className="mx-auto flex min-h-[400px] max-w-xl flex-col items-center justify-center text-center">
-                  <div className="mb-3 rounded-[1.7rem] border border-[#e6d5bd] bg-white p-1 shadow-md">
+                  <div className="najdi-arch mb-3 border border-[#d9c09f] bg-white p-1.5 pt-3 shadow-md ring-1 ring-[#b8893d]/30 ring-offset-2 ring-offset-[#fbf6ee]">
                     <MalhAlQasabLogo size="lg" />
                   </div>
                   <h2 className="font-kufi text-2xl font-bold text-[#3a2a1c] sm:text-3xl">{t.welcomeTitle}</h2>
+                  <div className="orn-divider mt-2 w-48" aria-hidden="true"><i /></div>
                   <p className="mt-2 max-w-md text-sm leading-6 text-[#685140]">{t.welcomeDesc}</p>
 
                   {(() => {
@@ -936,7 +938,7 @@ export default function Home() {
                         key={slide.src}
                         disabled={isStreaming}
                         onClick={() => askQuestion(language === "en" ? slide.ask.en : slide.ask.ar)}
-                        className="ec-photo group relative mt-5 block aspect-[16/8] w-full overflow-hidden rounded-3xl border border-[#e6d5bd] bg-[#2a2016] text-start shadow-md"
+                        className="ec-photo group relative mt-5 block aspect-[16/8] w-full overflow-hidden rounded-3xl border border-[#d9c09f] bg-[#2a2016] text-start shadow-md ring-1 ring-[#b8893d]/40 ring-offset-2 ring-offset-[#fbf6ee]"
                       >
                         <img src={isNarrow ? slide.src.replace("/images/bg/", "/images/bg-sm/") : slide.src} alt={language === "en" ? slide.en : slide.ar} className="size-full object-cover transition duration-700 group-hover:scale-105" />
                         <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-3.5 pt-12">
@@ -966,9 +968,9 @@ export default function Home() {
                         type="button"
                         disabled={isStreaming || !q}
                         onClick={() => q && askQuestion(q)}
-                        className="group flex items-center gap-2.5 rounded-2xl border border-[#e6d5bd] bg-white p-3 text-start text-sm font-bold text-[#3a2a1c] shadow-xs transition hover:border-[#94532d] hover:bg-[#faf4ea] active:scale-[0.98]"
+                        className="heritage-frame group flex items-center gap-2.5 rounded-2xl bg-white p-3 text-start text-sm font-bold text-[#3a2a1c] transition hover:-translate-y-0.5 hover:bg-[#faf4ea] active:scale-[0.98]"
                       >
-                        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#f3ebdf] text-[#94532d] transition group-hover:bg-[#94532d] group-hover:text-white">
+                        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#f3ebdf] text-[#94532d] ring-1 ring-[#b8893d]/50 transition group-hover:bg-[#94532d] group-hover:text-white">
                           <Icon className="size-4.5" />
                         </span>
                         <span className="min-w-0 leading-tight">{language === "en" ? enLabel : ar}</span>
@@ -1030,7 +1032,7 @@ export default function Home() {
                               key={q}
                               type="button"
                               onClick={() => askQuestion(q)}
-                              className="inline-flex items-center gap-1.5 rounded-full border border-[#e5d2b8] bg-[#fdfaf5] px-3 py-1.5 text-xs font-semibold text-[#6c3a1c] shadow-xs hover:border-[#94532d] hover:bg-[#f5eadb] transition active:scale-95"
+                              className="inline-flex items-center gap-1.5 rounded-full border border-[#d6b98a] bg-[#fdfaf5] px-3 py-1.5 text-xs font-semibold text-[#6c3a1c] shadow-xs hover:border-[#b8893d] hover:bg-[#f5eadb] transition active:scale-95"
                             >
                               <CornerDownLeft className={`size-3.5 text-[#94532d] ${language === "en" ? "-scale-x-100" : ""}`} />
                               {q}

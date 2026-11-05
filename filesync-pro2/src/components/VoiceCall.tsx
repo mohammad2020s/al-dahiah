@@ -879,7 +879,7 @@ registerProcessor('mic-processor', MicProcessor);`;
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col bg-[#21160e]/95 p-3 sm:p-5 backdrop-blur-xl text-[#fbf5ec] overflow-hidden ${
+      className={`vc-heritage fixed inset-0 z-50 flex flex-col bg-[#21160e]/95 p-3 sm:p-5 backdrop-blur-xl text-[#fbf5ec] overflow-hidden ${
         closingVia ? "vc-closing" : "vc-call-enter"
       }`}
       dir={isEn ? "ltr" : "rtl"}
@@ -1060,6 +1060,7 @@ registerProcessor('mic-processor', MicProcessor);`;
                 scale: isCameraOn || showcase ? "0.34" : "1",
               }}
             >
+              {!(isCameraOn || showcase) && <span className="vc-halo" aria-hidden="true" />}
               <GrandpaCall
                 externalAudioLevel={outputAudioLevel}
                 isSpeaking={status === "speaking" || isGeminiSpeaking}

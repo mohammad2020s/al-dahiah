@@ -49,7 +49,7 @@ export function RichText({ text, className = "" }: { text: string; className?: s
   // Numbered points the model wrote inline («... مشاهداتنا: ١. أحواض ... ٢. أكوام») go on their own lines
   const lines = text
     .replace(/\r/g, "")
-    .replace(/([^\n])[ \t]+([0-9٠-٩]{1,2})[.)][ \t]+(?=\S)/g, "$1\n$2. ")
+    .replace(/([:.،؛!؟)])[ \t]+([0-9٠-٩]{1,2})[.)][ \t]+(?=\S)/g, "$1\n$2. ")
     // …and so do dash bullets written inline after a colon or full stop («القصب: - الحالة: صافي. - الرياح…»)
     .replace(/([:.،%)])[ \t]+[-•][ \t]+(?=\S)/g, "$1\n- ")
     .split("\n");

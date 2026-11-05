@@ -26,6 +26,7 @@ export function MobileBar({
       className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e6d5bd] bg-[#fdfaf5]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_24px_rgba(58,42,28,0.12)] backdrop-blur-md lg:hidden"
       aria-label={en ? "Quick actions" : "اختصارات"}
     >
+      <div className="merlons absolute inset-x-0 -top-[13px] opacity-95" aria-hidden="true" />
       <div className="mx-auto flex max-w-lg items-end px-2">
         <button type="button" onClick={onChat} className={item}>
           <MessageCircle className="size-5 text-[#94532d]" />
@@ -39,7 +40,7 @@ export function MobileBar({
           <button
             type="button"
             onClick={onCall}
-            className="relative -mt-6 mb-1 grid size-16 place-items-center rounded-full border-4 border-[#fdfaf5] bg-gradient-to-br from-[#94532d] to-[#5a3018] text-white shadow-lg active:scale-95"
+            className="relative -mt-7 mb-1 grid size-16 place-items-center rounded-full border-4 border-[#fdfaf5] bg-gradient-to-br from-[#94532d] to-[#5a3018] text-white shadow-lg ring-2 ring-[#b8893d] active:scale-95"
             aria-label={en ? "Call Al-Dahiya" : "اتصل على الداهية"}
           >
             <span className="absolute size-14 animate-ping rounded-full bg-[#94532d]/25" />
@@ -65,7 +66,7 @@ export function FloatingCall({ language = "ar", onCall }: { language?: Language;
     <button
       type="button"
       onClick={onCall}
-      className="fab-call fixed bottom-6 end-6 z-40 hidden items-center gap-2 rounded-full bg-gradient-to-br from-[#94532d] to-[#5a3018] py-3 ps-3 pe-5 text-sm font-bold text-white shadow-xl shadow-stone-900/25 hover:brightness-110 active:scale-95 lg:inline-flex"
+      className="fab-call fixed bottom-6 end-6 z-40 hidden items-center gap-2 rounded-full bg-gradient-to-br from-[#94532d] to-[#5a3018] py-3 ps-3 pe-5 text-sm font-bold text-white shadow-xl shadow-stone-900/25 ring-2 ring-[#b8893d]/70 ring-offset-2 ring-offset-transparent hover:brightness-110 active:scale-95 lg:inline-flex"
     >
       <span className="relative grid size-9 place-items-center rounded-full bg-white/15">
         <span className="absolute inset-0 animate-ping rounded-full bg-amber-200/30" />
