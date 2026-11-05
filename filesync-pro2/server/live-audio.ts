@@ -3,7 +3,8 @@ import type { Server } from "http";
 import "dotenv/config";
 import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE } from "./alQasabScope.ts";
 import { QASAB_FILE_INDEX, fileContextFor } from "./qasabFile.ts";
-import { teach } from "./pronMemory.ts";
+import { teach, spokenForm } from "./pronMemory.ts";
+import { speakableTownName } from "./najdiStyle.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { createLimiter, clientIp } from "./rateLimit.ts";
 import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
@@ -93,8 +94,11 @@ export function setupLiveAudio(server: Server) {
     // Bilingual prompt: the caller may switch language mid-call (English → English, Arabic → Najdi only)
     // In a call he can put a place on the caller's screen: show it first, then explain
     const isOwnerCall = !!ownerKey && reqUrl.searchParams.get("key") === ownerKey;
-    const systemInstruction =
-      liveSystemInstruction() +
+    // The voice only ever sees the owner's pronunciations (no «القصب» anywhere, only «الگْصَبْ»…)
+    const systemInstruction = spokenForm(
+      liveSystemInstruction(),
+      speakableTownName
+    ) +
       (isOwnerCall
         ? "\n\nالمتصل الحين هو صاحب الموقع (المعلّم). إذا علّمك نطق كلمة («قل كذا»، «انطقها كذا»، «لا، تنقال …»): اسمع نطقه بدقة، واكتب الكلمة بإملائها العادي، واكتب نطقها بالحروف العربية والحركات بالضبط مثل ما سمعته (استخدم «گ» للقاف النجدية، والسكون والشدة مثل ما قالها)، واستدعِ الأداة learn_pronunciation، وبعدها قل الكلمة بنطقه مرة وحدة وقل: «حفظتها». ولو قال «لا، غلط» عدّلها واستدعِ الأداة مرة ثانية بالنطق الجديد."
         : "");
@@ -238,7 +242,7 @@ export function setupLiveAudio(server: Server) {
                   functionResponses: look.map((c) => ({
                     id: c.id,
                     name: c.name,
-                    response: { result: fileContextFor(String(c.args?.query || ""), "", 3500) || "ما فيه معلومة عن هذا في الملف الرسمي." },
+                    response: { result: spokenForm(fileContextFor(String(c.args?.query || ""), "", 3500) || "ما فيه معلومة عن هذا في الملف الرسمي.", speakableTownName) },
                   })),
                 },
               }));
@@ -282,7 +286,17 @@ export function setupLiveAudio(server: Server) {
     clientWs.on("message", (data) => {
       if (geminiWs.readyState !== WebSocket.OPEN) return;
       try {
-        const text = data.toString();
+        let text = data.toString();
+        // Chat context sent at the start of the call: the same spoken spellings as the instructions
+        if (text.includes('"clientContent"')) {
+          try {
+            const msg = JSON.parse(text);
+            for (const turn of msg.clientContent?.turns || []) {
+              for (const part of turn.parts || []) if (typeof part.text === "string") part.text = spokenForm(part.text, speakableTownName);
+            }
+            text = JSON.stringify(msg);
+          } catch {}
+        }
         // Never log raw microphone payloads: they contain private user audio.
         geminiWs.send(text);
       } catch {

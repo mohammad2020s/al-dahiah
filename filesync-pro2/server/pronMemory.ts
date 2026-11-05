@@ -153,3 +153,18 @@ export function ownerRulesAr(): string {
     list.map((r, i) => `${i + 1}) ${r.text}`).join("\n")
   );
 }
+
+/** Everything Gemini Live reads (instructions, tool results, chat context) rewritten so it only ever
+ *  sees the owner's pronunciations: «الگْصَبْ»، «الدَّاهِيِة»، «اعَرَّفْك» and every taught word.
+ *  Text after «غلط» on a line (the wrong examples) is left as written. */
+export function spokenForm(text: string, rewrite: (t: string) => string): string {
+  return text
+    .split("\n")
+    .map((line) => {
+      const i = line.indexOf("غلط");
+      const head = i >= 0 ? line.slice(0, i) : line;
+      const tail = i >= 0 ? line.slice(i) : "";
+      return rewrite(applyTaught(head)) + tail;
+    })
+    .join("\n");
+}
