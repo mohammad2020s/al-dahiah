@@ -11,11 +11,19 @@ import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
 
 // The call's instructions (also used by the pronunciation lab). Pronunciation first (models follow
 // the start of the instructions most closely) and a reminder at the end.
-export function liveSystemInstruction(): string {
+export function liveSystemInstruction(lang: "ar" | "en" = "ar"): string {
   const placeList = PLACE_TOPICS.map((t) => `${t.id} = ${t.titleAr} / ${t.titleEn}`).join("\n");
-  return `مكالمة صوتية — اقرأ هذا أول شي. ردودك في المكالمة قصيرة: جملتين أو ثلاث، وبعدها اسأل المتصل.
+  // Arabic call: the whole brief in Arabic so the voice thinks, and speaks, in Najdi Arabic (the English
+  // brief made it answer in English: «Welcome to Al-Qasab!»)
+  const langLock =
+    lang === "en"
+      ? "LANGUAGE: the caller chose English. Answer in simple, warm English. If they speak Arabic, answer in Najdi Arabic."
+      : "اللغة (قاعدة صارمة جداً): تكلّم بالعربي باللهجة النجدية القصبية بس، من أول كلمة لآخر كلمة. ممنوع تتكلم إنجليزي أبداً، حتى الترحيب وحتى اسمك واسم البلد (لا «Welcome» ولا «Al-Qasab» ولا «Al-Dahiya»). ما تتكلم إنجليزي إلا إذا المتصل نفسه تكلّم جملة إنجليزية كاملة.";
+  return `${langLock}
 
-${buildAlQasabSystemPrompt(undefined, "auto")}
+مكالمة صوتية — اقرأ هذا أول شي. ردودك في المكالمة قصيرة: جملتين أو ثلاث، وبعدها اسأل المتصل.
+
+${buildAlQasabSystemPrompt(undefined, lang)}
 
 OFFICIAL SALT SEASON FILE: the details (poems, poets, proverbs, people, dates, numbers, season stations, events, history) are NOT written here. When the caller asks for something like that, call the tool lookup_info with a short Arabic query FIRST, then answer from what it returns (it is verified and overrides anything above). Its sections:
 ${QASAB_FILE_INDEX}
@@ -32,7 +40,9 @@ ${placeList}
 اسم البلد بصوتك (قاعدة صارمة جداً): اسم البلد «القصَب» ينقال بالقاف النجدية «گ» مثل قاف «قريب» (= «گريب»): «الگْصَبْ»: اللام ساكنة، ثم «گ» ساكنة ملزوقة في «صَبْ»، ثم فتحة قصيرة على الصاد، والباء ساكنة. غلط: القاف الفصيحة «القَصَب»، و«القصّاب» و«القصاب» (مدّ أو تشديد)، و«الجصب». قل الاسم في الترحيب مرة، وبعدها «ديرتنا» أو «البلد» عادي.
 
 القاعدة صفر مرة ثانية (فوق كل شي): امشِ على «قاموس النطق المعتمد من صاحب الموقع» حرفياً: اسمك «الدَّاهِيِة» (دال مشدّدة مفتوحة، هاء مكسورة، ياء مكسورة)، واسم البلد «الگْصَبْ» بـ«گ» مثل «گريب»، وكل كلمات «عرف» الراء فيها مرقّقة («اعَرَّفْك»)، و«الصْبَخَة» = «اِصْبَخَة».
-تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف «گ» نجدية (گال، گَهْوة، الگْصَبْ)، والثاء والذال بأصواتها، والكلام قصير ومقطّع، والنبرة واطية ثابتة تنزل آخر الجملة، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.`;
+تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف «گ» نجدية (گال، گَهْوة، الگْصَبْ)، والثاء والذال بأصواتها، والكلام قصير ومقطّع، والنبرة واطية ثابتة تنزل آخر الجملة، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.
+
+${langLock}`;
 }
 
 
@@ -96,7 +106,7 @@ export function setupLiveAudio(server: Server) {
     const isOwnerCall = !!ownerKey && reqUrl.searchParams.get("key") === ownerKey;
     // The voice only ever sees the owner's pronunciations (no «القصب» anywhere, only «الگْصَبْ»…)
     const systemInstruction = spokenForm(
-      liveSystemInstruction(),
+      liveSystemInstruction(lang),
       speakableTownName
     ) +
       (isOwnerCall
@@ -199,8 +209,8 @@ export function setupLiveAudio(server: Server) {
         const piece = msg?.serverContent?.outputTranscription?.text;
         if (piece) said += piece;
         if (msg?.serverContent?.turnComplete && said.trim()) {
-          const wrong = /قص[ّ]?ا ?ب|قصّ|صَّبْخ|صبْخ|qass?aa?b|sabkha/i.test(said);
-          if (/قص|صبخ|qasab|sbakha|sabkha/i.test(said)) {
+          const wrong = /قص[ّ]?ا ?ب|قصّ|صَّبْخ|صبْخ|qass?aa?b|sabkha/i.test(said) || (lang === "ar" && /[a-z]{4,}/i.test(said) && !/[\u0600-\u06FF]/.test(said));
+          if (/قص|صبخ|qasab|sbakha|sabkha|[a-z]{4,}/i.test(said)) {
             console.log(`[Gemini Live] said${wrong ? " (CHECK PRONUNCIATION)" : ""}: ${said.replace(/\s+/g, " ").slice(0, 300)}`);
           }
           said = "";
