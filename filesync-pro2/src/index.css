@@ -432,8 +432,15 @@ body {
 .najdi-arch { border-radius: 999px 999px 22px 22px; }
 
 /* Carved triangles, as on Najdi doors and parapets */
-.najdi-carve {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M0 36 9 27 18 36zM18 36l9-9 9 9zM9 18l9-9 9 9z' fill='%23ffffff' fill-opacity='.07'/%3E%3C/svg%3E");
+.najdi-carve { position: relative; isolation: isolate; }
+.najdi-carve::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M0 36 9 27 18 36zM18 36l9-9 9 9zM9 18l9-9 9 9z' fill='%23ffffff' fill-opacity='.08'/%3E%3C/svg%3E");
 }
 
 /* Answer avatar: the grandfather's face in a gold ring */
