@@ -1,9 +1,12 @@
 import { WebSocketServer, WebSocket } from "ws";
 import type { Server } from "http";
 import "dotenv/config";
-import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE } from "./alQasabScope.ts";
+import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE, applyNajdiPhoneticDiacritics } from "./alQasabScope.ts";
+import { GoogleGenAI, Modality } from "@google/genai";
+import { buildSpeechPrompt } from "./api.ts";
+import { najdify } from "./najdiStyle.ts";
 import { QASAB_FILE_INDEX, fileContextFor } from "./qasabFile.ts";
-import { teach, spokenForm } from "./pronMemory.ts";
+import { teach, spokenForm, applyTaught } from "./pronMemory.ts";
 import { speakableTownName } from "./najdiStyle.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { createLimiter, clientIp } from "./rateLimit.ts";
@@ -45,6 +48,36 @@ ${placeList}
 ${langLock}`;
 }
 
+
+// «Reads my text» voice: the call model's own voice ignores the owner's spellings, so in Arabic calls its
+// audio is dropped and each sentence it says is rewritten (الگْصَبْ، الدَّاهِيِة، اعَرَّفْك + taught words)
+// and read aloud by Gemini TTS, which follows the written spelling. Set LIVE_TTS=off to go back.
+const TTS_MODELS = ["gemini-3.8-flash-tts", "gemini-3.1-flash-tts-preview"];
+async function readAloud(text: string): Promise<Buffer | null> {
+  const spoken = speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(najdify(text))));
+  for (const { tier, key } of voiceKeys("tts")) {
+    const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
+    let last = "";
+    for (const model of TTS_MODELS) {
+      try {
+        const r = await ai.models.generateContent({
+          model,
+          contents: [{ parts: [{ text: buildSpeechPrompt(spoken) }] }],
+          config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } } },
+        });
+        const part: any = r.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data);
+        if (part) return Buffer.from(part.inlineData.data, "base64");
+      } catch (e: any) {
+        last = String(e?.message || e);
+      }
+    }
+    if (last) {
+      console.warn(`[Call TTS] ${tier} key failed: ${last.slice(0, 140)}`);
+      pauseVoice("tts", tier, last);
+    }
+  }
+  return null;
+}
 
 export function setupLiveAudio(server: Server) {
   const wss = new WebSocketServer({ noServer: true });
@@ -220,6 +253,84 @@ export function setupLiveAudio(server: Server) {
       }
     };
 
+    // ---- «reads my text» state (Arabic calls) ----
+    const readMyText = lang === "ar" && process.env.LIVE_TTS !== "off";
+    const toClient = (obj: any) => { if (clientWs.readyState === WebSocket.OPEN) clientWs.send(JSON.stringify(obj)); };
+    type Turn = { gen: number; pending: string; first: boolean; liveAudio: string[]; sent: boolean; failed: boolean };
+    let gen = 0;
+    const newTurn = (): Turn => ({ gen, pending: "", first: true, liveAudio: [], sent: false, failed: false });
+    let turn = newTurn();
+    let chain: Promise<void> = Promise.resolve(); // keeps the spoken sentences in order
+    let playUntil = 0; // when the audio already sent will have finished playing
+    const sendPcm = (pcm: Buffer) => {
+      for (let i = 0; i < pcm.length; i += 24000) {
+        toClient({ serverContent: { modelTurn: { parts: [{ inlineData: { mimeType: "audio/pcm;rate=24000", data: pcm.subarray(i, i + 24000).toString("base64") } }] } } });
+      }
+      playUntil = Math.max(playUntil, Date.now()) + (pcm.length / 48000) * 1000;
+    };
+    const speakSegment = (t: Turn, text: string) => {
+      if (!text.trim()) return;
+      const audio = readAloud(text); // starts now, in parallel with the next sentence
+      chain = chain.then(async () => {
+        const pcm = await audio;
+        if (t.gen !== gen || clientGone) return;
+        if (!pcm) { t.failed = true; return; }
+        t.sent = true;
+        sendPcm(pcm);
+      });
+    };
+    // Cut the transcript at sentence ends: a short first piece so the voice starts fast, longer ones after
+    const takeSentences = (t: Turn, final: boolean) => {
+      if (final) { speakSegment(t, t.pending); t.pending = ""; return; }
+      const m = [...t.pending.matchAll(/[.!?؟\n]|،(?=\s)/g)];
+      if (!m.length) return;
+      const cut = m[m.length - 1].index! + 1;
+      if (cut < (t.first ? 12 : 90)) return;
+      speakSegment(t, t.pending.slice(0, cut));
+      t.pending = t.pending.slice(cut);
+      t.first = false;
+    };
+    // Returns the message to pass on to the page (or null), after taking the model's own audio out
+    const reshape = (msg: any): any | null => {
+      const sc = msg?.serverContent;
+      if (!sc) return msg;
+      if (sc.interrupted) {
+        gen++; turn = newTurn(); playUntil = 0;
+        return msg;
+      }
+      if (sc.inputTranscription?.text?.trim() && Date.now() < playUntil) {
+        // the caller talks over the guide: stop what is still playing or queued
+        gen++; turn = newTurn(); playUntil = 0;
+        toClient({ serverContent: { interrupted: true } });
+      }
+      const parts = sc.modelTurn?.parts;
+      if (Array.isArray(parts)) {
+        for (const p of parts) if (p.inlineData?.data) turn.liveAudio.push(p.inlineData.data);
+        const rest = parts.filter((p: any) => !p.inlineData?.data);
+        if (rest.length) sc.modelTurn.parts = rest; else delete sc.modelTurn;
+      }
+      if (sc.outputTranscription?.text) {
+        turn.pending += sc.outputTranscription.text;
+        takeSentences(turn, false);
+      }
+      if (sc.turnComplete) {
+        const t = turn;
+        takeSentences(t, true);
+        turn = newTurn();
+        delete sc.turnComplete;
+        chain = chain.then(() => {
+          if (t.gen !== gen || clientGone) return;
+          // Speech quota used up: the model's own voice for this answer, so the call never goes silent
+          if (t.failed && !t.sent && t.liveAudio.length) {
+            for (const d of t.liveAudio) toClient({ serverContent: { modelTurn: { parts: [{ inlineData: { mimeType: "audio/pcm;rate=24000", data: d } }] } } });
+            playUntil = Math.max(playUntil, Date.now()) + t.liveAudio.reduce((n, d) => n + d.length * 0.75, 0) / 48;
+          }
+          toClient({ serverContent: { turnComplete: true } });
+        });
+      }
+      return Object.keys(sc).length ? msg : null;
+    };
+
     const connect = () => {
       const { tier, key } = keys[keyIndex];
       // Official Gemini Live WebSocket endpoint
@@ -265,6 +376,15 @@ export function setupLiveAudio(server: Server) {
           }
         }
         logSpokenNames(text);
+        if (readMyText && text.includes("serverContent")) {
+          try {
+            const out = reshape(JSON.parse(text));
+            if (out && clientWs.readyState === WebSocket.OPEN) clientWs.send(JSON.stringify(out));
+            return;
+          } catch {
+            /* not JSON: forward as is */
+          }
+        }
         if (clientWs.readyState === WebSocket.OPEN) clientWs.send(text);
       });
 
