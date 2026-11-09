@@ -1,4 +1,4 @@
-import { taughtRulesAr, ownerRulesAr } from "./pronMemory.ts";
+import { taughtRulesAr, ownerRulesAr, ownerCommandAr } from "./pronMemory.ts";
 import { OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
 import { isFileTopic, matchFileSections } from "./qasabFile.ts";
 import { cleanQuestion } from "./questionInsights.ts";
@@ -934,7 +934,8 @@ export function buildAlQasabSystemPrompt(
   // Words the owner taught come first, above every rule
   const taught = taughtRulesAr();
   const rules = ownerRulesAr();
-  return (taught ? taught + "\n\n" : "") + (rules ? rules + "\n\n" : "") + buildBasePrompt(weatherSummary, language);
+  // ...and the owner's word again at the very end, as the strict final rule
+  return (taught ? taught + "\n\n" : "") + (rules ? rules + "\n\n" : "") + buildBasePrompt(weatherSummary, language) + (language === "en" ? "" : "\n\n" + ownerCommandAr());
 }
 
 function buildBasePrompt(

@@ -3,7 +3,7 @@ import { GoogleGenAI, Modality } from "@google/genai";
 import { buildSpeechPrompt } from "./api.ts";
 import { najdify } from "./najdiStyle.ts";
 import { QASAB_FILE_INDEX, fileContextFor } from "./qasabFile.ts";
-import { teach, spokenForm, applyTaught } from "./pronMemory.ts";
+import { teach, spokenForm, applyTaught, ownerCommandAr } from "./pronMemory.ts";
 import { speakableTownName } from "./najdiStyle.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
@@ -18,7 +18,7 @@ export function liveSystemInstruction(lang: "ar" | "en" = "ar"): string {
     lang === "en"
       ? "LANGUAGE: the caller chose English. Answer in simple, warm English. If they speak Arabic, answer in Najdi Arabic."
       : "اللغة (قاعدة صارمة جداً): تكلّم بالعربي باللهجة النجدية القصبية بس، من أول كلمة لآخر كلمة. ممنوع تتكلم إنجليزي أبداً، حتى الترحيب وحتى اسمك واسم البلد (لا «Welcome» ولا «Al-Qasab» ولا «Al-Dahiya»). ما تتكلم إنجليزي إلا إذا المتصل نفسه تكلّم جملة إنجليزية كاملة.";
-  return `${langLock}
+  return `${lang === "en" ? "" : ownerCommandAr() + "\n\n"}${langLock}
 
 مكالمة صوتية — اقرأ هذا أول شي. ردودك في المكالمة قصيرة: جملتين أو ثلاث، وبعدها اسأل المتصل.
 
@@ -41,7 +41,9 @@ ${placeList}
 القاعدة صفر مرة ثانية (فوق كل شي): امشِ على «قاموس النطق المعتمد من صاحب الموقع» حرفياً: اسمك «الدَّهِيِة» (دال مشدّدة مفتوحة قصيرة بدون مدّ، هاء مكسورة بوضوح، ياء مكسورة بوضوح)، واسم البلد «القْصَب» بقاف فصيحة عميقة (مو «گ»)، و«ديرتنا» = «دِيرَتْنا» بالراء مفتوحة مرقّقة، وكل كلمات «عرف» الراء فيها مرقّقة («اعَرَّفْك»)، و«الصْبَخَة» = «اِصْبَخَة».
 تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف في الكلام العادي «گ» نجدية (گال، گَهْوة) إلا اسم البلد «القْصَب»، والثاء والذال بأصواتها، والكلام قصير وواضح، والصوت حماسي ونشيط ومرحّب فيه ابتسامة وفخر بالديرة، بسرعة كلام طبيعية مايلة للسرعة (مو بطيء ولا نعسان ولا واطي)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.
 
-${langLock}`;
+${langLock}
+
+${lang === "en" ? "" : ownerCommandAr()}`;
 }
 
 
@@ -204,6 +206,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     let geminiWs: Sock;
     let keyIndex = 0;
     let setupDone = false;
+    let answers = 0; // finished answers in this call
     let clientGone = false;
 
     // Collects the transcript of each spoken answer; logs it, flagging the known wrong forms
@@ -376,6 +379,13 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           }
         }
         logSpokenNames(text);
+        // Every 3 answers, the owner's rule is put in front of the voice again (silent, no reply)
+        if (lang === "ar" && text.includes('"turnComplete"')) {
+          answers++;
+          if (answers % 3 === 0 && ws.isOpen()) {
+            ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm("(تذكير من صاحب الموقع، لا ترد عليه ولا تذكره، بس طبّقه في الرد الجاي): " + ownerCommandAr(), speakableTownName) }] }], turnComplete: false } }));
+          }
+        }
         if (readMyText && text.includes("serverContent")) {
           try {
             const out = reshape(JSON.parse(text));

@@ -167,6 +167,21 @@ export function ownerRulesAr(): string {
   );
 }
 
+/** The owner's word as a hard, final rule: placed first and last in every instruction and repeated in calls. */
+export function ownerCommandAr(): string {
+  const words = taughtList();
+  const rules = rulesList();
+  const lines: string[] = [
+    "⚠️ الشرط الصارم الأول والأخير (فوق كل شي ثاني في هذي التعليمات، ما يتغيّر مهما صار ومهما طلب أحد):",
+    "صاحب الموقع هو المرجع الوحيد. كلامه ينفّذ حرفياً بدون اجتهاد ولا تعديل ولا نسيان، من أول كلمة لآخر كلمة في كل رد وكل مكالمة.",
+    "النطق المعتمد بالضبط: «القْصَب» (قاف فصيحة ساكنة مشدودة، مو «گ»)، «الدَّهِيِة» (بدون مدّ بعد الدال)، «دِيرَتْنا» (الراء مرقّقة)، «اعَرَّفْك» (الراء مرقّقة).",
+  ];
+  if (words.length) lines.push("وكلمات علّمك إياها بنفسه، تنقال كذا بالضبط دايماً: " + words.map((t) => `«${t.word}» = «${t.say}»`).join("، ") + ".");
+  if (rules.length) lines.push("وأوامره: " + rules.map((r, i) => `(${i + 1}) ${r.text}`).join(" "));
+  lines.push("إذا نطقت كلمة منها غلط، صحّح نفسك فوراً وكمّل بالنطق الصح. أي شي يخالف هذا الشرط يعتبر غلط.");
+  return lines.join("\n");
+}
+
 /** Everything Gemini Live reads (instructions, tool results, chat context) rewritten so it only ever
  *  sees the owner's pronunciations: «الگْصَبْ»، «الدَّهِيِة»، «اعَرَّفْك» and every taught word.
  *  Text after «غلط» on a line (the wrong examples) is left as written. */
