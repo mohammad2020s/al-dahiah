@@ -22,9 +22,42 @@ interface Env {
 // ───────────── Express: the same API as on Render ─────────────
 const app = express();
 app.set("trust proxy", true);
-// 8 MB: room for a visitor's photo («صوّر واسأل»), which the page shrinks to ~1024 px first
-app.use(express.json({ limit: "8mb" }));
-app.use(express.urlencoded({ limit: "1mb", extended: true }));
+// Request bodies (JSON or form). Express's own parsers (body-parser → iconv-lite) do not load on
+// Workers, so a small reader instead. 8 MB: room for a visitor's photo («صوّر واسأل»).
+app.use((req, res, next) => {
+  const type = String(req.headers["content-type"] || "");
+  if (!/json|x-www-form-urlencoded/.test(type) || req.method === "GET" || req.method === "HEAD") return next();
+  const chunks: Buffer[] = [];
+  let size = 0;
+  let done = false;
+  req.on("data", (c: Buffer) => {
+    size += c.length;
+    if (size > 8 * 1024 * 1024 && !done) {
+      done = true;
+      res.status(413).json({ error: "Too large" });
+      return;
+    }
+    chunks.push(c);
+  });
+  req.on("end", () => {
+    if (done) return;
+    done = true;
+    const raw = Buffer.concat(chunks).toString("utf8");
+    try {
+      (req as any).body = type.includes("json") ? (raw.trim() ? JSON.parse(raw) : {}) : Object.fromEntries(new URLSearchParams(raw));
+    } catch {
+      res.status(400).json({ error: "Bad JSON" });
+      return;
+    }
+    next();
+  });
+  req.on("error", (e) => {
+    if (!done) {
+      done = true;
+      next(e);
+    }
+  });
+});
 app.use("/api", apiRouter);
 const ownerPage = (html: string) => (_req: express.Request, res: express.Response) => {
   res.set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" }).send(html);
