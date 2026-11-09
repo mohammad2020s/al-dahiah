@@ -75,7 +75,7 @@ function liveSay(key: string, instruction: string, prompt: string, voice = "Char
 
 // Extra lines added to the call instructions, one variant per run, to see which one the voice follows
 // A = the rules as deployed (Najdi «گ» in everyday words); B = every ق a deep ق (no «گ» at all)
-const NO_G = "\n\nتعديل نهائي يلغي أي قاعدة قبله عن القاف: انطق كل قاف في كل الكلمات قاف فصيحة من آخر الحلق، بدون «گ» أبداً (قال، قهوة، قريب، القْصَبْ كلها بقاف فصيحة). وباقي قواعد اللهجة النجدية والنبرة الواطية النازلة مثل ما هي.";
+const NO_G = "\n\nتعديل نهائي يلغي أي قاعدة قبله عن القاف: انطق كل قاف في كل الكلمات قاف فصيحة من آخر الحلق، بدون «گ» أبداً (قال، قهوة، قريب، القْصَب كلها بقاف فصيحة). وباقي قواعد اللهجة النجدية والنبرة الواطية النازلة مثل ما هي.";
 export const LIVE_VARIANTS: Record<string, string> = { A: "", B: NO_G };
 const LIVE_VOICES = ["Charon"];
 const LIVE_PROMPTS = [
@@ -83,7 +83,7 @@ const LIVE_PROMPTS = [
   "وش أشوف في القصب؟ جاوبني باختصار.",
   "أنا جاي من الرياض، كيف أوصل للقصب؟ باختصار.",
 ];
-const TTS_SPELLINGS = ["حيّاك الله في القْصَبْ يا بعد حيي. القهوة جاهزة، وقريب منك مملحة القْصَبْ، والطريق للقْصَبْ ساعة ونص من الرياض. تبي أعلّمك عن الجفار؟"];
+const TTS_SPELLINGS = ["حيّاك الله في القْصَب يا بعد حيي. القهوة جاهزة، وقريب منك مملحة القْصَب، والطريق للقْصَب ساعة ونص من الرياض. تبي أعلّمك عن الجفار؟"];
 const TTS_VOICES = ["Charon"];
 
 export function schedulePronLab(buildSpeechPrompt: (t: string) => string) {
