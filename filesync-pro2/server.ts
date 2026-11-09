@@ -18,6 +18,17 @@ async function startServer() {
   app.set("trust proxy", 1);
   const server = createServer(app);
 
+  // The site now lives on Cloudflare: anyone opening a page here (old links, printed barcodes,
+  // salt-passport stamps) is sent there with the same path and query. The API stays answering here.
+  // Set MOVED_TO="" on Render to switch this off.
+  const movedTo = process.env.MOVED_TO ?? "https://al-dahiah.m7md-msh2020.workers.dev";
+  if (movedTo && process.env.NODE_ENV === "production") {
+    app.use((req, res, next) => {
+      if (req.method !== "GET" || req.path.startsWith("/api/") || req.path === "/live") return next();
+      res.redirect(301, movedTo + req.originalUrl);
+    });
+  }
+
   // 8 MB: room for a visitor's photo («صوّر واسأل»), which the page shrinks to ~1024 px first
   app.use(express.json({ limit: "8mb" }));
   app.use(express.urlencoded({ limit: "1mb", extended: true }));
