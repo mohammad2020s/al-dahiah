@@ -39,7 +39,7 @@ ${placeList}
 اسم البلد بصوتك (قاعدة صارمة جداً): اسم البلد «القصَب» ينقال بالقاف النجدية «گ» مثل قاف «قريب» (= «گريب»): «الگْصَبْ»: اللام ساكنة، ثم «گ» ساكنة ملزوقة في «صَبْ»، ثم فتحة قصيرة على الصاد، والباء ساكنة. غلط: القاف الفصيحة «القَصَب»، و«القصّاب» و«القصاب» (مدّ أو تشديد)، و«الجصب». قل الاسم في الترحيب مرة، وبعدها «ديرتنا» أو «البلد» عادي.
 
 القاعدة صفر مرة ثانية (فوق كل شي): امشِ على «قاموس النطق المعتمد من صاحب الموقع» حرفياً: اسمك «الدَّاهِيِة» (دال مشدّدة مفتوحة، هاء مكسورة، ياء مكسورة)، واسم البلد «الگْصَبْ» بـ«گ» مثل «گريب»، وكل كلمات «عرف» الراء فيها مرقّقة («اعَرَّفْك»)، و«الصْبَخَة» = «اِصْبَخَة».
-تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف «گ» نجدية (گال، گَهْوة، الگْصَبْ)، والثاء والذال بأصواتها، والكلام قصير ومقطّع، والنبرة واطية ثابتة تنزل آخر الجملة، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.
+تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف «گ» نجدية (گال، گَهْوة، الگْصَبْ)، والثاء والذال بأصواتها، والكلام قصير وواضح، والصوت حيّ ونشيط ومرحّب فيه ابتسامة، بسرعة كلام طبيعية (مو بطيء ولا نعسان)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.
 
 ${langLock}`;
 }
@@ -178,7 +178,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           responseModalities: ["AUDIO"],
           // Calmer sampling: names come out the same way every time
           // Low: the same words and the same accent every call
-          temperature: 0.2,
+          temperature: 0.45,
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
@@ -227,7 +227,10 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     };
 
     // ---- «reads my text» state (Arabic calls) ----
-    const readMyText = lang === "ar" && process.env.LIVE_TTS !== "off";
+    // Only with a paid key: the free speech quota runs out after a few calls a day, and every answer
+    // then waits for it to fail before playing (slow). LIVE_TTS=on forces it, =off turns it off.
+    const readMyText =
+      lang === "ar" && process.env.LIVE_TTS !== "off" && (process.env.LIVE_TTS === "on" || !!process.env.GEMINI_PAID_API_KEY);
     const toClient = (obj: any) => { if (clientWs.isOpen()) clientWs.send(JSON.stringify(obj)); };
     type Turn = { gen: number; pending: string; first: boolean; liveAudio: string[]; sent: boolean; failed: boolean };
     let gen = 0;
