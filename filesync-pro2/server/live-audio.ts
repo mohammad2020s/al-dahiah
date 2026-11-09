@@ -32,14 +32,14 @@ Whenever the caller asks about one of these Al-Qasab places, or you start explai
 Places:
 ${placeList}
 
-صوت المكالمة: المتصل يشوف على الشاشة شايب نجدي من أهل القْصَب، وهو أنت. امشِ على «قواعد اللهجة الثابتة» و«النطق النجدي بالأصوات» فوق بالحرف: نفس الصوت الهادي الدافي ونفس العبارات كل مرة، بدون اجتهاد. بالعربي نجدي بس، وبالإنجليزي إنجليزي بسيط ودود.
+صوت المكالمة: المتصل يشوف على الشاشة شايب نجدي من أهل القْصَب، وهو أنت. امشِ على «قواعد اللهجة الثابتة» و«النطق النجدي بالأصوات» فوق بالحرف: نفس الصوت الحماسي الدافي ونفس العبارات كل مرة، بدون اجتهاد. بالعربي نجدي بس، وبالإنجليزي إنجليزي بسيط ودود.
 
 تعلّم النطق من المتصل: إذا صحّح لك المتصل نطق كلمة أو قالها بطريقة ثانية، اسمع نطقه بدقة وقلّده بالضبط (نفس الحركات والقاف والراء والمدّ) في باقي المكالمة كلها، إلا إذا خالف «قاموس النطق المعتمد من صاحب الموقع».
 
 اسم البلد بصوتك (قاعدة صارمة جداً): اسم البلد «القصَب» ينقال بالقاف النجدية «گ» مثل قاف «قريب» (= «گريب»): «الگْصَبْ»: اللام ساكنة، ثم «گ» ساكنة ملزوقة في «صَبْ»، ثم فتحة قصيرة على الصاد، والباء ساكنة. غلط: القاف الفصيحة «القَصَب»، و«القصّاب» و«القصاب» (مدّ أو تشديد)، و«الجصب». قل الاسم في الترحيب مرة، وبعدها «ديرتنا» أو «البلد» عادي.
 
 القاعدة صفر مرة ثانية (فوق كل شي): امشِ على «قاموس النطق المعتمد من صاحب الموقع» حرفياً: اسمك «الدَّاهِيِة» (دال مشدّدة مفتوحة، هاء مكسورة، ياء مكسورة)، واسم البلد «الگْصَبْ» بـ«گ» مثل «گريب»، وكل كلمات «عرف» الراء فيها مرقّقة («اعَرَّفْك»)، و«الصْبَخَة» = «اِصْبَخَة».
-تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف «گ» نجدية (گال، گَهْوة، الگْصَبْ)، والثاء والذال بأصواتها، والكلام قصير وواضح، والصوت حيّ ونشيط ومرحّب فيه ابتسامة، بسرعة كلام طبيعية (مو بطيء ولا نعسان)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.
+تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف «گ» نجدية (گال، گَهْوة، الگْصَبْ)، والثاء والذال بأصواتها، والكلام قصير وواضح، والصوت حماسي ونشيط ومرحّب فيه ابتسامة وفخر بالديرة، بسرعة كلام طبيعية مايلة للسرعة (مو بطيء ولا نعسان ولا واطي)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.
 
 ${langLock}`;
 }
@@ -59,7 +59,7 @@ async function readAloud(text: string): Promise<Buffer | null> {
         const r = await ai.models.generateContent({
           model,
           contents: [{ parts: [{ text: buildSpeechPrompt(spoken) }] }],
-          config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } } },
+          config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: process.env.LIVE_VOICE || "Fenrir" } } } },
         });
         const part: any = r.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data);
         if (part) return Buffer.from(part.inlineData.data, "base64");
@@ -98,7 +98,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         ? String(reqUrl.searchParams.get("voice"))
         : "";
     // Charon: in recorded tests it said «القْصَب» with two short syllables, where Puck often stretched it to «القصّاب»
-    const voiceName = testVoice || process.env.LIVE_VOICE || "Charon";
+    const voiceName = testVoice || process.env.LIVE_VOICE || "Fenrir"; // Fenrir: Gemini's lively, excitable male voice
 
     // Free key first; the paid key (GEMINI_PAID_API_KEY) only if the free one is refused
     const keys = voiceKeys("live");
@@ -329,7 +329,22 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
       });
 
       ws.onMessage(async (text) => {
-        if (!setupDone && text.includes("setupComplete")) setupDone = true;
+        if (!setupDone && text.includes("setupComplete")) {
+          setupDone = true;
+          // Arabic calls: a short example exchange already "said" in the owner's spellings and the
+          // lively tone, so the voice copies its own earlier words (sent before the page's context).
+          if (lang === "ar") {
+            ws.send(JSON.stringify({
+              clientContent: {
+                turns: [
+                  { role: "user", parts: [{ text: "مثال على طريقتك في الكلام (لا تعيده، بس امشِ على نطقه ونبرته): عرّفني بنفسك." }] },
+                  { role: "model", parts: [{ text: spokenForm("يا هلا والله ومرحبا! أنا الداهية، شايب من أهل القصب، وحيّاك الله في ديرتنا! أعرّفك على المملحة والجفار والصبخة والبلدة القديمة، وش تبي تعرف؟", speakableTownName) }] },
+                ],
+                turnComplete: false,
+              },
+            }));
+          }
+        }
         // lookup_info is answered here from the season file; other tool calls go on to the page
         if (text.includes("toolCall") && (text.includes("lookup_info") || text.includes("learn_pronunciation"))) {
           try {
