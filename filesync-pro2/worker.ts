@@ -168,6 +168,16 @@ export default {
     const dynamic = url.pathname === "/live" || url.pathname.startsWith("/api/") || url.pathname === "/stats" || url.pathname === "/stamps";
     if (!dynamic) return env.ASSETS.fetch(request);
 
+    // Until the Gemini key is added here as a secret, the chat, the call and the owner pages are
+    // answered by the Render server (which has the keys); the site itself is still served from here.
+    if (!env.GEMINI_API_KEY) {
+      const target = new URL(url.pathname + url.search, "https://al-dahiah.onrender.com");
+      const headers = new Headers(request.headers);
+      headers.set("X-Forwarded-For", request.headers.get("cf-connecting-ip") || "");
+      headers.delete("host");
+      return fetch(new Request(target.toString(), { method: request.method, headers, body: request.body, redirect: "manual" }));
+    }
+
     // The owner's taught words and rules: loaded before the first answer, refreshed every 5 minutes
     if (!memoryLoaded) {
       await refreshMemory().catch(() => {});
