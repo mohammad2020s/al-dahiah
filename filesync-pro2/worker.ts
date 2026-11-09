@@ -69,7 +69,20 @@ const expressHandler = httpServerHandler({ port: 3000 });
 
 // ───────────── voice calls ─────────────
 const OPEN = 1;
-const asText = (d: unknown) => (typeof d === "string" ? d : new TextDecoder().decode(d as ArrayBuffer));
+// A WebSocket frame as text: a string, bytes (ArrayBuffer / typed array) or a Blob
+async function asText(d: any): Promise<string> {
+  if (typeof d === "string") return d;
+  if (d && typeof d.arrayBuffer === "function" && !(d instanceof ArrayBuffer)) return Buffer.from(await d.arrayBuffer()).toString("utf8");
+  if (ArrayBuffer.isView(d)) return Buffer.from(d.buffer, d.byteOffset, d.byteLength).toString("utf8");
+  return Buffer.from(d as ArrayBuffer).toString("utf8");
+}
+/** Calls cb with each frame's text, in arrival order even when a frame needs async decoding. */
+function inOrder(cb: (t: string) => void) {
+  let chain: Promise<void> = Promise.resolve();
+  return (e: MessageEvent) => {
+    chain = chain.then(() => asText(e.data)).then(cb, (err) => console.warn("[Live Audio] could not read a frame:", String(err?.message || err)));
+  };
+}
 
 /** The caller's side of the call (already open). */
 function wrapAccepted(ws: WebSocket): Sock {
@@ -82,7 +95,7 @@ function wrapAccepted(ws: WebSocket): Sock {
     },
     isOpen: () => ws.readyState === OPEN,
     onOpen: (cb) => queueMicrotask(cb),
-    onMessage: (cb) => ws.addEventListener("message", (e: MessageEvent) => cb(asText(e.data))),
+    onMessage: (cb) => ws.addEventListener("message", inOrder(cb)),
     onClose: (cb) => ws.addEventListener("close", (e: CloseEvent) => cb(e.code, e.reason || "")),
     onError: (cb) => ws.addEventListener("error", (e: any) => cb(String(e?.message || "error"))),
   };
@@ -108,7 +121,7 @@ function openOutbound(url: string): Sock {
       sock.accept();
       ws = sock;
       if (closed) return sock.close(1000);
-      sock.addEventListener("message", (e: MessageEvent) => on.message.forEach((f) => f(asText(e.data))));
+      sock.addEventListener("message", inOrder((t) => on.message.forEach((f) => f(t))));
       sock.addEventListener("close", (e: CloseEvent) => on.close.forEach((f) => f(e.code, e.reason || "")));
       sock.addEventListener("error", (e: any) => on.error.forEach((f) => f(String(e?.message || "error"))));
       on.open.forEach((f) => f());

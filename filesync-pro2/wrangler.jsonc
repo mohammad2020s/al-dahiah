@@ -13,7 +13,7 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*", "/live", "/stats", "/stamps"]
   },
-  "d1_databases": [{ "binding": "DB", "database_name": "al-dahiah" }],
+  "d1_databases": [{ "binding": "DB", "database_name": "al-dahiah", "database_id": "2c2e065d-5058-42e3-a8f7-ec8134be35ee" }],
   // Express's body-parser pulls in iconv-lite, which does not bundle for Workers
   "alias": { "iconv-lite": "./server/iconvStub.js" },
   "observability": { "enabled": true },
