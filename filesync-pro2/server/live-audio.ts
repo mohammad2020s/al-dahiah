@@ -233,6 +233,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     let gen = 0;
     const newTurn = (): Turn => ({ gen, pending: "", first: true, liveAudio: [], sent: false, failed: false });
     let turn = newTurn();
+    let turnPassthrough = false; // this answer is played in the model's own voice (no TTS quota left)
     let chain: Promise<void> = Promise.resolve(); // keeps the spoken sentences in order
     let playUntil = 0; // when the audio already sent will have finished playing
     const sendPcm = (pcm: Buffer) => {
@@ -269,6 +270,15 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
       if (!sc) return msg;
       if (sc.interrupted) {
         gen++; turn = newTurn(); playUntil = 0;
+        turnPassthrough = false;
+        return msg;
+      }
+      // Speech quota used up (no TTS key free right now): a new answer goes out in the call model's own
+      // voice straight away, instead of waiting for the whole answer and then playing it late.
+      const turnStarting = !turn.pending && !turn.sent && !turn.failed && turn.liveAudio.length === 0 && turn.first;
+      if (turnStarting && !turnPassthrough && sc.modelTurn && voiceKeys("tts").length === 0) turnPassthrough = true;
+      if (turnPassthrough) {
+        if (sc.turnComplete) turnPassthrough = false;
         return msg;
       }
       if (sc.inputTranscription?.text?.trim() && Date.now() < playUntil) {
