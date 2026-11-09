@@ -172,9 +172,12 @@ export default {
     // answered by the Render server (which has the keys); the site itself is still served from here.
     if (!env.GEMINI_API_KEY) {
       const target = new URL(url.pathname + url.search, "https://al-dahiah.onrender.com");
-      const headers = new Headers(request.headers);
+      // Only the headers the API needs: Cloudflare's own cf-* headers must not be passed to another site
+      const headers = new Headers();
+      for (const [k, v] of request.headers) {
+        if (/^(content-type|accept|accept-language|user-agent|x-stats-key|upgrade|connection|sec-websocket-.*)$/i.test(k)) headers.set(k, v);
+      }
       headers.set("X-Forwarded-For", request.headers.get("cf-connecting-ip") || "");
-      headers.delete("host");
       return fetch(new Request(target.toString(), { method: request.method, headers, body: request.body, redirect: "manual" }));
     }
 
