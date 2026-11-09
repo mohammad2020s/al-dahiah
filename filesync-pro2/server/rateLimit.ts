@@ -11,13 +11,15 @@ interface Window {
 
 export function createLimiter({ windowMs, max }: { windowMs: number; max: number }) {
   const hits = new Map<string, Window>();
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, w] of hits) if (w.resetAt <= now) hits.delete(key);
-  }, windowMs).unref();
+  let nextSweep = 0;
 
   return function check(key: string): { ok: boolean; retryAfterSec: number } {
     const now = Date.now();
+    // Old entries are swept now and then on use (no timer: Cloudflare Workers forbid them at start-up)
+    if (now >= nextSweep) {
+      for (const [k, w] of hits) if (w.resetAt <= now) hits.delete(k);
+      nextSweep = now + windowMs;
+    }
     let w = hits.get(key);
     if (!w || w.resetAt <= now) {
       w = { count: 0, resetAt: now + windowMs };
@@ -28,11 +30,13 @@ export function createLimiter({ windowMs, max }: { windowMs: number; max: number
   };
 }
 
-/** Client IP behind Render's proxy (first X-Forwarded-For entry). */
+/** Client IP: Cloudflare's header when there, else the first X-Forwarded-For entry (Render's proxy). */
 export function clientIp(req: IncomingMessage): string {
+  const cf = req.headers["cf-connecting-ip"];
+  if (typeof cf === "string" && cf) return cf;
   const fwd = req.headers["x-forwarded-for"];
   const first = (Array.isArray(fwd) ? fwd[0] : fwd || "").split(",")[0].trim();
-  return first || req.socket.remoteAddress || "unknown";
+  return first || req.socket?.remoteAddress || "unknown";
 }
 
 export function rateLimitMiddleware(opts: { windowMs: number; max: number; messageAr: string; messageEn: string }) {

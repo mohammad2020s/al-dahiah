@@ -1,5 +1,6 @@
 import { najdify, speakableTownName, OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
-import { parseTeach, teach, forget, taughtList, applyTaught, taughtRulesAr, addRule, removeRule, rulesList } from "./pronMemory.ts";
+import { parseTeach, teach, forget, taughtList, applyTaught, taughtRulesAr, addRule, removeRule, rulesList, loadTaught, loadRules } from "./pronMemory.ts";
+import { getStore } from "./store.ts";
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { fileContextFor } from "./qasabFile.ts";
@@ -121,6 +122,44 @@ apiRouter.get("/passport/codes", (req, res) => {
 });
 
 // Owner-only question stats. Disabled unless STATS_KEY is set on the server.
+// Owner: move the saved data (question counts, taught words, rules) from one host to another
+apiRouter.get("/owner/export", async (req, res) => {
+  if (!ownerOnly(req, res)) return;
+  res.setHeader("Cache-Control", "no-store");
+  const store = getStore();
+  if (!store) return res.json({ hashes: {} });
+  const names = ((await store.command(["KEYS", "*"])) as string[]) || [];
+  const hashes: Record<string, Record<string, string>> = {};
+  for (const h of names) {
+    if (!/^(qstats:|dahiah:)/.test(h)) continue;
+    try {
+      const flat = ((await store.command(["HGETALL", h])) as string[]) || [];
+      const m: Record<string, string> = {};
+      for (let i = 0; i + 1 < flat.length; i += 2) m[flat[i]] = flat[i + 1];
+      hashes[h] = m;
+    } catch {
+      /* not a hash */
+    }
+  }
+  res.json({ hashes });
+});
+apiRouter.post("/owner/import", async (req, res) => {
+  if (!ownerOnly(req, res)) return;
+  const store = getStore();
+  const hashes = req.body?.hashes;
+  if (!store || !hashes || typeof hashes !== "object") return res.status(400).json({ error: "nothing to import" });
+  let n = 0;
+  for (const [h, m] of Object.entries(hashes as Record<string, Record<string, string>>)) {
+    if (!/^(qstats:|dahiah:)/.test(h)) continue;
+    for (const [k, v] of Object.entries(m || {})) {
+      await store.command(["HSET", h, k, String(v)]);
+      n++;
+    }
+  }
+  await Promise.all([loadTaught(), loadRules()]);
+  res.json({ imported: n });
+});
+
 apiRouter.get("/stats", async (req, res) => {
   if (!ownerOnly(req, res)) return;
   res.setHeader("Cache-Control", "no-store");

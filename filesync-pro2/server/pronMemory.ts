@@ -2,26 +2,23 @@
 // is saved in Key Value (Redis, hash dahiah:pron) and from then on goes into every prompt and every
 // read-aloud text, exactly as taught. Visitors cannot save words: their corrections only last for
 // their own call. Without REDIS_URL the words live in memory until the next restart.
-import { MiniRedis } from "./questionStats.ts";
+import { getStore } from "./store.ts";
 
 export type Taught = { word: string; say: string; note?: string; at: number };
 
 const HASH = "dahiah:pron";
 const memory = new Map<string, Taught>();
-let redis: MiniRedis | null = null;
-try {
-  if (process.env.REDIS_URL) redis = new MiniRedis(new URL(process.env.REDIS_URL));
-} catch {
-  redis = null;
-}
+const redis = getStore;
+// Cloudflare Workers: no timers or storage calls at start-up, so the worker calls refreshMemory() on requests
+const IS_WORKER = typeof (globalThis as any).WebSocketPair === "function";
 
 const bare = (w: string) => w.replace(/[ً-ٰٟـ«»"'.,،؟?!]/g, "").trim();
 
 /** Load the saved words (at start-up, and again now and then in case another instance saved some). */
 export async function loadTaught() {
-  if (!redis) return;
+  if (!redis()) return;
   try {
-    const arr = (await redis.command(["HGETALL", HASH])) as string[] | null;
+    const arr = (await redis()!.command(["HGETALL", HASH])) as string[] | null;
     if (!Array.isArray(arr)) return;
     for (let i = 0; i + 1 < arr.length; i += 2) {
       try {
@@ -32,9 +29,11 @@ export async function loadTaught() {
     console.warn("[Pron] could not load taught words:", (e as Error).message);
   }
 }
-console.log(`[Pron] taught words stored in ${redis ? "Key Value (permanent)" : "memory (lost on restart)"}`);
-loadTaught();
-setInterval(loadTaught, 5 * 60_000).unref?.();
+if (!IS_WORKER) {
+  console.log(`[Pron] taught words stored in ${redis() ? "Key Value (permanent)" : "memory (lost on restart)"}`);
+  loadTaught();
+  setInterval(loadTaught, 5 * 60_000).unref?.();
+}
 
 export async function teach(word: string, say: string, note = ""): Promise<Taught | null> {
   const key = bare(word);
@@ -42,9 +41,9 @@ export async function teach(word: string, say: string, note = ""): Promise<Taugh
   if (!key || !spoken || key.length > 40 || spoken.length > 60) return null;
   const t: Taught = { word: key, say: spoken, note: note.slice(0, 200), at: Date.now() };
   memory.set(key, t);
-  if (redis) {
+  if (redis()) {
     try {
-      await redis.command(["HSET", HASH, key, JSON.stringify(t)]);
+      await redis()!.command(["HSET", HASH, key, JSON.stringify(t)]);
     } catch (e) {
       console.warn("[Pron] could not save:", (e as Error).message);
     }
@@ -56,9 +55,9 @@ export async function teach(word: string, say: string, note = ""): Promise<Taugh
 export async function forget(word: string) {
   const key = bare(word);
   memory.delete(key);
-  if (redis) {
+  if (redis()) {
     try {
-      await redis.command(["HDEL", HASH, key]);
+      await redis()!.command(["HDEL", HASH, key]);
     } catch {}
   }
 }
@@ -101,9 +100,9 @@ const RULES_HASH = "dahiah:rules";
 const rules = new Map<string, Rule>();
 
 export async function loadRules() {
-  if (!redis) return;
+  if (!redis()) return;
   try {
-    const arr = (await redis.command(["HGETALL", RULES_HASH])) as string[] | null;
+    const arr = (await redis()!.command(["HGETALL", RULES_HASH])) as string[] | null;
     if (!Array.isArray(arr)) return;
     for (let i = 0; i + 1 < arr.length; i += 2) {
       try {
@@ -112,8 +111,22 @@ export async function loadRules() {
     }
   } catch {}
 }
-loadRules();
-setInterval(loadRules, 5 * 60_000).unref?.();
+if (!IS_WORKER) {
+  loadRules();
+  setInterval(loadRules, 5 * 60_000).unref?.();
+}
+
+let lastRefresh = 0;
+let refreshing: Promise<void> | null = null;
+/** Worker: load the taught words and rules on the first request, then again every 5 minutes. */
+export function refreshMemory(): Promise<void> {
+  const now = Date.now();
+  if (refreshing) return refreshing;
+  if (now - lastRefresh < 5 * 60_000) return Promise.resolve();
+  lastRefresh = now;
+  refreshing = Promise.all([loadTaught(), loadRules()]).then(() => {}).finally(() => { refreshing = null; });
+  return refreshing;
+}
 
 export const rulesList = () => [...rules.values()].sort((a, b) => a.at - b.at);
 
@@ -122,9 +135,9 @@ export async function addRule(text: string): Promise<Rule | null> {
   if (!clean) return null;
   const r: Rule = { id: String(Date.now()), text: clean, at: Date.now() };
   rules.set(r.id, r);
-  if (redis) {
+  if (redis()) {
     try {
-      await redis.command(["HSET", RULES_HASH, r.id, JSON.stringify(r)]);
+      await redis()!.command(["HSET", RULES_HASH, r.id, JSON.stringify(r)]);
     } catch {}
   }
   console.log(`[Pron] rule added: ${clean.slice(0, 80)}`);
@@ -136,9 +149,9 @@ export async function removeRule(n: number): Promise<Rule | null> {
   const r = rulesList()[n - 1];
   if (!r) return null;
   rules.delete(r.id);
-  if (redis) {
+  if (redis()) {
     try {
-      await redis.command(["HDEL", RULES_HASH, r.id]);
+      await redis()!.command(["HDEL", RULES_HASH, r.id]);
     } catch {}
   }
   return r;

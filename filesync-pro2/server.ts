@@ -3,7 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import path from "path";
 import fs from "fs";
-import { setupLiveAudio } from "./server/live-audio.ts";
+import { setupLiveAudio } from "./server/liveNode.ts";
 import { apiRouter, buildSpeechPrompt } from "./server/api.ts";
 import { schedulePronLab } from "./server/pronLab.ts";
 import { STATS_PAGE_HTML } from "./server/statsPage.ts";

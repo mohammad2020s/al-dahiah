@@ -1,6 +1,3 @@
-import { WebSocketServer, WebSocket } from "ws";
-import type { Server } from "http";
-import "dotenv/config";
 import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE, applyNajdiPhoneticDiacritics } from "./alQasabScope.ts";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { buildSpeechPrompt } from "./api.ts";
@@ -9,7 +6,6 @@ import { QASAB_FILE_INDEX, fileContextFor } from "./qasabFile.ts";
 import { teach, spokenForm, applyTaught } from "./pronMemory.ts";
 import { speakableTownName } from "./najdiStyle.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
-import { createLimiter, clientIp } from "./rateLimit.ts";
 import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
 
 // The call's instructions (also used by the pronunciation lab). Pronunciation first (models follow
@@ -79,41 +75,20 @@ async function readAloud(text: string): Promise<Buffer | null> {
   return null;
 }
 
-export function setupLiveAudio(server: Server) {
-  const wss = new WebSocketServer({ noServer: true });
+/** A WebSocket as the call code needs it: the same shape on Node (ws) and on Cloudflare Workers. */
+export interface Sock {
+  send(text: string): void;
+  close(code?: number): void;
+  isOpen(): boolean;
+  onOpen(cb: () => void): void;
+  onMessage(cb: (text: string) => void): void;
+  onClose(cb: (code: number, reason: string) => void): void;
+  onError(cb: (message: string) => void): void;
+}
+export type OpenSock = (url: string) => Sock;
 
-  // Voice calls cost the most: at most 6 new calls per 10 minutes and 2 at once per visitor
-  const callStartLimit = createLimiter({ windowMs: 10 * 60_000, max: 6 });
-  const openCalls = new Map<string, number>();
-
-  server.on("upgrade", (request, socket, head) => {
-    socket.on("error", (err) => {
-      console.warn("Socket error during upgrade:", err);
-    });
-
-    const pathname = new URL(request.url || "", `http://${request.headers.host || "localhost"}`).pathname;
-    if (pathname === "/live") {
-      const ip = clientIp(request);
-      if ((openCalls.get(ip) || 0) >= 2 || !callStartLimit(ip).ok) {
-        console.warn(`[Live Audio] Rate limited ${ip}`);
-        socket.write("HTTP/1.1 429 Too Many Requests\r\nConnection: close\r\n\r\n");
-        socket.destroy();
-        return;
-      }
-      wss.handleUpgrade(request, socket, head, (ws) => {
-        openCalls.set(ip, (openCalls.get(ip) || 0) + 1);
-        ws.on("close", () => {
-          const n = (openCalls.get(ip) || 1) - 1;
-          if (n <= 0) openCalls.delete(ip);
-          else openCalls.set(ip, n);
-        });
-        wss.emit("connection", ws, request);
-      });
-    }
-  });
-
-  wss.on("connection", async (clientWs: WebSocket, request: any) => {
-    const reqUrl = new URL(request?.url || "", `http://${request?.headers?.host || "localhost"}`);
+/** One voice call: the caller's page on `clientWs`, Gemini Live opened with `openSock`. */
+export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     const lang = reqUrl.searchParams.get("lang") === "en" ? "en" : "ar";
     console.log(`[Live Audio] Client connected (language: ${lang})`);
     // Owner-only voice test (?voice=…&key=STATS_KEY); visitors always get the default voice
@@ -228,7 +203,7 @@ export function setupLiveAudio(server: Server) {
     };
 
 
-    let geminiWs: WebSocket;
+    let geminiWs: Sock;
     let keyIndex = 0;
     let setupDone = false;
     let clientGone = false;
@@ -255,7 +230,7 @@ export function setupLiveAudio(server: Server) {
 
     // ---- «reads my text» state (Arabic calls) ----
     const readMyText = lang === "ar" && process.env.LIVE_TTS !== "off";
-    const toClient = (obj: any) => { if (clientWs.readyState === WebSocket.OPEN) clientWs.send(JSON.stringify(obj)); };
+    const toClient = (obj: any) => { if (clientWs.isOpen()) clientWs.send(JSON.stringify(obj)); };
     type Turn = { gen: number; pending: string; first: boolean; liveAudio: string[]; sent: boolean; failed: boolean };
     let gen = 0;
     const newTurn = (): Turn => ({ gen, pending: "", first: true, liveAudio: [], sent: false, failed: false });
@@ -334,16 +309,15 @@ export function setupLiveAudio(server: Server) {
     const connect = () => {
       const { tier, key } = keys[keyIndex];
       // Official Gemini Live WebSocket endpoint
-      const ws = new WebSocket(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${key}`);
+      const ws = openSock(`wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${key}`);
       geminiWs = ws;
 
-      ws.on("open", () => {
+      ws.onOpen(() => {
         console.log(`[Gemini Live] Connected (${tier} key), sending low-latency audio setup`);
         ws.send(JSON.stringify(setupMessage));
       });
 
-      ws.on("message", async (data) => {
-        let text = data.toString();
+      ws.onMessage(async (text) => {
         if (!setupDone && text.includes("setupComplete")) setupDone = true;
         // lookup_info is answered here from the season file; other tool calls go on to the page
         if (text.includes("toolCall") && (text.includes("lookup_info") || text.includes("learn_pronunciation"))) {
@@ -379,17 +353,16 @@ export function setupLiveAudio(server: Server) {
         if (readMyText && text.includes("serverContent")) {
           try {
             const out = reshape(JSON.parse(text));
-            if (out && clientWs.readyState === WebSocket.OPEN) clientWs.send(JSON.stringify(out));
+            if (out && clientWs.isOpen()) clientWs.send(JSON.stringify(out));
             return;
           } catch {
             /* not JSON: forward as is */
           }
         }
-        if (clientWs.readyState === WebSocket.OPEN) clientWs.send(text);
+        if (clientWs.isOpen()) clientWs.send(text);
       });
 
-      ws.on("close", (code, reason) => {
-        const why = reason.toString();
+      ws.onClose((code, why) => {
         console.log(`[Gemini Live] Gemini connection closed (${code}, ${tier} key):`, why);
         if (clientGone || ws !== geminiWs) return;
         // Refused before the call started (quota / key): pause this key and try the next one
@@ -402,21 +375,21 @@ export function setupLiveAudio(server: Server) {
             return;
           }
         }
-        if (clientWs.readyState === WebSocket.OPEN) clientWs.close();
+        if (clientWs.isOpen()) clientWs.close();
       });
 
-      ws.on("error", (err) => {
-        console.error(`[Gemini Live] Gemini connection error (${tier} key):`, err.message);
+      ws.onError((message) => {
+        console.error(`[Gemini Live] Gemini connection error (${tier} key):`, message);
         // A failed handshake is followed by "close", which handles the retry
       });
     };
     connect();
 
     // Forward client audio to Gemini in the exact realtimeInput format
-    clientWs.on("message", (data) => {
-      if (geminiWs.readyState !== WebSocket.OPEN) return;
-      try {
-        let text = data.toString();
+    clientWs.onMessage((raw) => {
+      if (!geminiWs.isOpen()) return;
+      let text = raw;
+      {
         // Chat context sent at the start of the call: the same spoken spellings as the instructions
         if (text.includes('"clientContent"')) {
           try {
@@ -429,21 +402,16 @@ export function setupLiveAudio(server: Server) {
         }
         // Never log raw microphone payloads: they contain private user audio.
         geminiWs.send(text);
-      } catch {
-        geminiWs.send(data);
       }
     });
 
-    clientWs.on("close", () => {
+    clientWs.onClose(() => {
       clientGone = true;
       console.log("[Live Audio] Client disconnected");
-      if (geminiWs.readyState === WebSocket.OPEN || geminiWs.readyState === WebSocket.CONNECTING) {
-        geminiWs.close();
-      }
+      geminiWs.close();
     });
 
-    clientWs.on("error", (err) => {
-      console.warn("[Live Audio] Client WebSocket error:", err.message);
+    clientWs.onError((message) => {
+      console.warn("[Live Audio] Client WebSocket error:", message);
     });
-  });
 }
