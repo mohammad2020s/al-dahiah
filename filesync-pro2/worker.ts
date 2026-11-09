@@ -8,6 +8,7 @@ import express from "express";
 import { apiRouter } from "./server/api.ts";
 import { STATS_PAGE_HTML } from "./server/statsPage.ts";
 import { STAMPS_PAGE_HTML } from "./server/stampsPage.ts";
+import { TEACH_PAGE_HTML } from "./server/teachPage.ts";
 import { runCall, type Sock } from "./server/live-audio.ts";
 import { useD1, getStore } from "./server/store.ts";
 import { refreshMemory, loadTaught, loadRules } from "./server/pronMemory.ts";
@@ -64,6 +65,7 @@ const ownerPage = (html: string) => (_req: express.Request, res: express.Respons
 };
 app.get("/stats", ownerPage(STATS_PAGE_HTML));
 app.get("/stamps", ownerPage(STAMPS_PAGE_HTML));
+app.get("/teach", ownerPage(TEACH_PAGE_HTML));
 app.listen(3000);
 const expressHandler = httpServerHandler({ port: 3000 });
 
@@ -226,7 +228,7 @@ export default {
     // Plain settings and secrets also as process.env (the shared server code reads them there)
     for (const [k, v] of Object.entries(env)) if (typeof v === "string" && process.env[k] === undefined) process.env[k] = v;
     const url = new URL(request.url);
-    const dynamic = url.pathname === "/live" || url.pathname.startsWith("/api/") || url.pathname === "/stats" || url.pathname === "/stamps";
+    const dynamic = url.pathname === "/live" || url.pathname.startsWith("/api/") || url.pathname === "/stats" || url.pathname === "/stamps" || url.pathname === "/teach";
     if (!dynamic) return env.ASSETS.fetch(request);
 
     // Until the Gemini key is added here as a secret, the chat, the call and the owner pages are

@@ -160,6 +160,36 @@ apiRouter.post("/owner/import", async (req, res) => {
   res.json({ imported: n });
 });
 
+// Owner teaching page (/teach): the taught pronunciations and the owner's rules, read and changed here
+apiRouter.get("/owner/pron", (req, res) => {
+  if (!ownerOnly(req, res)) return;
+  res.setHeader("Cache-Control", "no-store");
+  res.json({ words: taughtList(), rules: rulesList() });
+});
+apiRouter.post("/owner/pron", async (req, res) => {
+  if (!ownerOnly(req, res)) return;
+  const word = String(req.body?.word || "").trim();
+  const say = String(req.body?.say || "").trim();
+  if (!word || !say || word.length > 60 || say.length > 80) return res.status(400).json({ error: "اكتب الكلمة وطريقة نطقها" });
+  const t = await teach(word, say, String(req.body?.note || "").slice(0, 120));
+  res.json({ ok: !!t, taught: t });
+});
+apiRouter.post("/owner/pron/forget", async (req, res) => {
+  if (!ownerOnly(req, res)) return;
+  await forget(String(req.body?.word || ""));
+  res.json({ ok: true });
+});
+apiRouter.post("/owner/rule", async (req, res) => {
+  if (!ownerOnly(req, res)) return;
+  const text = String(req.body?.text || "").trim();
+  if (!text || text.length > 400) return res.status(400).json({ error: "اكتب القاعدة" });
+  res.json({ ok: true, rule: await addRule(text) });
+});
+apiRouter.post("/owner/rule/remove", async (req, res) => {
+  if (!ownerOnly(req, res)) return;
+  res.json({ ok: true, removed: await removeRule(Number(req.body?.n)) });
+});
+
 apiRouter.get("/stats", async (req, res) => {
   if (!ownerOnly(req, res)) return;
   res.setHeader("Cache-Control", "no-store");

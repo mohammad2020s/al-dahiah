@@ -7,6 +7,7 @@ import { setupLiveAudio } from "./server/liveNode.ts";
 import { apiRouter, buildSpeechPrompt } from "./server/api.ts";
 import { schedulePronLab } from "./server/pronLab.ts";
 import { STATS_PAGE_HTML } from "./server/statsPage.ts";
+import { TEACH_PAGE_HTML } from "./server/teachPage.ts";
 import { STAMPS_PAGE_HTML } from "./server/stampsPage.ts";
 
 const PORT = Number(process.env.PORT || 3000);
@@ -41,6 +42,9 @@ async function startServer() {
   app.use("/api", apiRouter);
 
   // Owner page: what visitors ask (data needs STATS_KEY)
+  app.get("/teach", (_req, res) => {
+    res.set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" }).send(TEACH_PAGE_HTML);
+  });
   app.get("/stats", (_req, res) => {
     res.set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" }).send(STATS_PAGE_HTML);
   });
