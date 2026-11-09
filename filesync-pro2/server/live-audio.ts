@@ -59,7 +59,7 @@ async function readAloud(text: string): Promise<Buffer | null> {
         const r = await ai.models.generateContent({
           model,
           contents: [{ parts: [{ text: buildSpeechPrompt(spoken) }] }],
-          config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: process.env.LIVE_VOICE || "Fenrir" } } } },
+          config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: process.env.LIVE_VOICE || "Algenib" } } } },
         });
         const part: any = r.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data);
         if (part) return Buffer.from(part.inlineData.data, "base64");
@@ -98,7 +98,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         ? String(reqUrl.searchParams.get("voice"))
         : "";
     // Charon: in recorded tests it said «القْصَب» with two short syllables, where Puck often stretched it to «القصّاب»
-    const voiceName = testVoice || process.env.LIVE_VOICE || "Fenrir"; // Fenrir: Gemini's lively, excitable male voice
+    const voiceName = testVoice || process.env.LIVE_VOICE || "Algenib"; // Algenib: Gemini's gravelly, older-sounding male voice
 
     // Free key first; the paid key (GEMINI_PAID_API_KEY) only if the free one is refused
     const keys = voiceKeys("live");
