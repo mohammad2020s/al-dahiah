@@ -190,8 +190,6 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         systemInstruction: {
           parts: [{ text: systemInstruction }]
         },
-        // A text transcript of what the guide says, so the logs show how it said the place names
-        outputAudioTranscription: {},
         realtimeInputConfig: {
           automaticActivityDetection: {
             startOfSpeechSensitivity: "START_SENSITIVITY_LOW",
