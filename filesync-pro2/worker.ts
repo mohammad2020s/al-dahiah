@@ -173,17 +173,27 @@ function liveCall(request: Request, url: URL): Response {
 // Taught words, the owner's rules and the question counts lived in Render's Key Value. The first
 // requests here copy them over once (server to server, with the owner key both sides already have).
 let migrating = false;
+let migrateStatus = "not started";
 async function migrateFromRender(env: Env) {
   const key = typeof env.STATS_KEY === "string" ? env.STATS_KEY : "";
   const store = getStore();
-  if (migrating || !key || !env.DB || !store) return;
+  if (migrating) return;
+  if (!key || !env.DB || !store) {
+    migrateStatus = `skipped: key ${!!key}, db ${!!env.DB}, store ${!!store}`;
+    return;
+  }
   migrating = true;
+  migrateStatus = "running";
   try {
     const meta = ((await store.command(["HGETALL", "dahiah:meta"])) as string[]) || [];
-    if (meta.includes("migratedFromRender")) return;
+    if (meta.includes("migratedFromRender")) {
+      migrateStatus = `already done: ${meta[meta.indexOf("migratedFromRender") + 1]}`;
+      return;
+    }
     const r = await fetch("https://al-dahiah.onrender.com/api/owner/export", { headers: { "x-stats-key": key } });
     if (!r.ok) {
-      console.warn(`[Migrate] Render export failed: HTTP ${r.status}`);
+      migrateStatus = `Render export failed: HTTP ${r.status}`;
+      console.warn(`[Migrate] ${migrateStatus}`);
       migrating = false;
       return;
     }
@@ -198,9 +208,11 @@ async function migrateFromRender(env: Env) {
     for (let i = 0; i < stmts.length; i += 50) await env.DB.batch(stmts.slice(i, i + 50));
     await store.command(["HSET", "dahiah:meta", "migratedFromRender", `${new Date().toISOString()} (${stmts.length})`]);
     await Promise.all([loadTaught(), loadRules()]);
-    console.log(`[Migrate] copied ${stmts.length} saved entries from Render`);
+    migrateStatus = `done: copied ${stmts.length} entries`;
+    console.log(`[Migrate] ${migrateStatus}`);
   } catch (e: any) {
-    console.warn(`[Migrate] failed: ${String(e?.message || e).slice(0, 200)}`);
+    migrateStatus = `failed: ${String(e?.message || e).slice(0, 200)}`;
+    console.warn(`[Migrate] ${migrateStatus}`);
     migrating = false;
   }
 }
@@ -230,6 +242,11 @@ export default {
       return fetch(new Request(target.toString(), { method: request.method, headers, body: request.body, redirect: "manual" }));
     }
 
+    // Moving the saved data over: runs on its own once; /api/migrate-status runs it now and shows how it went
+    if (url.pathname === "/api/migrate-status") {
+      await migrateFromRender(env);
+      return new Response(migrateStatus, { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
+    }
     if (env.GEMINI_API_KEY) ctx.waitUntil(migrateFromRender(env));
 
     // The owner's taught words and rules: loaded before the first answer, refreshed every 5 minutes
