@@ -110,9 +110,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Heritage places in Al-Qasab",
     keywords: ["الاماكن التراثيه", "اماكن تراثيه", "المعالم التراثيه", "معالم تراثيه", "الاماكن التاريخيه", "المعالم التاريخيه", "اماكن تاريخيه", "heritage places", "heritage sites", "historic places"],
     answerAr:
-      "القْصَب مليانة تراث يا بعد حيي! هذي أبرز أماكنها التراثية:\n١. قصر الشيخ عبدالله بن زاحم جنب الجامع، فيه وثائق وصور من تاريخ الدولة.\n٢. سوق العبيدي، من أقدم أسواق نجد.\n٣. مبنى القصبي التراثي وسط السوق.\n٤. منزل الراشد على السور القديم.\n٥. مرقب القْصَب، برج المراقبة الطيني.\n٧. أبواب القْصَب وسورها «العَقْدة».\n٦. القرية التراثية بأزقتها وبيوتها الطينية ومقاهيها.\nتبي أعلّمك عن وحدة منها؟",
+      "القْصَب مليانة تراث يا بعد حيي! هذي أبرز أماكنها التراثية:\n١. قصر الشيخ عبدالله بن زاحم جنب الجامع، فيه وثائق وصور من تاريخ الدولة.\n٢. سوق العبيدي، من أقدم أسواق نجد.\n٣. مبنى القصبي التراثي وسط السوق.\n٤. منزل الراشد على السور القديم.\n٥. مرقب القْصَب، برج المراقبة الطيني.\n٦. أبواب القْصَب وسورها «العَقْدة».\n٧. القرية التراثية بأزقتها وبيوتها الطينية ومقاهيها.\n٨. المساجد القديمة: مسجد لبدة، ومسجد الشعبة، ومسجد مسهرة.\n٩. مدرسة البنات الأولى.\n١٠. دار الداغر.\n١١. دار حميدان الشويعر، الشاعر النجدي المشهور من أهل القْصَب.\nتبي أعلّمك عن وحدة منها؟",
     answerEn:
-      "Al-Qasab is full of heritage! Its main heritage places:\n1. Sheikh Abdullah bin Zahim's palace beside the mosque, with documents and photos from the history of the Saudi state.\n2. Souq Al-Obaidi, one of Najd's oldest markets.\n3. The Al-Qusaibi heritage building in the souq.\n4. The Al-Rashid house on the old town wall.\n5. The Al-Qasab mud-brick watchtower.\n7. Al-Qasab's old gates and town wall («Al-Aqda»).\n6. The heritage village with its mud-brick lanes and cafes.\nWant to hear about one of them?",
+      "Al-Qasab's main heritage places:\n1. Sheikh Abdullah bin Zahim's palace beside the mosque.\n2. Souq Al-Obaidi, one of Najd's oldest markets.\n3. The Al-Qusaibi heritage building.\n4. The Al-Rashid house on the old wall.\n5. The Al-Qasab mud-brick watchtower.\n6. The old gates and town wall («Al-Aqda»).\n7. The heritage village.\n8. The old mosques: Libda, Al-Shu'ba and Mashara.\n9. The First Girls' School.\n10. Dar Al-Daghir.\n11. The house of Humaidan Al-Shuwai'ir, the famous Najdi poet from Al-Qasab.\nWant to hear about one of them?",
     images: ZAHIM_IMAGES.slice(0, 2),
   },
   {
@@ -121,9 +121,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Tourist places in Al-Qasab",
     keywords: ["الاماكن السياحيه", "اماكن سياحيه", "المعالم السياحيه", "معالم سياحيه", "اماكن القصب", "معالم القصب", "tourist places", "attractions", "places to visit", "sights"],
     answerAr:
-      "أبشر! هذي أماكن القْصَب السياحية، وتلقاها كلها على الخريطة التفاعلية تحت، اضغط على أي دبوس يطلع لك اسمه:\n• مَمْلَحَة القْصَب (الجْفَارْ): الممالح الكبيرة وأكوام الملح الأبيض.\n• مَمْلَحَة المقحم النموذجية: ممشى خشبي وأكواخ خوص وكشك ملح.\n• الصْبَخَة: جلسات الليل جنوب البلد.\n• أرض موسم ملح القْصَب.\n• القرية التراثية وقصر ابن زاحم.\n• مرقب القْصَب على تل الثويليل.\n• حديقة الملك سلمان، والنادي التشكيلي (السريالي).\n• وبرّا البلد: روضة العكرشية، والواحة الخضراء (بحيرة برودان)، والنفود وجبل الفهدة، ومنتزه الشفيعي، ومتحف ومحمية طيور الوشم.\n• والمقاهي التراثية الأربع.\nوتلقى كل التفاصيل في الموقع الرسمي للمدينة.\nوش تبي أعلّمك عنه أكثر؟",
+      "أبشر! هذي أماكن القْصَب السياحية، وتلقاها على الخريطة التفاعلية تحت:\n• مَمْلَحَة القْصَب (الجْفَارْ): الممالح الكبيرة وأكوام الملح الأبيض.\n• مَمْلَحَة المقحم النموذجية: ممشى خشبي وأكواخ خوص وكشك ملح.\n• الصْبَخَة: جلسات الليل جنوب البلد.\n• أرض موسم ملح القْصَب، والقرية التراثية وقصر ابن زاحم.\n• مرقب القْصَب على تل الثويليل.\n• متحف ومحمية طيور الوشم بالقلعة التراثية.\n• بحيرة برودان (الواحة الخضراء).\n• روضة العكرشية، ومنتزه النخلة في العكرشية.\n• جبل الشفيعي (منتزه الشفيعي)، وجبل الفهدة، وجبل مصيخ.\n• مزرعة حزيمة: بيوت ريفية وعسل وجولة في المزرعة.\n• حديقة الملك سلمان، والنادي التشكيلي (السريالي)، والمقاهي التراثية.\nوش تبي أعلّمك عنه أكثر؟",
     answerEn:
-      "Here are Al-Qasab's tourist places, all pinned on the interactive map below (tap a pin to see its name):\n• The Al-Qasab salt pans (Al-Jifar): the big pans and hills of white salt.\n• The Al-Muqhim model salt pan: wooden walkway, reed huts and a salt kiosk.\n• Al-Sabkha: night gatherings south of town.\n• The Salt Season grounds.\n• The heritage village and Ibn Zahim's palace.\n• The Al-Qasab watchtower on Al-Thuwaylil hill.\n• King Salman Park and the Surrealist art club.\n• Out of town: Rawdat Al-Akrashiya, the Green Oasis (Burdan lake), the Nafud dunes and Jabal Al-Fahda, Al-Shafei park, and the Al-Washm bird museum and reserve.\n• The four heritage cafes.\nFull details are on the official city guide.\nWhat would you like to know more about?",
+      "Al-Qasab's tourist places, pinned on the interactive map below:\n• The Al-Qasab salt pans (Al-Jfar).\n• The Al-Muqhim model salt pan.\n• Al-Sabkha night gatherings south of town.\n• The Salt Season grounds, the heritage village and Ibn Zahim's palace.\n• The Al-Qasab watchtower.\n• The Al-Washm bird museum and reserve at the heritage fort.\n• Burdan lake (the Green Oasis).\n• Rawdat Al-Akrashiya and Al-Nakhla park in Al-Akrashiya.\n• Jabal Al-Shafei (Al-Shafei park), Jabal Al-Fahda and Jabal Musaikh.\n• Huzaima farm: rural houses, honey and a farm tour.\n• King Salman Park, the Surrealist art club and the heritage cafes.\nWhat would you like to know more about?",
     link: OFFICIAL_SITE,
   },
   {
@@ -202,6 +202,56 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     images: [],
     mapsUrl: "https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7",
     coordinates: { lat: 25.2994722, lng: 45.5121389 },
+  },
+  {
+    id: "musaikh",
+    titleAr: "جبل مصيخ",
+    titleEn: "Jabal Musaikh",
+    keywords: ["مصيخ", "musaikh"],
+    answerAr:
+      "جبل مصيخ من الأماكن السياحية في القْصَب. ما عندي للحين تفاصيل أكثر عنه ولا موقعه بالضبط، فتأكد من الطريق قبل تروح. تبي أعلّمك عن جبل الفهدة أو منتزه الشفيعي؟",
+    answerEn:
+      "Jabal Musaikh is one of Al-Qasab's tourist spots. I don't have more details or its exact location yet, so check the way before going.",
+  },
+  {
+    id: "nakhla_park",
+    titleAr: "منتزه النخلة في العكرشية",
+    titleEn: "Al-Nakhla park in Al-Akrashiya",
+    keywords: ["منتزه النخله", "منتزة النخله", "منتزه النخلة", "النخله في العكرشيه", "nakhla"],
+    answerAr:
+      "منتزه النخلة في روضة العكرشية، شمال غرب القْصَب. ما عندي للحين تفاصيل أكثر عنه، بس الروضة نفسها فيها مواقف ومسجد ودورات مياه وجلسات مظللة. تبي أعلّمك عن روضة العكرشية؟",
+    answerEn:
+      "Al-Nakhla park is in Rawdat Al-Akrashiya, northwest of Al-Qasab. The meadow has parking, a mosque, restrooms and shaded seating.",
+  },
+  {
+    id: "girls_school",
+    titleAr: "مدرسة البنات الأولى",
+    titleEn: "The First Girls' School",
+    keywords: ["مدرسه البنات", "مدرسة البنات"],
+    answerAr:
+      "مدرسة البنات الأولى من معالم القْصَب التراثية، وتلقاها في القرية التراثية، ورقمها ١٦ على خريطة موسم الملح. تبي أدلك عليها في الخريطة؟",
+    answerEn:
+      "The First Girls' School is one of Al-Qasab's heritage landmarks, in the heritage village: number 16 on the Salt Season map.",
+  },
+  {
+    id: "daghir_house",
+    titleAr: "دار الداغر",
+    titleEn: "Dar Al-Daghir",
+    keywords: ["الداغر", "داغر"],
+    answerAr:
+      "دار الداغر من البيوت الطينية التراثية في القرية التراثية بالقْصَب، ورقمها ٢٠ على خريطة موسم الملح، قريبة من شارع الفن وسوق العبيدي. تبي أدلك عليها في الخريطة؟",
+    answerEn:
+      "Dar Al-Daghir is a heritage mud-brick house in Al-Qasab's heritage village: number 20 on the Salt Season map, near Art Street and Souq Al-Obaidi.",
+  },
+  {
+    id: "humaidan_house",
+    titleAr: "دار حميدان الشويعر",
+    titleEn: "The house of Humaidan Al-Shuwai'ir",
+    keywords: ["حميدان", "الشويعر"],
+    answerAr:
+      "دار حميدان الشويعر في القرية التراثية بالقْصَب، ورقمها ١٨ على خريطة موسم الملح، قريبة من شارع الفن. وحميدان الشويعر شاعر نجدي مشهور من أهل القْصَب، اشتهر بشعر الحكمة والنقد. تبي أدلك عليها في الخريطة؟",
+    answerEn:
+      "The house of Humaidan Al-Shuwai'ir is in Al-Qasab's heritage village: number 18 on the Salt Season map, near Art Street. Humaidan Al-Shuwai'ir is a famous Najdi poet from Al-Qasab, known for his poems of wisdom and criticism.",
   },
   {
     id: "rashid_house",
