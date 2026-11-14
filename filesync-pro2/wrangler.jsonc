@@ -16,6 +16,11 @@
   "d1_databases": [{ "binding": "DB", "database_name": "al-dahiah", "database_id": "2c2e065d-5058-42e3-a8f7-ec8134be35ee" }],
   // Express's body-parser pulls in iconv-lite, which does not bundle for Workers
   "alias": { "iconv-lite": "./server/iconvStub.js" },
+  // The site's own address (registered on Cloudflare): both point at this Worker
+  "routes": [
+    { "pattern": "al-dahiah.com", "custom_domain": true },
+    { "pattern": "www.al-dahiah.com", "custom_domain": true }
+  ],
   "observability": { "enabled": true },
   "keep_vars": true,
   "vars": { "NODE_ENV": "production" }
