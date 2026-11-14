@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Download, ExternalLink, Map as MapIcon, Minus, Navigation, Plus, X, LocateFixed } from "lucide-react";
 import type { Language } from "../i18n";
-import { VENUE_MAP, VENUE_NODES, venueNode, venueRoute, nearestNode } from "../../server/venueMap";
+import { VENUE_MAP, VENUE_NODES, venueNode, venueRoute, nearestNode } from "../../server/venueMap.ts";
 
 // The official season map (A2 PDF) in a framed viewer: pins for every station, «أنت هنا» where the
 // visitor taps or picks, the walking route drawn on the map, and step-by-step directions.
