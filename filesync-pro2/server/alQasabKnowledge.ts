@@ -166,10 +166,35 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     coordinates: { lat: 25.2991872, lng: 45.5063997 },
   },
   {
+    id: "musafer",
+    titleAr: "استراحة المسافر",
+    titleEn: "Al-Musafer Rest Houses",
+    keywords: ["استراحه المسافر", "استراحات المسافر", "المسافر", "استراحه للتاجير", "استراحات للتاجير", "تاجير شهري", "تاجير سنوي", "musafer"],
+    answerAr:
+      "أبشر! «استراحة المسافر» استراحات للتأجير اليومي والشهري والسنوي في القْصَب، مكانها في الجهة الشرقية من البلد، حوالي ٢ كيلو شرق البلدة القديمة. وهذا موقعها: https://maps.app.goo.gl/1DvbSj9ciQCtwzus9 تبي أدلك على الطريق؟",
+    answerEn:
+      "Al-Musafer Rest Houses in Al-Qasab: rest houses to rent by the day, month or year, on the east side of town (about 2 km east of the old town). Location: https://maps.app.goo.gl/1DvbSj9ciQCtwzus9",
+    images: [],
+    mapsUrl: "https://maps.app.goo.gl/1DvbSj9ciQCtwzus9",
+    coordinates: { lat: 25.3012048, lng: 45.529392 },
+  },
+  {
+    id: "lodging",
+    titleAr: "وين أبات في القصب",
+    titleEn: "Where to stay in Al-Qasab",
+    keywords: ["وين ابات", "وين انام", "مبيت", "سكن", "اسكن", "تاجير يومي", "للتاجير", "فندق", "فنادق", "شقق", "استراحه", "استراحات", "hotel", "stay", "accommodation", "بيوت للتاجير"],
+    answerAr:
+      "يا هلا! لو تبي تبات في القْصَب عندك:\n١. «حزيمة»: بيوت ريفية تأجير يومي، وفيها عسل وجولة في المزرعة، شرق البلدة القديمة بنص كيلو: https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7\n٢. «استراحة المسافر»: استراحات تأجير يومي وشهري وسنوي، في الجهة الشرقية من البلد: https://maps.app.goo.gl/1DvbSj9ciQCtwzus9\nتبي أدلك على وحدة منهم؟",
+    answerEn:
+      "Places to stay in Al-Qasab:\n1. Huzaima: rural houses by the day, with honey and a farm tour, half a km east of the old town: https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7\n2. Al-Musafer Rest Houses: rest houses by the day, month or year, on the east side of town: https://maps.app.goo.gl/1DvbSj9ciQCtwzus9",
+    images: [],
+    mapsUrl: "https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7",
+  },
+  {
     id: "huzaima",
     titleAr: "حزيمة (بيوت ريفية وعسل ومزرعة)",
     titleEn: "Huzaima (rural houses, honey and a farm)",
-    keywords: ["حزيمه", "حزيمة", "huzaima", "بيوت ريفيه", "بيت ريفي", "بيوت للتاجير", "تاجير يومي", "وين ابات", "وين انام", "مبيت", "سكن", "عسل", "منحل", "جوله في المزرعه", "مزرعه", "مزارع"],
+    keywords: ["حزيمه", "حزيمة", "huzaima", "بيوت ريفيه", "بيت ريفي", "عسل", "منحل", "جوله في المزرعه", "مزرعه", "مزارع"],
     answerAr:
       "يا هلا! «حزيمة» مكان ريفي حلو في القْصَب: بيوت ريفية تأجير يومي لو تبي تبات وتستانس، وعندهم عسل للبيع، وتقدر تاخذ جولة في المزرعة، والدخول بمبلغ رمزي. مكانها شرق البلدة القديمة بحوالي نص كيلو، وهذا موقعها: https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7 تبي أدلك على الطريق؟",
     answerEn:

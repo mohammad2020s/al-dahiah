@@ -222,6 +222,16 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
     directionsUrl: "https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7",
     coordinates: { lat: 25.2994722, lng: 45.5121389 },
   },
+  {
+    id: "musafer",
+    name: "استراحة المسافر (تأجير يومي وشهري وسنوي)",
+    category: "استراحات للتأجير",
+    address: "الجهة الشرقية من القصب",
+    description: "استراحات للتأجير اليومي والشهري والسنوي.",
+    geocodingQuery: "استراحة المسافر القصب",
+    directionsUrl: "https://maps.app.goo.gl/1DvbSj9ciQCtwzus9",
+    coordinates: { lat: 25.3012048, lng: 45.529392 },
+  },
 ];
 
 export interface CafePlace {
