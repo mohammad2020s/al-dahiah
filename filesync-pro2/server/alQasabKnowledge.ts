@@ -166,6 +166,19 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     coordinates: { lat: 25.2991872, lng: 45.5063997 },
   },
   {
+    id: "huzaima",
+    titleAr: "حزيمة (بيوت ريفية وعسل ومزرعة)",
+    titleEn: "Huzaima (rural houses, honey and a farm)",
+    keywords: ["حزيمه", "حزيمة", "huzaima", "بيوت ريفيه", "بيت ريفي", "بيوت للتاجير", "تاجير يومي", "وين ابات", "وين انام", "مبيت", "سكن", "عسل", "منحل", "جوله في المزرعه", "مزرعه", "مزارع"],
+    answerAr:
+      "يا هلا! «حزيمة» مكان ريفي حلو في القْصَب: بيوت ريفية تأجير يومي لو تبي تبات وتستانس، وعندهم عسل للبيع، وتقدر تاخذ جولة في المزرعة، والدخول بمبلغ رمزي. مكانها شرق البلدة القديمة بحوالي نص كيلو، وهذا موقعها: https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7 تبي أدلك على الطريق؟",
+    answerEn:
+      "Huzaima in Al-Qasab: rural houses to rent by the day, honey for sale, and a tour of the farm, with a small entry fee. It's about half a kilometre east of the old town. Location: https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7",
+    images: [],
+    mapsUrl: "https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7",
+    coordinates: { lat: 25.2994722, lng: 45.5121389 },
+  },
+  {
     id: "rashid_house",
     titleAr: "منزل الراشد التراثي",
     titleEn: "Al-Rashid heritage house",

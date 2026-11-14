@@ -212,6 +212,16 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
       lng: 45.506,
     },
   },
+  {
+    id: "huzaima",
+    name: "حزيمة (بيوت ريفية وعسل ومزرعة)",
+    category: "بيوت ريفية ومزرعة",
+    address: "شرق البلدة القديمة بالقصب",
+    description: "بيوت ريفية للتأجير اليومي، وبيع عسل، وجولة في المزرعة، والدخول بمبلغ رمزي.",
+    geocodingQuery: "حزيمة القصب",
+    directionsUrl: "https://maps.app.goo.gl/JSiR6EhvDPBp8nYR7",
+    coordinates: { lat: 25.2994722, lng: 45.5121389 },
+  },
 ];
 
 export interface CafePlace {
