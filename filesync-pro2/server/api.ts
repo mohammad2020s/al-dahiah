@@ -593,17 +593,38 @@ export function buildSpeechPrompt(transcript: string): string {
   ].join("\n");
 }
 
-/** Seconds of 24 kHz 16-bit mono audio (a WAV header, if any, is ignored). */
-export function pcmSeconds(buf: Buffer): number {
-  return Math.max(0, buf.length - (isWav(buf) ? 44 : 0)) / 48000;
-}
-export const isWav = (buf: Buffer) => buf.length > 44 && buf.toString("ascii", 0, 4) === "RIFF";
-/** Raw PCM from a TTS answer (strips the WAV header gemini-3.8-flash-tts adds). */
+/**
+ * Raw PCM from a TTS answer. gemini-3.8-flash-tts sends a WAV file whose "data" chunk is followed
+ * by a C2PA (content credentials) chunk: played as audio, that metadata was a loud «تشش» after
+ * every sentence. So only the bytes of the "data" chunk are kept, with a 5 ms fade at both ends.
+ */
 export function toPcm(buf: Buffer): Buffer {
-  if (!isWav(buf)) return buf;
-  const i = buf.indexOf("data", 12, "ascii");
-  return i > 0 ? buf.subarray(i + 8) : buf.subarray(44);
+  let pcm = buf;
+  if (buf.length > 12 && buf.toString("ascii", 0, 4) === "RIFF") {
+    pcm = Buffer.alloc(0);
+    for (let o = 12; o + 8 <= buf.length; ) {
+      const id = buf.toString("ascii", o, o + 4);
+      const size = buf.readUInt32LE(o + 4);
+      if (id === "data") {
+        const end = size === 0xffffffff ? buf.length : Math.min(buf.length, o + 8 + size);
+        pcm = Buffer.from(buf.subarray(o + 8, end));
+        break;
+      }
+      o += 8 + size + (size % 2);
+    }
+  } else pcm = Buffer.from(buf);
+  if (pcm.length % 2) pcm = pcm.subarray(0, pcm.length - 1);
+  const n = pcm.length / 2, fade = Math.min(120, Math.floor(n / 2));
+  for (let i = 0; i < fade; i++) {
+    const g = i / fade;
+    pcm.writeInt16LE(Math.round(pcm.readInt16LE(i * 2) * g), i * 2);
+    const j = (n - 1 - i) * 2;
+    pcm.writeInt16LE(Math.round(pcm.readInt16LE(j) * g), j);
+  }
+  return pcm;
 }
+/** Seconds of 24 kHz 16-bit mono speech in a TTS answer. */
+export const pcmSeconds = (buf: Buffer) => toPcm(buf).length / 48000;
 /** Longest believable reading of `text` (anything longer = the model read the notes too). */
 export const maxSpeechSeconds = (text: string) => 4 + text.replace(/[\u064B-\u0670\s]/g, "").length * 0.35;
 
@@ -763,7 +784,12 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
           console.warn(`[TTS] ${model} failed:`, lastError.slice(0, 120));
         }
       }
-      if (audio?.data) return res.json({ audio: audio.data, mimeType: audio.mimeType });
+      if (audio?.data) {
+        const raw = Buffer.from(audio.data, "base64");
+        // A clean WAV (no trailing metadata chunk) for the chat voice
+        if (raw.toString("ascii", 0, 4) === "RIFF") return res.json({ audio: pcmToWav(toPcm(raw)).toString("base64"), mimeType: "audio/wav" });
+        return res.json({ audio: audio.data, mimeType: audio.mimeType });
+      }
       if (/429|quota|exhaust|permission|api key/i.test(lastError)) pauseVoice("tts", tier, lastError);
       else lastError = lastError || "Failed to generate audio";
     } catch (err: any) {
