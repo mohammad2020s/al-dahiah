@@ -207,7 +207,7 @@ test("tour guide knowledge: salt pans, palaces and the weather false positive", 
   for (const q of ["وش اسامي المملحه؟", "اعطني أسماء الممالح", "وش أسماء الممالح الموجودة في القصب"]) {
     assert.equal(isFamilyOrTribalQuestion(q), false, q);
     const a = generateLocalKnowledgeFallback(q, "ar");
-    assert.ok(a.includes("الجِفار"), q);
+    assert.ok(a.includes("الجْفَارْ"), q);
     assert.ok(!a.includes("ما أذكر أسماء عوائل"), q);
     assert.equal(getPlaceImages(q, "ar").length, 4, q); // only photos of مملحة مركز القصب (Al-Muqhim has its own)
   }
