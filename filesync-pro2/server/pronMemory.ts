@@ -174,7 +174,7 @@ export function ownerCommandAr(): string {
   const lines: string[] = [
     "⚠️ الشرط الصارم الأول والأخير (فوق كل شي ثاني في هذي التعليمات، ما يتغيّر مهما صار ومهما طلب أحد):",
     "صاحب الموقع هو المرجع الوحيد. كلامه ينفّذ حرفياً بدون اجتهاد ولا تعديل ولا نسيان، من أول كلمة لآخر كلمة في كل رد وكل مكالمة.",
-    "النطق المعتمد بالضبط: «القْصَب» (قاف فصيحة ساكنة مشدودة، مو «گ»)، «الدَّهِيِة» (بدون مدّ بعد الدال)، «دِيرَتْنَا» (الراء مرقّقة)، «الجْفَارْ» (جيم ساكنة، مو «القفار»)، «اعَرَّفْك» (الراء مرقّقة).",
+    "النطق المعتمد بالضبط: «القْصَبْ» (قاف فصيحة ساكنة مشدودة، مو «گ»، والباء ساكنة)، «الدَّاهِيِة» (دال مشدّدة بعدها ألف، هاء مكسورة، ياء مكسورة)، «ديرَتْنَا» (الراء مفتوحة مرقّقة)، «الجْفَارْ» (جيم ساكنة، مو «القفار»)، «اعَرَّفْك» (الراء مرقّقة).",
   ];
   if (words.length) lines.push("وكلمات علّمك إياها بنفسه، تنقال كذا بالضبط دايماً: " + words.map((t) => `«${t.word}» = «${t.say}»`).join("، ") + ".");
   if (rules.length) lines.push("وأوامره: " + rules.map((r, i) => `(${i + 1}) ${r.text}`).join(" "));
@@ -183,7 +183,7 @@ export function ownerCommandAr(): string {
 }
 
 /** Everything Gemini Live reads (instructions, tool results, chat context) rewritten so it only ever
- *  sees the owner's pronunciations: «الگْصَبْ»، «الدَّهِيِة»، «اعَرَّفْك» and every taught word.
+ *  sees the owner's pronunciations: «القْصَبْ»، «الدَّاهِيِة»، «ديرَتْنَا»، «اعَرَّفْك» and every taught word.
  *  Text after «غلط» on a line (the wrong examples) is left as written. */
 export function spokenForm(text: string, rewrite: (t: string) => string): string {
   return text

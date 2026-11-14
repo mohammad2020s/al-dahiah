@@ -579,7 +579,7 @@ ${context}`;
 /**
  * Gemini TTS prompt: a SHORT director's note, then the transcript. Long notes (the old Arabic rule
  * list) were read out loud by gemini-3.8-flash-tts — one word took 3+ minutes of audio. The
- * pronunciation itself is carried by the diacritized text (القْصَب، الدَّهِيِة، دِيرَتْنَا…).
+ * pronunciation itself is carried by the diacritized text (القْصَبْ، الدَّاهِيِة، ديرَتْنَا…).
  */
 export function buildSpeechPrompt(transcript: string): string {
   const plain = transcript.replace(/[\u064B-\u0670\u065F]/g, "");
