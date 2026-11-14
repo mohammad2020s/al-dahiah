@@ -168,7 +168,7 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
               value={here.id || ""}
               onChange={(e) => { const n = venueNode(e.target.value); if (n) { manual.current = true; setGps({ state: "idle" }); setHere({ x: n.x, y: n.y, id: n.id }); } }}
             >
-              {!here.id && <option value="">{en ? `Your tap (near ${hereNode ? (en ? hereNode.en : hereNode.ar) : ""})` : `مكان ضغطتك (قرب ${hereNode ? hereNode.ar : ""})`}</option>}
+              {!here.id && <option value="">{gps.state === "found" ? (en ? `Your location (near ${hereNode?.en || ""})` : `موقعك الحين (قرب ${hereNode?.ar || ""})`) : en ? `Your tap (near ${hereNode?.en || ""})` : `مكان ضغطتك (قرب ${hereNode?.ar || ""})`}</option>}
               {options.map((n) => <option key={n.id} value={n.id}>{label(n)}</option>)}
             </select>
           </label>
