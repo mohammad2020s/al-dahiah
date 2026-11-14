@@ -100,12 +100,11 @@ test("answers ticket inquiries with the free online registration ticket", () => 
   assert.match(answerEn, /qasab-tickets\.pages\.dev/);
 });
 
-test("speech prompt carries pronunciation notes only for words in the text", async () => {
+test("speech prompt stays short and ends with the transcript", async () => {
   const { buildSpeechPrompt } = await import("./api.ts").catch(() => ({ buildSpeechPrompt: null as any }));
   if (!buildSpeechPrompt) return; // api.ts needs server deps that may be missing locally
   const p = buildSpeechPrompt("حيّاك الله في القْصَب والصْبَخَة");
-  assert.match(p, /never «القصّاب»|Never «القصّاب»/);
-  assert.match(p, /«الصَّبْخة»/);
+  assert.ok(p.length < 500, "a long prompt gets read out loud");
   assert.match(p, /#### TRANSCRIPT\nحيّاك الله في القْصَب والصْبَخَة$/);
   assert.equal(buildSpeechPrompt("hello"), "hello");
 });

@@ -1,6 +1,6 @@
 import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE, applyNajdiPhoneticDiacritics } from "./alQasabScope.ts";
 import { GoogleGenAI, Modality } from "@google/genai";
-import { buildSpeechPrompt } from "./api.ts";
+import { buildSpeechPrompt, pcmSeconds, toPcm, maxSpeechSeconds } from "./api.ts";
 import { najdify } from "./najdiStyle.ts";
 import { QASAB_FILE_INDEX, fileContextFor } from "./qasabFile.ts";
 import { teach, spokenForm, applyTaught, ownerCommandAr } from "./pronMemory.ts";
@@ -54,18 +54,29 @@ ${lang === "en" ? "" : ownerCommandAr()}`;
 const TTS_MODELS = ["gemini-3.8-flash-tts", "gemini-3.1-flash-tts-preview"];
 async function readAloud(text: string): Promise<Buffer | null> {
   const spoken = speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(najdify(text))));
+  const limit = maxSpeechSeconds(spoken);
   for (const { tier, key } of voiceKeys("tts")) {
     const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
+    const say = async (model: string, prompt: string): Promise<Buffer | null> => {
+      const r = await ai.models.generateContent({
+        model,
+        contents: [{ parts: [{ text: prompt }] }],
+        config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: process.env.LIVE_VOICE || "Algenib" } } } },
+      });
+      const part: any = r.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data);
+      return part ? Buffer.from(part.inlineData.data, "base64") : null;
+    };
     let last = "";
     for (const model of TTS_MODELS) {
       try {
-        const r = await ai.models.generateContent({
-          model,
-          contents: [{ parts: [{ text: buildSpeechPrompt(spoken) }] }],
-          config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: process.env.LIVE_VOICE || "Algenib" } } } },
-        });
-        const part: any = r.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data);
-        if (part) return Buffer.from(part.inlineData.data, "base64");
+        let audio = await say(model, buildSpeechPrompt(spoken));
+        // Far too long = it read the director's notes as well: once more with the bare text
+        if (audio && pcmSeconds(audio) > limit) {
+          console.warn(`[Call TTS] ${model} answer too long (${pcmSeconds(audio).toFixed(0)}s), retrying bare`);
+          audio = await say(model, spoken);
+          if (audio && pcmSeconds(audio) > limit) audio = null;
+        }
+        if (audio) return toPcm(audio);
       } catch (e: any) {
         last = String(e?.message || e);
       }

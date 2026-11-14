@@ -577,28 +577,35 @@ ${context}`;
 }
 
 /**
- * Gemini TTS takes "director's notes" before the transcript. Only the notes for words that are
- * in the text are added, so a short answer stays a short prompt. The notes are not read aloud.
+ * Gemini TTS prompt: a SHORT director's note, then the transcript. Long notes (the old Arabic rule
+ * list) were read out loud by gemini-3.8-flash-tts — one word took 3+ minutes of audio. The
+ * pronunciation itself is carried by the diacritized text (القْصَب، الدَّهِيِة، دِيرَتْنَا…).
  */
 export function buildSpeechPrompt(transcript: string): string {
-  const plain = transcript.replace(/[ً-ٰٟ]/g, "");
+  const plain = transcript.replace(/[\u064B-\u0670\u065F]/g, "");
   if (!/[\u0600-\u06FF]/.test(plain)) return transcript;
-  const notes: string[] = [];
-  if (/[قگ]صب/.test(plain)) notes.push("اسم البلد «الگْصَبْ»: «گ» نجدية مثل «گريب» ساكنة ملزوقة في «صَبْ»، والفتحة القصيرة على الصاد بس. غلط: القاف الفصيحة «القَصَب»، و«القصّاب».");
-  if (/صبخ/.test(plain)) notes.push("«الصْبَخَة» تنقال «اِصْبَخَة»: الصاد ساكنة. غلط: «الصَّبْخة».");
-  if (/جفار/.test(plain)) notes.push("«الجفار» = «الجْفَارْ»: جيم معطّشة ساكنة، ثم فاء مفتوحة ممدودة، والراء ساكنة. غلط: «القفار» و«الجْفَارْ» بكسرة.");
-  if (/مملح/.test(plain)) notes.push("«المَمْلَحَة» بفتح الميم الأولى وسكون الثانية.");
   return [
-    "اقرأ النص بصوت شايب نجدي من أهل القْصَب في الوشم، يسولف بهدوء في مجلسه: صوت واطي وعميق وثابت، كلام موزون، وآخر الجملة ينزل، بدون تلحين مصري.",
-    "الأصوات: الجيم معطّشة (مو «گ» المصرية)، والقاف في الكلام العادي «گ» نجدية (قال = گال، قهوة = گَهْوة)، إلا اسم البلد «القْصَب» بقاف فصيحة، و«ديرتنا» = «دِيرَتْنَا» بالراء مفتوحة مرقّقة، والثاء ثاء والذال ذال، والحركة الأولى القصيرة تنحذف (جْمَل، كْتاب)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة وبعد الياء (خير، كبير)، ضربة وحدة بدون ترديد.",
-    taughtRulesAr(),
-    OWNER_PRONUNCIATIONS_AR,
-    ...(notes.length ? ["أسماء الأماكن (قاعدة صارمة فوق كل شي، قلها أبطأ وأوضح):", ...notes.map((n) => `- ${n}`)] : []),
-    "",
-    "#### النص",
+    "Read ONLY the transcript below, word for word, exactly as it is written and vowelled. Never read these notes.",
+    "### DIRECTOR'S NOTES",
+    "Voice: a lively, warm old man from Najd (central Saudi Arabia), smiling and genuinely interested in the listener. Najdi Arabic, natural brisk pace, never sleepy, never Egyptian.",
+    "#### TRANSCRIPT",
     transcript,
   ].join("\n");
 }
+
+/** Seconds of 24 kHz 16-bit mono audio (a WAV header, if any, is ignored). */
+export function pcmSeconds(buf: Buffer): number {
+  return Math.max(0, buf.length - (isWav(buf) ? 44 : 0)) / 48000;
+}
+export const isWav = (buf: Buffer) => buf.length > 44 && buf.toString("ascii", 0, 4) === "RIFF";
+/** Raw PCM from a TTS answer (strips the WAV header gemini-3.8-flash-tts adds). */
+export function toPcm(buf: Buffer): Buffer {
+  if (!isWav(buf)) return buf;
+  const i = buf.indexOf("data", 12, "ascii");
+  return i > 0 ? buf.subarray(i + 8) : buf.subarray(44);
+}
+/** Longest believable reading of `text` (anything longer = the model read the notes too). */
+export const maxSpeechSeconds = (text: string) => 4 + text.replace(/[\u064B-\u0670\s]/g, "").length * 0.35;
 
 // Owner-only pronunciation lab: speaks each candidate spelling with the site's TTS, then has a
 // Gemini model write down what it HEARS (phonetically, long vowels and doubled consonants marked),
@@ -724,34 +731,41 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   if (keys.length === 0) return res.status(503).json({ error: "Speech is unavailable right now" });
 
   let lastError = "TTS error";
-  // Free key first; if its speech quota is used up, the paid key (when set)
+  const spoken = speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text)))).slice(0, 400);
+  const limit = maxSpeechSeconds(spoken);
+  // Paid key first when there is one (the free speech quota is gone after a few answers a day)
   for (const { tier, key } of keys) {
     try {
       const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
-      const ttsCall = (model: string) => ai.models.generateContent({
+      const ttsCall = (model: string, prompt: string) => ai.models.generateContent({
         model,
-        // Same Najdi corrections as the chat («القْصَب», «الصْبَخَة», «المَمْلَحَة») so the voice says them right
-        contents: [{ parts: [{ text: buildSpeechPrompt(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text)))).slice(0, 400)) }] }],
+        contents: [{ parts: [{ text: prompt }] }],
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } },
         },
       });
+      const audioOf = (r: any) => r?.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.mimeType?.startsWith("audio/"))?.inlineData;
       // The newest TTS model first; the old preview (retiring 17 Nov 2026) only if it refuses
-      let response: any;
-      try {
-        response = await ttsCall("gemini-3.8-flash-tts");
-      } catch (e: any) {
-        console.warn("[TTS] gemini-3.8-flash-tts failed, falling back:", String(e?.message || e).slice(0, 120));
-        response = await ttsCall("gemini-3.1-flash-tts-preview");
+      let audio: any = null;
+      for (const model of ["gemini-3.8-flash-tts", "gemini-3.1-flash-tts-preview"]) {
+        try {
+          audio = audioOf(await ttsCall(model, buildSpeechPrompt(spoken)));
+          // Read the notes too (far too long)? Once more with the bare text
+          if (audio?.data && pcmSeconds(Buffer.from(audio.data, "base64")) > limit) {
+            console.warn(`[TTS] ${model} answer too long, retrying with the bare text`);
+            audio = audioOf(await ttsCall(model, spoken));
+            if (audio?.data && pcmSeconds(Buffer.from(audio.data, "base64")) > limit) audio = null;
+          }
+          if (audio?.data) break;
+        } catch (e: any) {
+          lastError = String(e?.message || e);
+          console.warn(`[TTS] ${model} failed:`, lastError.slice(0, 120));
+        }
       }
-      const audioPart = response.candidates?.[0]?.content?.parts?.find(
-        (p: any) => p.inlineData?.mimeType?.startsWith("audio/")
-      );
-      if (audioPart?.inlineData?.data) {
-        return res.json({ audio: audioPart.inlineData.data, mimeType: audioPart.inlineData.mimeType });
-      }
-      lastError = "Failed to generate audio";
+      if (audio?.data) return res.json({ audio: audio.data, mimeType: audio.mimeType });
+      if (/429|quota|exhaust|permission|api key/i.test(lastError)) pauseVoice("tts", tier, lastError);
+      else lastError = lastError || "Failed to generate audio";
     } catch (err: any) {
       lastError = String(err?.message || err);
       pauseVoice("tts", tier, lastError);

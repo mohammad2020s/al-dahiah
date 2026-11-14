@@ -196,9 +196,13 @@ export async function streamChatWithFallback(opts: {
   return { text: "", engine: null, timedOut: false };
 }
 
-/** For the live voice call and generated speech: free key first, paid key after its quota. */
+/**
+ * Live call: free key first, paid key after its quota. Generated speech (TTS): paid key first,
+ * because the free speech quota is gone after a few answers a day and waiting for it to refuse
+ * made every answer start late.
+ */
 export function voiceKeys(kind: "live" | "tts"): { tier: Tier; key: string }[] {
-  return (["free", "paid"] as Tier[])
+  return ((kind === "tts" ? ["paid", "free"] : ["free", "paid"]) as Tier[])
     .filter((tier) => keyFor(tier) && !isPaused({ tier, model: kind }))
     .map((tier) => ({ tier, key: keyFor(tier) }));
 }
