@@ -115,6 +115,25 @@ export function venueRoute(from: { x: number; y: number }, toId: string): VenueR
   return { points, via };
 }
 
+// ───────────── phone location → the map ─────────────
+// The map is a drawing, so it is tied to real coordinates by six places whose GPS positions are known
+// (Al-Zahim palace, Al-Manie' diwaniya, Al-Rashid, Budoor coffee, Art coffee, Shahi Naqi'): a
+// least-squares affine fit, about 20–60 map points (10–20 m) off at those places.
+const LAT0 = 25.299, LNG0 = 45.506, M_LNG = 100766, M_LAT = 110700;
+const FX = [4.804918, 0.920234, 745.87174];
+const FY = [1.206443, -1.829083, 504.35824];
+
+/** Where a phone's GPS position falls on the map, and whether it is on (or right by) the season grounds. */
+export function gpsToMap(lat: number, lng: number): { x: number; y: number; inside: boolean; metresAway: number } {
+  const e = (lng - LNG0) * M_LNG, n = (lat - LAT0) * M_LAT;
+  const x = FX[0] * e + FX[1] * n + FX[2];
+  const y = FY[0] * e + FY[1] * n + FY[2];
+  const inside = x > -60 && x < VENUE_MAP.width + 60 && y > -60 && y < VENUE_MAP.height + 60;
+  // distance from the gate, for «you are not at the season yet»
+  const metresAway = Math.round(Math.hypot((lng - 45.5072574) * M_LNG, (lat - 25.2983509) * M_LAT));
+  return { x, y, inside, metresAway };
+}
+
 // ───────────── chat: does a question want the season map? ─────────────
 const norm = (s: string) =>
   s.toLowerCase().replace(/[ً-ٰٟـ]/g, "").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/\s+/g, " ");

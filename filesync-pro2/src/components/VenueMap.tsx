@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Download, ExternalLink, Map as MapIcon, Minus, Navigation, Plus, X, LocateFixed } from "lucide-react";
 import type { Language } from "../i18n";
-import { VENUE_MAP, VENUE_NODES, venueNode, venueRoute, nearestNode } from "../../server/venueMap.ts";
+import { VENUE_MAP, VENUE_NODES, venueNode, venueRoute, nearestNode, gpsToMap } from "../../server/venueMap.ts";
 
 // The official season map (A2 PDF) in a framed viewer: pins for every station, «أنت هنا» where the
 // visitor taps or picks, the walking route drawn on the map, and step-by-step directions.
@@ -46,13 +46,21 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
     return { x: e.x, y: e.y, id: "E" };
   });
   const [zoom, setZoom] = useState(1);
+  // «الداهية» finds the visitor on the map from the phone's location
+  const [gps, setGps] = useState<{ state: "idle" | "finding" | "found" | "away" | "denied" | "error"; metres?: number; acc?: number }>({ state: "idle" });
+  const manual = useRef(false); // the visitor picked or tapped their spot: stop moving it
+  const [locateTick, setLocateTick] = useState(0);
   const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const on = (e: Event) => {
       const d = (e as CustomEvent<Target>).detail || {};
       const f = d.from ? venueNode(d.from) : null;
+      manual.current = !!f;
+      setGps({ state: "idle" });
       if (f) setHere({ x: f.x, y: f.y, id: f.id });
+      else { const e0 = venueNode("E")!; setHere({ x: e0.x, y: e0.y, id: "E" }); }
+      setLocateTick((t) => t + 1);
       setToId(d.to || "");
       setZoom(window.innerWidth < 700 ? 2.2 : 1.2);
       setOpen(true);
@@ -70,6 +78,25 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  // Follow the phone while the map is open (unless the visitor set the spot themselves)
+  useEffect(() => {
+    if (!open || manual.current) return;
+    if (!("geolocation" in navigator)) { setGps({ state: "error" }); return; }
+    setGps({ state: "finding" });
+    const id = navigator.geolocation.watchPosition(
+      (pos) => {
+        if (manual.current) return;
+        const m = gpsToMap(pos.coords.latitude, pos.coords.longitude);
+        if (!m.inside) { setGps({ state: "away", metres: m.metresAway }); return; }
+        setHere({ x: Math.min(W, Math.max(0, m.x)), y: Math.min(H, Math.max(0, m.y)) });
+        setGps({ state: "found", acc: Math.round(pos.coords.accuracy) });
+      },
+      (err) => setGps({ state: err.code === err.PERMISSION_DENIED ? "denied" : "error" }),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
+    );
+    return () => navigator.geolocation.clearWatch(id);
+  }, [open, locateTick]);
 
   const route = useMemo(() => (toId ? venueRoute(here, toId) : null), [here, toId]);
   const routeLine = useMemo(() => (route ? smoothRoute(route.points) : ""), [route]);
@@ -104,6 +131,8 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
     const r = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
     const x = ((e.clientX - r.left) / r.width) * W;
     const y = ((e.clientY - r.top) / r.height) * H;
+    manual.current = true;
+    setGps({ state: "idle" });
     setHere({ x, y });
   };
 
@@ -137,7 +166,7 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
             <select
               className="min-h-10 w-full rounded-xl border border-[#e6d5bd] bg-white px-2 text-sm"
               value={here.id || ""}
-              onChange={(e) => { const n = venueNode(e.target.value); if (n) setHere({ x: n.x, y: n.y, id: n.id }); }}
+              onChange={(e) => { const n = venueNode(e.target.value); if (n) { manual.current = true; setGps({ state: "idle" }); setHere({ x: n.x, y: n.y, id: n.id }); } }}
             >
               {!here.id && <option value="">{en ? `Your tap (near ${hereNode ? (en ? hereNode.en : hereNode.ar) : ""})` : `مكان ضغطتك (قرب ${hereNode ? hereNode.ar : ""})`}</option>}
               {options.map((n) => <option key={n.id} value={n.id}>{label(n)}</option>)}
@@ -152,7 +181,21 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
               <option value="WC2">{en ? "Nearest restroom" : "أقرب دورة مياه"}</option>
             </select>
           </label>
-          <p className="text-xs text-[#7a5a45] sm:col-span-2">{en ? "Tip: tap the map where you are standing to set «You are here»; tap a number to go there." : "تلميح: اضغط على الخريطة مكان ما أنت واقف عشان يحدد «أنت هنا»، واضغط على أي رقم عشان يدلك عليه."}</p>
+          <div className="flex flex-wrap items-center gap-2 text-xs sm:col-span-2">
+            <span className={`font-bold ${gps.state === "found" ? "text-[#0f766e]" : gps.state === "finding" ? "text-[#1d6fd8]" : "text-[#7a5a45]"}`}>
+              {gps.state === "finding" && (en ? "Al-Dahiya is finding where you are…" : "الداهية يحدد موقعك…")}
+              {gps.state === "found" && (en ? `Al-Dahiya found you on the map (about ±${gps.acc} m).` : `الداهية حدد موقعك على الخريطة (تقريباً ±${gps.acc} متر).`)}
+              {gps.state === "away" && (en ? `You are not at the season yet (about ${((gps.metres || 0) / 1000).toFixed(1)} km away), so the route starts at the entrance.` : `أنت للحين مو في الموسم (تبعد تقريباً ${((gps.metres || 0) / 1000).toFixed(1)} كم)، فبديت لك الطريق من الدخول.`)}
+              {gps.state === "denied" && (en ? "Location is off: allow it to be found automatically, or tap where you are." : "الموقع مقفل: اسمح للموقع عشان يحددك تلقائياً، أو اضغط مكانك على الخريطة.")}
+              {gps.state === "error" && (en ? "Couldn't get your location: tap where you are on the map." : "ما قدرت أحدد موقعك: اضغط مكانك على الخريطة.")}
+              {gps.state === "idle" && manual.current && (en ? "Tap the map to move «You are here»." : "اضغط على الخريطة عشان تغيّر «أنت هنا».")}
+            </span>
+            {(manual.current || gps.state === "denied" || gps.state === "error" || gps.state === "away") && (
+              <button type="button" onClick={() => { manual.current = false; setLocateTick((t) => t + 1); }} className="inline-flex min-h-9 items-center gap-1 rounded-lg border border-[#1d6fd8]/40 bg-white px-2.5 font-bold text-[#1d6fd8]">
+                <LocateFixed className="size-3.5" /> {en ? "Find me" : "حدد موقعي"}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* the map */}
