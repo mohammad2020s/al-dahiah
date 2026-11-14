@@ -185,7 +185,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   }
   ctx.fillStyle = MUTED;
   ctx.font = '600 28px Alexandria, sans-serif';
-  ctx.fillText(en ? "Ask «Al-Dahiya» · al-dahiah.onrender.com" : "اسأل «الداهية» · al-dahiah.onrender.com", W / 2, H - 56);
+  ctx.fillText(en ? "Ask «Al-Dahiya» · al-dahiah.com" : "اسأل «الداهية» · al-dahiah.com", W / 2, H - 56);
 
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/png"));
 }

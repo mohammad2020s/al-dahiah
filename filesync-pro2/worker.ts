@@ -228,6 +228,12 @@ export default {
     // Plain settings and secrets also as process.env (the shared server code reads them there)
     for (const [k, v] of Object.entries(env)) if (typeof v === "string" && process.env[k] === undefined) process.env[k] = v;
     const url = new URL(request.url);
+    // The site's address is al-dahiah.com: page visits on the workers.dev address go there
+    // (the API and calls keep answering on both, so nothing open breaks)
+    if (url.hostname.endsWith(".workers.dev") && request.method === "GET" && !url.pathname.startsWith("/api/") && url.pathname !== "/live") {
+      return Response.redirect("https://al-dahiah.com" + url.pathname + url.search, 301);
+    }
+    if (url.hostname === "www.al-dahiah.com") return Response.redirect("https://al-dahiah.com" + url.pathname + url.search, 301);
     const dynamic = url.pathname === "/live" || url.pathname.startsWith("/api/") || url.pathname === "/stats" || url.pathname === "/stamps" || url.pathname === "/teach";
     if (!dynamic) return env.ASSETS.fetch(request);
 
