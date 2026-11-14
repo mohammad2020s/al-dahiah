@@ -11,6 +11,30 @@ export const openVenueMap = (t: Target = {}) => window.dispatchEvent(new CustomE
 
 const W = VENUE_MAP.width;
 const H = VENUE_MAP.height;
+// Smooth the route: drop points that double back right away, then round every corner (Chaikin, 3 passes)
+function smoothRoute(pts: [number, number][]): string {
+  let p = pts.filter((q, i) => i === 0 || Math.hypot(q[0] - pts[i - 1][0], q[1] - pts[i - 1][1]) > 4);
+  for (let changed = true; changed && p.length > 3; ) {
+    changed = false;
+    for (let i = 1; i < p.length - 1; i++) {
+      const a = p[i - 1], b = p[i], c = p[i + 1];
+      const v1 = [b[0] - a[0], b[1] - a[1]], v2 = [c[0] - b[0], c[1] - b[1]];
+      const cos = (v1[0] * v2[0] + v1[1] * v2[1]) / (Math.hypot(v1[0], v1[1]) * Math.hypot(v2[0], v2[1]) || 1);
+      if (cos < -0.85) { p.splice(i, 1); changed = true; break; } // a hairpin: cut it
+    }
+  }
+  for (let k = 0; k < 3; k++) {
+    const out: [number, number][] = [p[0]];
+    for (let i = 0; i < p.length - 1; i++) {
+      const [x0, y0] = p[i], [x1, y1] = p[i + 1];
+      out.push([0.75 * x0 + 0.25 * x1, 0.75 * y0 + 0.25 * y1], [0.25 * x0 + 0.75 * x1, 0.25 * y0 + 0.75 * y1]);
+    }
+    out.push(p[p.length - 1]);
+    p = out;
+  }
+  return p.map((q) => `${q[0].toFixed(1)},${q[1].toFixed(1)}`).join(" ");
+}
+
 const toArabicDigits = (n: number) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[+d]);
 
 export function VenueMap({ language = "ar" }: { language?: Language }) {
@@ -48,6 +72,7 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
   }, [open]);
 
   const route = useMemo(() => (toId ? venueRoute(here, toId) : null), [here, toId]);
+  const routeLine = useMemo(() => (route ? smoothRoute(route.points) : ""), [route]);
   const dest = route ? route.points[route.points.length - 1] : null;
   const destNode = toId ? (toId.startsWith("WC") && dest ? nearestNode(dest[0], dest[1], ["service"]) : venueNode(toId)) : null;
   const hereNode = here.id ? venueNode(here.id) : nearestNode(here.x, here.y);
@@ -138,8 +163,8 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
               <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 size-full cursor-crosshair" onClick={onMapTap}>
                 {route && (
                   <>
-                    <polyline points={route.points.map((p) => p.join(",")).join(" ")} fill="none" stroke="#fff" strokeWidth={stroke + 6} strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
-                    <polyline points={route.points.map((p) => p.join(",")).join(" ")} fill="none" stroke="#1d6fd8" strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={`${stroke * 2.2} ${stroke * 1.4}`} className="venue-route" />
+                    <polyline points={routeLine} fill="none" stroke="#fff" strokeWidth={stroke + 6} strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
+                    <polyline points={routeLine} fill="none" stroke="#1d6fd8" strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={`${stroke * 2.2} ${stroke * 1.4}`} className="venue-route" />
                   </>
                 )}
                 {/* pins to tap */}
