@@ -53,6 +53,7 @@ import { SeasonCountdown } from "../components/SeasonCountdown";
 import { BackgroundSlideshow, SLIDES } from "../components/BackgroundSlideshow";
 import { PrayerTimes, prayerTimes } from "../components/PrayerTimes";
 import { NearMe, openNearMe } from "../components/NearMe";
+import { VenueMap, VenueMapCard } from "../components/VenueMap";
 import { WelcomeGrandpa } from "../components/WelcomeGrandpa";
 import { MobileBar, FloatingCall } from "../components/MobileBar";
 import { DidYouKnow } from "../components/DidYouKnow";
@@ -89,6 +90,7 @@ type ChatMessage = {
   audio?: string;
   /** Next questions to tap under an answer */
   followUps?: string[];
+  venueMap?: { to?: string; from?: string } | null;
   /** «صوّر واسأل»: the visitor's photo (small preview data URL) */
   photo?: string;
 };
@@ -672,6 +674,7 @@ export default function Home() {
                         ticketUrl: typeof data.ticketUrl === "string" ? data.ticketUrl : undefined,
                         link: data.link && typeof data.link.url === "string" ? data.link : undefined,
                         followUps: Array.isArray(data.followUps) ? data.followUps.slice(0, 3) : undefined,
+                        venueMap: data.venueMap && typeof data.venueMap === "object" ? data.venueMap : undefined,
                       }
                     : m
                 )
@@ -728,6 +731,7 @@ export default function Home() {
       {/* In-site turn-by-turn directions, opened by every «خذني لها» button */}
       <NavigateSheet language={language} />
       <NearMe language={language} />
+      <VenueMap language={language} />
       <WelcomeGrandpa language={language} onCall={handleStartCall} />
       <MobileBar language={language} onChat={goToChat} onCall={handleStartCall} onMore={goToSeason} />
       <FloatingCall language={language} onCall={handleStartCall} />
@@ -832,6 +836,8 @@ export default function Home() {
             </div>
 
             <SeasonCountdown language={language} onAsk={askQuestion} />
+
+            <VenueMapCard language={language} />
 
             <DidYouKnow language={language} onAsk={(q) => askQuestion(q)} />
 
@@ -985,6 +991,9 @@ export default function Home() {
                       <MessageBubble message={m} language={language} />
                       {m.role === "assistant" && m.weather && (
                         <WeatherCard weather={m.weather} language={language} />
+                      )}
+                      {m.role === "assistant" && m.venueMap && (
+                        <VenueMapCard language={language} to={m.venueMap.to} from={m.venueMap.from} compact />
                       )}
                       {m.role === "assistant" && m.images && m.images.length > 0 && (
                         <PlaceGallery images={m.images} language={language} />

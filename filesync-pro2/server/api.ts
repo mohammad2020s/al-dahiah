@@ -1,6 +1,7 @@
 import { najdify, speakableTownName, OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
 import { parseTeach, teach, forget, taughtList, applyTaught, taughtRulesAr, addRule, removeRule, rulesList, loadTaught, loadRules } from "./pronMemory.ts";
 import { getStore } from "./store.ts";
+import { venueMapIntent } from "./venueMap.ts";
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { fileContextFor } from "./qasabFile.ts";
@@ -525,6 +526,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       : showMap
         ? getPlaceLocation(userPrompt, lang) || getLocationForQuery(userPrompt, finalAnswer)
         : null;
+    const venueMap = photo ? null : venueMapIntent(userPrompt) || (topicId === "season_map" ? {} : null);
     const totalResponseTimeMs = Date.now() - requestStartTime;
 
     if (!res.writableEnded && !res.destroyed) {
@@ -532,12 +534,14 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         type: "done",
         answer: finalAnswer,
         guarded: false,
-        showMap,
-        locationData,
+        showMap: showMap && !venueMap?.to,
+        locationData: venueMap?.to ? null : locationData,
         weather: null,
-        images,
+        images: venueMap ? (images || []).filter((im: any) => !/season-map/.test(im?.src || "")) : images,
         mapsUrl,
         ticketUrl,
+        // The season's own map (stations, «أنت هنا», directions) when the question is about it
+        venueMap,
         // A button such as the official city guide, for topics that carry one
         link: (() => {
           const l = photo ? null : matchPlaceTopic(userPrompt)?.link;
