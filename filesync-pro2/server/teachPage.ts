@@ -79,7 +79,7 @@ export const TEACH_PAGE_HTML = `<!doctype html>
       </div>
       <div class="actions">
         <button class="btn" id="teach">احفظ النطق</button>
-        <button class="btn ghost" id="hear">اسمع كيف ينطقها</button>
+        <button class="btn ghost" id="hear">اسمع كيف ينطقها (بصوت المكالمة)</button>
       </div>
       <div class="msg" id="teachMsg"></div>
     </section>
@@ -180,13 +180,14 @@ export const TEACH_PAGE_HTML = `<!doctype html>
     var say = $("say").value.trim() || $("word").value.trim();
     if (!say) return msg("teachMsg", "اكتب الكلمة أول", false);
     var b = $("hear"); b.disabled = true; msg("teachMsg", "لحظة…", true);
-    fetch("/api/speak", { method: "POST", headers: { "Content-Type": "application/json", "x-stats-key": key() }, body: JSON.stringify({ text: "حيّاك الله، " + say + "." }) })
+    fetch("/api/speak", { method: "POST", headers: { "Content-Type": "application/json", "x-stats-key": key() }, body: JSON.stringify({ text: "حيّاك الله، " + say + ".", asIs: true }) })
       .then(function (r) { return r.json(); })
       .then(function (d) {
         b.disabled = false;
         if (!d.audio) return msg("teachMsg", "صوت الاستماع مو متاح الحين (غالباً خلص حده اليومي)، جرّب بكرة. النطق انحفظ عادي إذا ضغطت احفظ.", false);
         var bin = atob(d.audio), pcm = new Uint8Array(bin.length);
         for (var i = 0; i < bin.length; i++) pcm[i] = bin.charCodeAt(i);
+        if (bin.slice(0, 4) === "RIFF") { new Audio(URL.createObjectURL(new Blob([pcm], { type: "audio/wav" }))).play(); msg("teachMsg", "", true); return; }
         var rate = Number((/rate=(\\d+)/.exec(d.mimeType || "") || [])[1]) || 24000;
         var head = new DataView(new ArrayBuffer(44));
         function str(o, s) { for (var j = 0; j < s.length; j++) head.setUint8(o + j, s.charCodeAt(j)); }

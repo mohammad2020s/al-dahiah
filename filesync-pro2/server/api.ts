@@ -755,7 +755,11 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   if (keys.length === 0) return res.status(503).json({ error: "Speech is unavailable right now" });
 
   let lastError = "TTS error";
-  const spoken = speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text)))).slice(0, 400);
+  // Owner's «اسمع» on the teaching page: his spelling exactly as typed, in the call's voice
+  const expected = process.env.STATS_KEY || "";
+  const given = String(req.headers["x-stats-key"] || "");
+  const asOwner = !!req.body?.asIs && expected.length > 0 && given.length === expected.length && timingSafeEqual(Buffer.from(given), Buffer.from(expected));
+  const spoken = (asOwner ? String(text) : speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text))))).slice(0, 400);
   const limit = maxSpeechSeconds(spoken);
   // Paid key first when there is one (the free speech quota is gone after a few answers a day)
   for (const { tier, key } of keys) {
@@ -766,7 +770,7 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
         contents: [{ parts: [{ text: prompt }] }],
         config: {
           responseModalities: [Modality.AUDIO],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Charon" } } },
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: asOwner ? process.env.LIVE_VOICE || "Algenib" : "Charon" } } },
         },
       });
       const audioOf = (r: any) => r?.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.mimeType?.startsWith("audio/"))?.inlineData;
