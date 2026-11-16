@@ -301,7 +301,9 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
       const m = [...t.pending.matchAll(/[.!?؟\n]|،(?=\s)/g)];
       if (!m.length) return;
       const cut = m[m.length - 1].index! + 1;
-      if (cut < (t.first ? 12 : 90)) return;
+      // First piece short (the voice starts fast), then bigger pieces: every piece is one TTS request,
+      // and the paid key allows 10 a minute / 100 a day per voice model
+      if (cut < (t.first ? 12 : 170)) return;
       speakSegment(t, t.pending.slice(0, cut));
       t.pending = t.pending.slice(cut);
       t.first = false;
