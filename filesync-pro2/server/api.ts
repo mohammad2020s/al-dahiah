@@ -625,6 +625,14 @@ export function toPcm(buf: Buffer): Buffer {
 }
 /** Seconds of 24 kHz 16-bit mono speech in a TTS answer. */
 export const pcmSeconds = (buf: Buffer) => toPcm(buf).length / 48000;
+/**
+ * The last step before text goes to the TTS voice. «القْصَبْ» (sukun on ق) made the voice add a long
+ * vowel later in the word about 1 time in 8 («القصيب»، «القصيم»); with a fatha on ق it said a short,
+ * clean «qaSab» 8 times out of 8 in owner tests. Only what the voice reads changes; the written name
+ * stays «القْصَبْ».
+ */
+export const ttsSpelling = (text: string) => text.replace(/قْصَبْ/g, "قَصَبْ");
+
 /** Longest believable reading of `text` (anything longer = the model read the notes too). */
 export const maxSpeechSeconds = (text: string) => 4 + text.replace(/[\u064B-\u0670\s]/g, "").length * 0.35;
 
@@ -759,7 +767,7 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   const expected = process.env.STATS_KEY || "";
   const given = String(req.headers["x-stats-key"] || "");
   const asOwner = !!req.body?.asIs && expected.length > 0 && given.length === expected.length && timingSafeEqual(Buffer.from(given), Buffer.from(expected));
-  const spoken = (asOwner ? String(text) : speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text))))).slice(0, 400);
+  const spoken = (asOwner ? String(text) : ttsSpelling(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text)))))).slice(0, 400);
   const limit = maxSpeechSeconds(spoken);
   // Paid key first when there is one (the free speech quota is gone after a few answers a day)
   for (const { tier, key } of keys) {

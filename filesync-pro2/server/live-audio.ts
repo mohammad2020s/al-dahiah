@@ -1,6 +1,6 @@
 import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE, applyNajdiPhoneticDiacritics } from "./alQasabScope.ts";
 import { GoogleGenAI, Modality } from "@google/genai";
-import { buildSpeechPrompt, pcmSeconds, toPcm, maxSpeechSeconds } from "./api.ts";
+import { buildSpeechPrompt, pcmSeconds, toPcm, maxSpeechSeconds, ttsSpelling } from "./api.ts";
 import { najdify } from "./najdiStyle.ts";
 import { QASAB_FILE_INDEX, fileContextFor } from "./qasabFile.ts";
 import { teach, spokenForm, applyTaught, ownerCommandAr } from "./pronMemory.ts";
@@ -53,7 +53,7 @@ ${lang === "en" ? "" : ownerCommandAr()}`;
 // and read aloud by Gemini TTS, which follows the written spelling. Set LIVE_TTS=off to go back.
 const TTS_MODELS = ["gemini-3.8-flash-tts", "gemini-3.1-flash-tts-preview"];
 async function readAloud(text: string): Promise<Buffer | null> {
-  const spoken = speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(najdify(text))));
+  const spoken = ttsSpelling(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(najdify(text)))));
   const limit = maxSpeechSeconds(spoken);
   for (const { tier, key } of voiceKeys("tts")) {
     const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
