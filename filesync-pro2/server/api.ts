@@ -719,7 +719,7 @@ apiRouter.post("/pron-listen", async (req: Request, res: Response) => {
   if (!ownerOnly(req, res)) return;
   const pcm = Buffer.from(String(req.body?.pcm || ""), "base64");
   if (pcm.length < 4800) return res.status(400).json({ error: "audio too short" });
-  const key = keyFor("free") || keyFor("paid");
+  const key = keyFor("paid") || keyFor("free"); // owner tests: the free quota runs out fast
   const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
   try {
     const t = await ai.models.generateContent({
