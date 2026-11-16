@@ -211,7 +211,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           // Calmer sampling: names come out the same way every time
           // Low: the same words and the same accent every call
           temperature: 0.45,
-          ...(exp.has("tlmin") ? { thinkingConfig: { thinkingLevel: "minimal" } } : {}),
+          // (thinkingConfig budget 0 / level minimal: both refused by gemini-3.8-live, tested 16 Nov)
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
