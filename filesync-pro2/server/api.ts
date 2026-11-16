@@ -587,7 +587,7 @@ export function buildSpeechPrompt(transcript: string): string {
   return [
     "Read ONLY the transcript below, word for word, exactly as it is written and vowelled. Never read these notes.",
     "### DIRECTOR'S NOTES",
-    "Voice: a lively, warm old man from Najd (central Saudi Arabia), smiling and genuinely interested in the listener. Najdi Arabic, natural brisk pace, never sleepy, never Egyptian.",
+    "Voice: a lively, warm old man from Najd (central Saudi Arabia), smiling and genuinely interested in the listener. Najdi Arabic, natural brisk pace, never sleepy, never Egyptian. In القَصَبْ and مَرْقَب the ق is a deep classical Q, never G.",
     "#### TRANSCRIPT",
     transcript,
   ].join("\n");

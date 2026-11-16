@@ -271,9 +271,10 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     const readMyText =
       lang === "ar" && process.env.LIVE_TTS !== "off" && (process.env.LIVE_TTS === "on" || !!process.env.GEMINI_PAID_API_KEY);
     const toClient = (obj: any) => { if (clientWs.isOpen()) clientWs.send(JSON.stringify(obj)); };
-    type Turn = { gen: number; pending: string; first: boolean; liveAudio: string[]; sent: boolean; failed: boolean };
+    // spoken: characters handed to TTS so far; failAt: where the first refused piece starts (-1 = none)
+    type Turn = { gen: number; pending: string; first: boolean; liveAudio: string[]; sent: boolean; failed: boolean; spoken: number; failAt: number };
     let gen = 0;
-    const newTurn = (): Turn => ({ gen, pending: "", first: true, liveAudio: [], sent: false, failed: false });
+    const newTurn = (): Turn => ({ gen, pending: "", first: true, liveAudio: [], sent: false, failed: false, spoken: 0, failAt: -1 });
     let turn = newTurn();
     let turnPassthrough = false; // this answer is played in the model's own voice (no TTS quota left)
     let chain: Promise<void> = Promise.resolve(); // keeps the spoken sentences in order
@@ -285,15 +286,44 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
       playUntil = Math.max(playUntil, Date.now()) + (pcm.length / 48000) * 1000;
     };
     const speakSegment = (t: Turn, text: string) => {
+      const start = t.spoken;
+      t.spoken += text.length;
       if (!text.trim()) return;
-      const audio = readAloud(text); // starts now, in parallel with the next sentence
+      // After a refused piece the rest of this answer is in the model's own voice: no more TTS for it
+      // Starts now, in parallel with the next sentence. A voice that hasn't answered in 9 s counts as
+      // refused (the model's own voice takes over) instead of holding the whole call silent.
+      const audio: Promise<Buffer | null> = t.failed
+        ? Promise.resolve(null)
+        : Promise.race([readAloud(text), new Promise<null>((r) => setTimeout(() => r(null), 9000))]);
       chain = chain.then(async () => {
         const pcm = await audio;
         if (t.gen !== gen || clientGone) return;
-        if (!pcm) { t.failed = true; return; }
+        if (!pcm || t.failed) {
+          // Refused (per-minute / per-day speech limit): remember where, the rest plays at turn end
+          if (!t.failed) { t.failed = true; t.failAt = start; }
+          return;
+        }
         t.sent = true;
         sendPcm(pcm);
       });
+    };
+    // The model's own audio for this answer from the point the read voice stopped (by share of the
+    // text, moved to the quietest moment nearby so it starts between words). Never leaves a gap.
+    const liveAudioFrom = (t: Turn): Buffer => {
+      const all = Buffer.concat(t.liveAudio.map((d) => Buffer.from(d, "base64")));
+      if (!t.sent || t.failAt <= 0 || t.spoken <= 0) return all;
+      const samples = all.length >> 1;
+      const guess = Math.floor((t.failAt / t.spoken) * samples);
+      const win = 1200, reach = 9600; // 50 ms windows, ±400 ms
+      let best = guess, bestE = Infinity;
+      for (let c = Math.max(0, guess - reach); c <= Math.min(samples - win, guess + reach); c += 240) {
+        let e = 0;
+        for (let i = c; i < c + win; i += 4) { const v = all.readInt16LE(i * 2); e += v * v; }
+        if (e < bestE) { bestE = e; best = c; }
+      }
+      const from = Buffer.from(all.subarray(Math.min(all.length, (best + win / 2) * 2)));
+      for (let i = 0; i < Math.min(240, from.length >> 1); i++) from.writeInt16LE(Math.round(from.readInt16LE(i * 2) * (i / 240)), i * 2);
+      return from;
     };
     // Cut the transcript at sentence ends: a short first piece so the voice starts fast, longer ones after
     const takeSentences = (t: Turn, final: boolean) => {
@@ -347,10 +377,11 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         delete sc.turnComplete;
         chain = chain.then(() => {
           if (t.gen !== gen || clientGone) return;
-          // Speech quota used up: the model's own voice for this answer, so the call never goes silent
-          if (t.failed && !t.sent && t.liveAudio.length) {
-            for (const d of t.liveAudio) toClient({ serverContent: { modelTurn: { parts: [{ inlineData: { mimeType: "audio/pcm;rate=24000", data: d } }] } } });
-            playUntil = Math.max(playUntil, Date.now()) + t.liveAudio.reduce((n, d) => n + d.length * 0.75, 0) / 48;
+          // A piece was refused (speech limit): the rest of the answer in the model's own voice, so the
+          // guide never stops mid-answer
+          if (t.failed && t.liveAudio.length) {
+            const rest = liveAudioFrom(t);
+            if (rest.length) sendPcm(rest);
           }
           toClient({ serverContent: { turnComplete: true } });
         });
