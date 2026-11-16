@@ -135,6 +135,9 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         ? "\n\nالمتصل الحين هو صاحب الموقع (المعلّم). إذا علّمك نطق كلمة («قل كذا»، «انطقها كذا»، «لا، تنقال …»): اسمع نطقه بدقة، واكتب الكلمة بإملائها العادي، واكتب نطقها بالحروف العربية والحركات بالضبط مثل ما سمعته (استخدم «گ» للقاف النجدية، والسكون والشدة مثل ما قالها)، واستدعِ الأداة learn_pronunciation، وبعدها قل الكلمة بنطقه مرة وحدة وقل: «حفظتها». ولو قال «لا، غلط» عدّلها واستدعِ الأداة مرة ثانية بالنطق الجديد."
         : "");
 
+    // Owner-only experiments (?exp=nb,think0&key=STATS_KEY), so a setting is tried before visitors get it
+    const exp = new Set(isOwnerCall ? String(reqUrl.searchParams.get("exp") || "").split(",") : []);
+
     // Built once; sent on every connection attempt
     const setupMessage = {
       setup: {
@@ -172,6 +175,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
               },
               {
                 name: "show_place",
+                ...(exp.has("nb") ? { behavior: "NON_BLOCKING" } : {}),
                 description: "Show the caller photos or an info card of an Al-Qasab place on their call screen. Call it right before explaining that place.",
                 parameters: {
                   type: "OBJECT",
@@ -193,6 +197,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           // Calmer sampling: names come out the same way every time
           // Low: the same words and the same accent every call
           temperature: 0.45,
+          ...(exp.has("think0") ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
