@@ -52,8 +52,21 @@ ${lang === "en" ? "" : ownerCommandAr()}`;
 // audio is dropped and each sentence it says is rewritten (القْصَبْ، الدَّاهِيِة، اعَرَّفْك، ديرَتْنَا + taught words)
 // and read aloud by Gemini TTS, which follows the written spelling. Set LIVE_TTS=off to go back.
 const TTS_MODELS = ["gemini-3.8-flash-tts", "gemini-3.1-flash-tts-preview"];
+// Recently spoken sentences (greetings and openers repeat a lot): played at once instead of ~3 s of TTS
+const ttsCache = new Map<string, Buffer>();
 async function readAloud(text: string): Promise<Buffer | null> {
   const spoken = ttsSpelling(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(najdify(text)))));
+  const cacheKey = spoken.trim();
+  const hit = ttsCache.get(cacheKey);
+  if (hit) return hit;
+  const pcm = await readAloudFresh(spoken);
+  if (pcm && cacheKey.length <= 120) {
+    if (ttsCache.size >= 300) ttsCache.delete(ttsCache.keys().next().value!);
+    ttsCache.set(cacheKey, pcm);
+  }
+  return pcm;
+}
+async function readAloudFresh(spoken: string): Promise<Buffer | null> {
   const limit = maxSpeechSeconds(spoken);
   for (const { tier, key } of voiceKeys("tts")) {
     const ai = new GoogleGenAI({ apiKey: key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
@@ -175,7 +188,8 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
               },
               {
                 name: "show_place",
-                ...(exp.has("nb") ? { behavior: "NON_BLOCKING" } : {}),
+                // The guide keeps talking while the photos open (it used to wait ~1 s per call, 2–4 calls per answer)
+                behavior: "NON_BLOCKING",
                 description: "Show the caller photos or an info card of an Al-Qasab place on their call screen. Call it right before explaining that place.",
                 parameters: {
                   type: "OBJECT",
@@ -197,7 +211,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           // Calmer sampling: names come out the same way every time
           // Low: the same words and the same accent every call
           temperature: 0.45,
-          ...(exp.has("think0") ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+          ...(exp.has("tlmin") ? { thinkingConfig: { thinkingLevel: "minimal" } } : {}),
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
@@ -211,9 +225,12 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         },
         realtimeInputConfig: {
           automaticActivityDetection: {
+            // LOW start: steady car/street noise doesn't count as the caller talking.
+            // HIGH end + 450 ms: answers as soon as the caller stops (the page also mutes pure noise).
             startOfSpeechSensitivity: "START_SENSITIVITY_LOW",
             endOfSpeechSensitivity: "END_SENSITIVITY_HIGH",
-            silenceDurationMs: 500
+            prefixPaddingMs: 200,
+            silenceDurationMs: 450
           }
         }
       }
@@ -245,6 +262,8 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         /* binary/partial frame */
       }
     };
+
+    const answeredIds = new Set<string>();
 
     // ---- «reads my text» state (Arabic calls) ----
     // Only with a paid key: the free speech quota runs out after a few calls a day, and every answer
@@ -365,6 +384,20 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
             }));
           }
         }
+        // show_place is non-blocking: answered here at once (silently), the page only shows the photos
+        if (text.includes("toolCall") && text.includes("show_place")) {
+          try {
+            const msg = JSON.parse(text);
+            const calls: any[] = msg.toolCall?.functionCalls || [];
+            const shows = calls.filter((c) => c.name === "show_place");
+            if (shows.length) {
+              ws.send(JSON.stringify({ toolResponse: { functionResponses: shows.map((c) => ({ id: c.id, name: c.name, response: { result: "shown", scheduling: "SILENT" } })) } }));
+              for (const c of shows) answeredIds.add(c.id);
+              msg.toolCall.answered = true;
+              text = JSON.stringify(msg);
+            }
+          } catch {}
+        }
         // lookup_info is answered here from the season file; other tool calls go on to the page
         if (text.includes("toolCall") && (text.includes("lookup_info") || text.includes("learn_pronunciation"))) {
           try {
@@ -443,6 +476,16 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
       if (!geminiWs.isOpen()) return;
       let text = raw;
       {
+        // The page still answers show_place (older pages): those ids were answered already, drop them
+        if (answeredIds.size && text.includes('"toolResponse"')) {
+          try {
+            const msg = JSON.parse(text);
+            const rest = (msg.toolResponse?.functionResponses || []).filter((r: any) => !answeredIds.has(r.id));
+            if (!rest.length) return;
+            msg.toolResponse.functionResponses = rest;
+            text = JSON.stringify(msg);
+          } catch {}
+        }
         // Chat context sent at the start of the call: the same spoken spellings as the instructions
         if (text.includes('"clientContent"')) {
           try {

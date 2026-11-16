@@ -647,6 +647,40 @@ registerProcessor('mic-processor', MicProcessor);`;
       let audioBufferSamples = 0;
       const targetInputSamples = Math.max(1, Math.floor(captureCtx.sampleRate / 10)); // 100ms
 
+      // Noise gate: steady background noise (cars, AC, crowd) kept the model thinking the caller was
+      // still talking, so it answered late or not at all. The noise floor is learned on the fly; a
+      // 100 ms chunk clearly louder than it is speech. Speech (plus 100 ms before it and 600 ms after
+      // it, so no syllable is cut) goes out as is; pure noise goes out as silence, so Gemini hears
+      // the caller stop right away.
+      let noiseFloor = 0;
+      let warmChunks = 0;
+      let hangover = 0;
+      let held: Uint8Array | null = null; // the chunk before speech starts (word onsets)
+      const SPEECH_RATIO = 2.0, MIN_SPEECH_RMS = 0.006, HANGOVER_CHUNKS = 6;
+      // The level is measured above ~300 Hz only: car and road noise is mostly low rumble, voices
+      // are not (tested on a recording made in a car: speech and pauses separate cleanly).
+      const hpA = (() => { const rc = 1 / (2 * Math.PI * 300), dt = 1 / captureCtx.sampleRate; return rc / (rc + dt); })();
+      let hpX1 = 0, hpY1 = 0, hpX2 = 0, hpY2 = 0;
+      const chunkRms = (f: Float32Array) => {
+        let sum = 0;
+        for (let i = 0; i < f.length; i++) {
+          const y1 = hpA * (hpY1 + f[i] - hpX1); hpX1 = f[i]; hpY1 = y1;
+          const y2 = hpA * (hpY2 + y1 - hpX2); hpX2 = y1; hpY2 = y2;
+          sum += y2 * y2;
+        }
+        return Math.sqrt(sum / Math.max(1, f.length));
+      };
+      const sendPcm16 = (bytes: Uint8Array) => {
+        let binary = '';
+        const chunkSize = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize) as unknown as number[]);
+        }
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({ realtimeInput: { audio: { mimeType: 'audio/pcm;rate=16000', data: btoa(binary) } } }));
+        }
+      };
+
       workletNode.port.onmessage = (event) => {
         if (!isSessionActiveRef.current) return;
         if (isMutedRef.current) {
@@ -680,26 +714,27 @@ registerProcessor('mic-processor', MicProcessor);`;
         audioBuffer = [];
         audioBufferSamples = 0;
         const pcm16 = downsampleTo16k(merged, captureCtx.sampleRate);
-
         const bytes = new Uint8Array(pcm16.buffer, pcm16.byteOffset, pcm16.byteLength);
-        let binary = '';
-        const chunkSize = 0x8000;
-        for (let i = 0; i < bytes.length; i += chunkSize) {
-          binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize) as unknown as number[]);
-        }
-        const base64 = btoa(binary);
 
-        const payload = {
-          realtimeInput: {
-            audio: {
-              mimeType: 'audio/pcm;rate=16000',
-              data: base64
-            }
-          }
-        };
+        const level = chunkRms(merged);
+        // Learn the floor: quick to follow it down, slow to follow it up (speech doesn't raise it)
+        if (warmChunks < 5) { noiseFloor = warmChunks === 0 ? level : Math.min(noiseFloor, level) * 0.5 + level * 0.5; warmChunks++; }
+        else if (level < noiseFloor) noiseFloor = noiseFloor * 0.7 + level * 0.3;
+        else noiseFloor = noiseFloor * 0.996 + Math.min(level, noiseFloor * SPEECH_RATIO) * 0.004;
+        const isSpeech = warmChunks >= 5 && level > Math.max(MIN_SPEECH_RMS, noiseFloor * SPEECH_RATIO);
 
-        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify(payload));
+        if (isSpeech) {
+          if (hangover === 0 && held) sendPcm16(held); // the moment just before the first word
+          hangover = HANGOVER_CHUNKS;
+          held = null;
+          sendPcm16(bytes);
+        } else if (hangover > 0) {
+          hangover--;
+          sendPcm16(bytes);
+        } else {
+          // Not speech: send the same length of silence (keeps the stream's timing), hold this chunk
+          if (held) sendPcm16(new Uint8Array(held.length));
+          held = new Uint8Array(bytes); // copy: the next chunk reuses nothing, but be safe
         }
       };
 
@@ -799,7 +834,8 @@ registerProcessor('mic-processor', MicProcessor);`;
                   : { result: "unknown place" },
               };
             });
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
+            // show_place is answered by the server already (non-blocking): only show the photos here
+            if (!msg.toolCall?.answered && wsRef.current?.readyState === WebSocket.OPEN) {
               wsRef.current.send(JSON.stringify({ toolResponse: { functionResponses } }));
             }
             return;
