@@ -12,7 +12,7 @@ const SWAPS: [string, string][] = [
   ["من الجدير بالذكر أن", "ترى"],
   ["تجدر الإشارة إلى أن", "ترى"],
   ["في الختام", "وفي الأخير"],
-  ["عزيزي المستخدم", "يا بعد حيي"],
+  ["عزيزي المستخدم", "يالغالي"],
   ["هل تريد", "تبي"],
   ["هل تود", "تبي"],
   ["شكراً لك", "الله يعطيك العافية"],
@@ -46,7 +46,11 @@ const SWAPS: [string, string][] = [
   ["أوكي", "أبشر"],
   ["حسناً", "أبشر"],
   ["جداً", "مرّة"],
-  ["عزيزي", "يا بعد حيي"],
+  ["عزيزي", "يالغالي"],
+  // The owner retired «يا بعد حيي»: whatever the model still says, the visitor hears «يالغالي»
+  ["يا بعد حيي", "يالغالي"],
+  ["يا بعد حيّي", "يالغالي"],
+  ["يابعد حيي", "يالغالي"],
 ];
 
 const RULES = SWAPS.map(([from, to]) => ({
@@ -78,6 +82,8 @@ export function najdify(text: string): string {
  *  الدَّاهِيِة، اعَرَّفْك). Keeps the attached و/ف/ب/ل. */
 export function speakableTownName(text: string): string {
   const M = "[\\u064B-\\u065F\\u0670]*";
+  // «يا بعد حيي» (any vowels) is retired by the owner: «يالغالي»
+  text = text.replace(new RegExp(`(?<![\\p{L}\\p{M}])يا${M}\\s*ب${M}ع${M}د${M}\\s+ح${M}ي${M}ي${M}(?![\\p{L}\\p{M}])`, "gu"), "يالغالي");
   // «أعرّفك» the way the owner says it: «اعَرَّفْك» (doubled, light ر)
   text = text.replace(new RegExp(`(?<![\\p{L}\\p{M}])([اأنيت])${M}ع${M}ر${M}ف${M}(ك|كم|ه|ها)${M}(?![\\p{L}\\p{M}])`, "gu"), (_m, p: string, end: string) => `${p === "أ" ? "ا" : p}عَرَّفْ${end}`);
   // The guide's own name, with the vowels the owner gave: «الدَّاهِيِة» (also catches «الدهية»)
