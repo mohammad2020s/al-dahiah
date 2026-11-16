@@ -685,6 +685,35 @@ apiRouter.post("/pron-test", async (req: Request, res: Response) => {
   res.json({ raw, voice, model: ttsModel, results: out });
 });
 
+// Owner-only: does the TTS voice stream? Times the first and last audio chunk of one sentence.
+apiRouter.post("/tts-timing", async (req: Request, res: Response) => {
+  if (!ownerOnly(req, res)) return;
+  const keys = voiceKeys("tts");
+  if (!keys.length) return res.status(503).json({ error: "no key" });
+  const ai = new GoogleGenAI({ apiKey: keys[0].key, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
+  const text = String(req.body?.text || "يا هلا والله يالغالي، حيّاك الله.");
+  const model = String(req.body?.model || "gemini-3.8-flash-tts");
+  const config: any = { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: process.env.LIVE_VOICE || "Algenib" } } } };
+  const out: any = { model };
+  try {
+    let t0 = Date.now();
+    await ai.models.generateContent({ model, contents: [{ parts: [{ text: buildSpeechPrompt(text) }] }], config });
+    out.wholeMs = Date.now() - t0;
+    t0 = Date.now();
+    const chunks: number[] = [];
+    let bytes = 0;
+    const stream = await ai.models.generateContentStream({ model, contents: [{ parts: [{ text: buildSpeechPrompt(text) }] }], config });
+    for await (const c of stream) {
+      const d = (c as any).candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data)?.inlineData?.data;
+      if (d) { chunks.push(Date.now() - t0); bytes += Buffer.from(d, "base64").length; }
+    }
+    out.stream = { chunks: chunks.length, firstMs: chunks[0], lastMs: chunks[chunks.length - 1], seconds: Math.round(bytes / 4800) / 10 };
+  } catch (e: any) {
+    out.error = String(e?.message || e).slice(0, 200);
+  }
+  res.json(out);
+});
+
 // Owner-only: what does a recorded answer (24 kHz PCM from the voice call) actually sound like?
 apiRouter.post("/pron-listen", async (req: Request, res: Response) => {
   if (!ownerOnly(req, res)) return;
