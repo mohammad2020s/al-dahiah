@@ -84,7 +84,7 @@ export function BackgroundSlideshow({
         <div className="bgs-veil absolute inset-0" />
       </div>
       {loaded[index] && (
-        <div key={current.src} className="bgs-caption fixed bottom-3 start-3 z-[5] hidden items-center gap-1 rounded-full border border-white/50 bg-[#3a2a1c]/55 p-1 text-white shadow-lg backdrop-blur-md lg:flex">
+        <div key={current.src} className="bgs-caption fixed bottom-3 start-3 z-[5] hidden items-center gap-1 rounded-full border border-white/50 bg-[#3f2a22]/55 p-1 text-white shadow-lg backdrop-blur-md lg:flex">
           <button
             type="button"
             onClick={() => onAsk?.(en ? current.ask.en : current.ask.ar)}

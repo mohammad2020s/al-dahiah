@@ -243,7 +243,7 @@ export default function SaltBagCall({
         overflow: 'hidden',
         position: 'relative',
         background: 'radial-gradient(circle at 50% 38%, #4a2a2a 0%, #2b1d1d 70%)',
-        boxShadow: '0 25px 60px rgba(0,0,0,0.55)',
+        boxShadow: '0 25px 60px rgba(0, 0, 0,0.55)',
         ...style,
       }}
     >

@@ -45,22 +45,22 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
   };
 
   return (
-    <div className="pg-enter mt-2 w-full max-w-md rounded-3xl border border-[#e6d5bd] bg-white p-2.5 shadow-sm">
+    <div className="pg-enter mt-2 w-full max-w-md rounded-3xl border border-[#e2d5c6] bg-white p-2.5 shadow-sm">
       <div className="flex items-center justify-between px-1.5 pb-2">
-        <span className="flex items-center gap-1.5 text-xs font-bold text-[#5c331b]">
-          <Images className="size-4 text-[#94532d]" />
+        <span className="flex items-center gap-1.5 text-xs font-bold text-[#6a3420]">
+          <Images className="size-4 text-[#a5492a]" />
           {isEn ? "Real photos" : "صور حقيقية من المكان"}
         </span>
         <span className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => sharePlace({ title: current.caption, image: current.src, en: isEn })}
-            className="inline-flex items-center gap-1 rounded-full border border-[#e6d5bd] bg-[#fdfaf5] px-2.5 py-1 text-[11px] font-bold text-[#6c3a1c] hover:bg-[#f3ebdf] active:scale-95"
+            className="inline-flex items-center gap-1 rounded-full border border-[#e2d5c6] bg-[#fdf9f3] px-2.5 py-1 text-[11px] font-bold text-[#7d3a22] hover:bg-[#f2e9dd] active:scale-95"
           >
             <Share2 className="size-3.5" />
             {isEn ? "Share" : "شارك"}
           </button>
-          <span dir="ltr" className="text-[11px] font-medium text-[#947760] tabular-nums">
+          <span dir="ltr" className="text-[11px] font-medium text-[#956c5f] tabular-nums">
             {active + 1} / {count}
           </span>
         </span>
@@ -70,7 +70,7 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
         type="button"
         onClick={() => setViewerOpen(true)}
         {...swipeHandlers}
-        className="group relative block w-full overflow-hidden rounded-2xl bg-[#2a2016] aspect-[4/3] focus-visible:outline-2 focus-visible:outline-[#94532d]"
+        className="group relative block w-full overflow-hidden rounded-2xl bg-[#291c17] aspect-[4/3] focus-visible:outline-2 focus-visible:outline-[#a5492a]"
         title={isEn ? "Open full screen" : "عرض بملء الشاشة"}
       >
         <img
@@ -105,7 +105,7 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
               onClick={() => setActive(i)}
               style={{ animationDelay: `${80 + i * 60}ms` }}
               className={`pg-thumb relative size-16 shrink-0 snap-start overflow-hidden rounded-xl transition ${
-                i === active ? "ring-2 ring-[#94532d] ring-offset-2" : "opacity-70 hover:opacity-100"
+                i === active ? "ring-2 ring-[#a5492a] ring-offset-2" : "opacity-70 hover:opacity-100"
               }`}
               title={img.caption}
             >

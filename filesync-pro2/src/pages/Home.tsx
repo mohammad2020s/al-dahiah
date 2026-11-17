@@ -125,47 +125,47 @@ function WeatherCard({ weather, language = "ar" }: { weather: WeatherData; langu
   const t = translations[language];
 
   return (
-    <div className="mt-3 overflow-hidden rounded-[1.35rem] border border-[#e5d2b8] bg-gradient-to-br from-white to-[#fbf5ec] p-4 shadow-sm sm:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ede1cd] pb-3.5">
+    <div className="mt-3 overflow-hidden rounded-[1.35rem] border border-[#e5d0b8] bg-gradient-to-br from-white to-[#fbf6ee] p-4 shadow-sm sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#eddecd] pb-3.5">
         <div className="flex items-center gap-2.5">
-          <div className="grid size-10 place-items-center rounded-2xl bg-[#94532d] text-white shadow-sm shadow-stone-900/10">
+          <div className="grid size-10 place-items-center rounded-2xl bg-[#a5492a] text-white shadow-sm shadow-stone-900/10">
             <CloudSun className="size-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-xs font-bold text-[#3a2a1c]">{t.weatherCardTitle}</h3>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#94532d]/10 px-2 py-0.5 text-[11px] font-semibold text-[#94532d]">
-                <span className="size-1.5 rounded-full bg-[#94532d] animate-pulse" />
+              <h3 className="text-xs font-bold text-[#3f2a22]">{t.weatherCardTitle}</h3>
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#a5492a]/10 px-2 py-0.5 text-[11px] font-semibold text-[#a5492a]">
+                <span className="size-1.5 rounded-full bg-[#a5492a] animate-pulse" />
                 {weather.source === "fallback" ? t.weatherFallbackBadge : t.weatherLiveBadge}
               </span>
             </div>
-            <p className="mt-0.5 text-[11px] text-[#786450]">
+            <p className="mt-0.5 text-[11px] text-[#85695a]">
               {weather.source === "fallback" ? t.weatherFallbackAttribution : t.weatherGoogleAttribution}
             </p>
           </div>
         </div>
         <div className="flex items-baseline gap-1 text-right">
-          <span className="font-display-ar text-2xl font-bold text-[#844826] sm:text-3xl">{weather.temperature}°</span>
-          <span className="text-xs font-semibold text-[#6c3a1c]">{t.celsius}</span>
+          <span className="font-display-ar text-2xl font-bold text-[#8f3f24] sm:text-3xl">{weather.temperature}°</span>
+          <span className="text-xs font-semibold text-[#7d3a22]">{t.celsius}</span>
         </div>
       </div>
 
       <div className="mt-3.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[11px] font-medium text-[#786450]">{t.weatherCondition}</p>
-          <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.conditionText}</p>
+        <div className="rounded-xl border border-[#ebdfce] bg-white p-2.5 text-center shadow-xs">
+          <p className="text-[11px] font-medium text-[#85695a]">{t.weatherCondition}</p>
+          <p className="mt-1 text-xs font-bold text-[#33241d]">{weather.conditionText}</p>
         </div>
-        <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[11px] font-medium text-[#786450]">{t.weatherFeelsLike}</p>
-          <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.feelsLike}° {t.celsius}</p>
+        <div className="rounded-xl border border-[#ebdfce] bg-white p-2.5 text-center shadow-xs">
+          <p className="text-[11px] font-medium text-[#85695a]">{t.weatherFeelsLike}</p>
+          <p className="mt-1 text-xs font-bold text-[#33241d]">{weather.feelsLike}° {t.celsius}</p>
         </div>
-        <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[11px] font-medium text-[#786450]">{t.weatherHumidity}</p>
-          <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.humidity}%</p>
+        <div className="rounded-xl border border-[#ebdfce] bg-white p-2.5 text-center shadow-xs">
+          <p className="text-[11px] font-medium text-[#85695a]">{t.weatherHumidity}</p>
+          <p className="mt-1 text-xs font-bold text-[#33241d]">{weather.humidity}%</p>
         </div>
-        <div className="rounded-xl border border-[#ede0cb] bg-white p-2.5 text-center shadow-xs">
-          <p className="text-[11px] font-medium text-[#786450]">{t.weatherWindSpeed}</p>
-          <p className="mt-1 text-xs font-bold text-[#2e2218]">{weather.windSpeed} {t.weatherKmH}</p>
+        <div className="rounded-xl border border-[#ebdfce] bg-white p-2.5 text-center shadow-xs">
+          <p className="text-[11px] font-medium text-[#85695a]">{t.weatherWindSpeed}</p>
+          <p className="mt-1 text-xs font-bold text-[#33241d]">{weather.windSpeed} {t.weatherKmH}</p>
         </div>
       </div>
     </div>
@@ -236,7 +236,7 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
   }, [servicePins, language, multiPin, allPlaces, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]);
 
   return (
-    <div className="my-4 overflow-hidden rounded-3xl border border-[#e5d2b8] bg-white shadow-lg shadow-gray-200/50 w-full">
+    <div className="my-4 overflow-hidden rounded-3xl border border-[#e5d0b8] bg-white shadow-lg shadow-gray-200/50 w-full">
       <LeafletMap
         className="h-64 sm:h-72"
         points={mapPoints}
@@ -244,17 +244,17 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
         fitIds={servicePins ? servicePins.map((p) => p.id) : multiPin ? CAFE_PIN_IDS : undefined}
         zoom={15}
       />
-      <div className="flex items-center justify-between gap-2 border-t border-[#ebdfcc] px-3 py-2.5">
-        <span className="min-w-0 truncate text-xs font-bold text-[#33251a]">
+      <div className="flex items-center justify-between gap-2 border-t border-[#ebddcc] px-3 py-2.5">
+        <span className="min-w-0 truncate text-xs font-bold text-[#38261f]">
           {servicePins ? (language === "en" && location.nameEn ? location.nameEn : location.name) : locationTitle}
         </span>
         {allPlaces || servicePins ? (
-          <span className="shrink-0 text-[11px] text-[#786450]">{language === "en" ? "Tap a pin to see its name" : "اضغط على أي دبوس يطلع اسمه"}</span>
+          <span className="shrink-0 text-[11px] text-[#85695a]">{language === "en" ? "Tap a pin to see its name" : "اضغط على أي دبوس يطلع اسمه"}</span>
         ) : (
         <button
           type="button"
           onClick={() => openNavigation({ lat: activeCoordinates.lat, lng: activeCoordinates.lng, name: locationTitle })}
-          className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#78411f]"
+          className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#a5492a] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#86391f]"
         >
           <Navigation className="size-3.5" />
           {language === "en" ? "Take me there" : "خذني لها"}
@@ -263,17 +263,17 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
       </div>
 
       {servicePins && (
-        <div className="border-t border-[#ebdfcc] bg-[#fcf8f1] p-3 sm:p-4 space-y-1.5">
+        <div className="border-t border-[#ebddcc] bg-[#fbf7f2] p-3 sm:p-4 space-y-1.5">
           {servicePins.map((p) => (
-            <div key={p.id} className="flex items-center justify-between gap-2 rounded-xl border border-[#e7d8c2] bg-white px-2.5 py-2">
-              <span className="flex min-w-0 items-center gap-2 text-xs font-bold text-[#33251a]">
+            <div key={p.id} className="flex items-center justify-between gap-2 rounded-xl border border-[#e7d6c2] bg-white px-2.5 py-2">
+              <span className="flex min-w-0 items-center gap-2 text-xs font-bold text-[#38261f]">
                 <span className={`size-2.5 shrink-0 rounded-full ${p.kind === "wc" ? "bg-[#2563a8]" : "bg-[#2f7d4f]"}`} />
                 <span className="truncate">{language === "en" && p.nameEn ? p.nameEn : p.name}</span>
               </span>
               <button
                 type="button"
                 onClick={() => openNavigation({ lat: p.lat, lng: p.lng, name: language === "en" && p.nameEn ? p.nameEn : p.name })}
-                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2 py-1 text-[11px] font-bold text-white hover:bg-[#78411f]"
+                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#a5492a] px-2 py-1 text-[11px] font-bold text-white hover:bg-[#86391f]"
               >
                 <Navigation className="size-3" />
                 {language === "en" ? "Take me there" : "خذني له"}
@@ -284,23 +284,23 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
       )}
 
       {isCafes && location.places && (
-        <div className="border-t border-[#ebdfcc] bg-[#fcf8f1] p-3 sm:p-4">
+        <div className="border-t border-[#ebddcc] bg-[#fbf7f2] p-3 sm:p-4">
           <div className="space-y-2">
             {location.places.map((place: any) => (
               <div
                 key={place.id}
-                className="rounded-xl border border-[#e7d8c2] bg-white p-2.5 transition hover:shadow-xs"
+                className="rounded-xl border border-[#e7d6c2] bg-white p-2.5 transition hover:shadow-xs"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-[#33251a]">{place.name}</span>
+                      <span className="text-xs font-bold text-[#38261f]">{place.name}</span>
                       <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[11px] font-extrabold text-amber-800">
                         <Star className="size-2.5 fill-amber-500 text-amber-500" />
                         {place.rating} / 5
                       </span>
                     </div>
-                    <p className="mt-1 text-[11px] text-[#584535]">{place.description}</p>
+                    <p className="mt-1 text-[11px] text-[#5d4437]">{place.description}</p>
                   </div>
                   <button
                     type="button"
@@ -309,7 +309,7 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
                         ? openNavigation({ lat: place.coordinates.lat, lng: place.coordinates.lng, name: place.name })
                         : window.open(place.directionsUrl, "_blank", "noopener")
                     }
-                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#94532d] px-2 py-1 text-[11px] font-bold text-white shadow-xs hover:bg-[#78411f]"
+                    className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#a5492a] px-2 py-1 text-[11px] font-bold text-white shadow-xs hover:bg-[#86391f]"
                   >
                     <Navigation className="size-3" />
                     <span>{language === "en" ? "Take me there" : "خذني له"}</span>
@@ -381,7 +381,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
   return (
     <div className={`flex flex-col ${isUser ? "items-start" : "items-start w-full"}`}>
       {isUser ? (
-        <div className="najdi-carve max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-[#a35e33] to-[#7a4322] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-stone-950/15 ring-1 ring-[#d6a84a]/30">
+        <div className="najdi-carve max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-[#a64e30] to-[#7c3720] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-stone-950/15 ring-1 ring-[#d08372]/30">
           {message.photo && (
             <img
               src={message.photo}
@@ -396,7 +396,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
           <div className="flex items-center justify-between pr-0.5">
             <div className="flex items-center gap-2">
               <span className="dahiah-avatar size-9 shrink-0 rounded-full" aria-hidden="true" />
-              <span className="font-kufi text-sm font-bold text-[#3a2a1c]">{t.appName}</span>
+              <span className="font-kufi text-sm font-bold text-[#3f2a22]">{t.appName}</span>
             </div>
 
             <div className="flex items-center gap-1.5">
@@ -404,16 +404,16 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
                 <>
                   <button
                     onClick={handleCopy}
-                    className="inline-flex items-center gap-1 rounded-full border border-[#e5d2b8] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#6c3a1c] shadow-xs transition hover:bg-[#f8efe2]"
+                    className="inline-flex items-center gap-1 rounded-full border border-[#e5d0b8] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#7d3a22] shadow-xs transition hover:bg-[#f6ede4]"
                   >
-                    {copied ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3 text-[#94532d]" />}
+                    {copied ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3 text-[#a5492a]" />}
                     <span>{copied ? "تم النسخ" : "نسخ"}</span>
                   </button>
 
                   <button
                     onClick={handleToggleSpeak}
                     disabled={isLoadingAudio}
-                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-[#e5d2b8] bg-white text-[#6c3a1c] hover:bg-[#f8efe2] shadow-xs"
+                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-[#e5d0b8] bg-white text-[#7d3a22] hover:bg-[#f6ede4] shadow-xs"
                   >
                     {isLoadingAudio ? (
                       <Loader2 className="size-3 animate-spin" />
@@ -424,7 +424,7 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
                       </>
                     ) : (
                       <>
-                        <Volume2 className="size-3.5 text-[#94532d]" />
+                        <Volume2 className="size-3.5 text-[#a5492a]" />
                         <span>{t.listenAudio}</span>
                       </>
                     )}
@@ -435,17 +435,17 @@ function MessageBubble({ message, language = "ar" }: { message: ChatMessage; lan
           </div>
 
           <div
-            className={`heritage-frame rounded-[1.4rem] border-s-4 !border-s-[#b8893d] px-5 py-4 text-sm leading-7 sm:px-6 sm:py-5 ${
+            className={`heritage-frame rounded-[1.4rem] border-s-4 !border-s-[#c46f57] px-5 py-4 text-sm leading-7 sm:px-6 sm:py-5 ${
               message.guarded
-                ? "border-[#e8d5bb] bg-[#fcf7ef] text-[#6d2520]"
-                : "border-[#e6d5bd] bg-white text-[#241515]"
+                ? "border-[#e8d3bb] bg-[#faf6f1] text-[#6d2520]"
+                : "border-[#e2d5c6] bg-white text-[#241515]"
             }`}
           >
             {message.content ? (
               <RichText text={message.content} />
             ) : (
-              <div className="flex items-center gap-2 py-1 text-xs text-[#786450]">
-                <Loader2 className="size-4 animate-spin text-[#94532d]" />
+              <div className="flex items-center gap-2 py-1 text-xs text-[#85695a]">
+                <Loader2 className="size-4 animate-spin text-[#a5492a]" />
                 <span>{t.thinking}</span>
               </div>
             )}
@@ -517,7 +517,7 @@ export default function Home() {
   };
   useEffect(() => {
     const meta = document.querySelector('meta[name="theme-color"]');
-    meta?.setAttribute("content", night ? "#1f1610" : "#94532d");
+    meta?.setAttribute("content", night ? "#1e1411" : "#a5492a");
   }, [night]);
   const goToChat = () => {
     document.getElementById("chat-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -712,7 +712,7 @@ export default function Home() {
   return (
     <main
       dir={language === "ar" ? "rtl" : "ltr"}
-      className={`soft-grid relative min-h-screen overflow-hidden bg-[#f8f2e9] text-[#2e2218] ${night ? "night" : ""}`}
+      className={`soft-grid relative min-h-screen overflow-hidden bg-[#f1e7da] text-[#33241d] ${night ? "night" : ""}`}
     >
       <LanguageModal
         isOpen={isLanguageModalOpen}
@@ -758,39 +758,39 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <MalhAlQasabLogo size="md" className="rounded-2xl" />
             <div>
-              <h1 className="font-kufi text-xl sm:text-2xl font-bold leading-none text-[#78411f]">
+              <h1 className="font-kufi text-xl sm:text-2xl font-bold leading-none text-[#86391f]">
                 الداهية
               </h1>
-              <p className="mt-1 text-[11px] font-semibold text-[#94532d]">
+              <p className="mt-1 text-[11px] font-semibold text-[#a5492a]">
                 {t.tagline}
               </p>
             </div>
           </div>
 
           {/* Sponsor Tag */}
-          <div className="flex items-center gap-2.5 rounded-full border border-[#e6d5bd] bg-[#fdfaf5] px-4 py-1.5 shadow-xs">
+          <div className="flex items-center gap-2.5 rounded-full border border-[#e2d5c6] bg-[#fdf9f3] px-4 py-1.5 shadow-xs">
             <div className="text-right leading-tight">
-              <p className="text-[11px] font-medium text-[#a8744a]">{t.sponsoredBy}</p>
-              <p className="mt-0.5 text-[11px] font-bold text-[#5c331b]">
+              <p className="text-[11px] font-medium text-[#aa6048]">{t.sponsoredBy}</p>
+              <p className="mt-0.5 text-[11px] font-bold text-[#6a3420]">
                 {t.sponsorName}
               </p>
             </div>
-            <div className="grid size-8 place-items-center rounded-full bg-white border border-[#e6d5bd] p-0.5">
+            <div className="grid size-8 place-items-center rounded-full bg-white border border-[#e2d5c6] p-0.5">
               <TanmiahLogo size="sm" />
             </div>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#e6d5bd] bg-[#fbf6ee] px-3 py-1.5 text-xs font-semibold text-[#844826]">
-              <span className="size-2 rounded-full bg-[#94532d] animate-pulse" />
+            <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#e2d5c6] bg-[#faf5ef] px-3 py-1.5 text-xs font-semibold text-[#8f3f24]">
+              <span className="size-2 rounded-full bg-[#a5492a] animate-pulse" />
               <span>{t.onlineStatus}</span>
             </div>
 
             <button
               type="button"
               onClick={toggleTheme}
-              className="grid size-8 place-items-center rounded-xl border border-[#e6d5bd] bg-[#fbf6ee] text-[#6c3a1c] shadow-xs hover:bg-[#f5eadb] transition"
+              className="grid size-8 place-items-center rounded-xl border border-[#e2d5c6] bg-[#faf5ef] text-[#7d3a22] shadow-xs hover:bg-[#f1e7da] transition"
               title={night ? (language === "en" ? "Day look" : "الوضع النهاري") : language === "en" ? "Night look" : "الوضع الليلي"}
               aria-label={night ? (language === "en" ? "Day look" : "الوضع النهاري") : language === "en" ? "Night look" : "الوضع الليلي"}
             >
@@ -798,15 +798,15 @@ export default function Home() {
             </button>
             <button
               onClick={() => setIsLanguageModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-[#e6d5bd] bg-[#fbf6ee] px-3 py-1.5 text-xs font-bold text-[#6c3a1c] shadow-xs hover:bg-[#f5eadb] transition"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#e2d5c6] bg-[#faf5ef] px-3 py-1.5 text-xs font-bold text-[#7d3a22] shadow-xs hover:bg-[#f1e7da] transition"
             >
-              <Globe className="size-3.5 text-[#94532d]" />
+              <Globe className="size-3.5 text-[#a5492a]" />
               <span>{language === "ar" ? "English / العربية" : "العربية / English"}</span>
             </button>
 
             <button
               onClick={() => setMessages([])}
-              className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs text-[#775c46] hover:bg-[#f5eadb] hover:text-[#6c3a1c] transition"
+              className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs text-[#85695a] hover:bg-[#f1e7da] hover:text-[#7d3a22] transition"
             >
               <Plus className="size-4" />
               <span className="hidden sm:inline">{t.newChat}</span>
@@ -820,7 +820,7 @@ export default function Home() {
           {/* Sidebar */}
           <aside id="season-panel" className="order-2 w-full scroll-mt-4 lg:order-none lg:w-[300px] shrink-0 flex flex-col gap-4">
             {/* Top card (desktop): earthy brown with a Sadu ribbon */}
-            <div className="najdi-carve relative hidden overflow-hidden rounded-[1.7rem] bg-gradient-to-br from-[#4a2814] via-[#6c3a1c] to-[#94532d] p-5 pt-6 text-white shadow-lg shadow-stone-950/20 ring-1 ring-[#d6a84a]/40 ring-inset lg:block">
+            <div className="najdi-carve relative hidden overflow-hidden rounded-[1.7rem] bg-gradient-to-br from-[#472417] via-[#7d3a22] to-[#a5492a] p-5 pt-6 text-white shadow-lg shadow-stone-950/20 ring-1 ring-[#d08372]/40 ring-inset lg:block">
               <div className="sadu-strip absolute inset-x-0 top-0" aria-hidden="true" />
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-bold">
                 <Sparkles className="size-3" />
@@ -830,7 +830,7 @@ export default function Home() {
                 {t.guideTitle1} <br />
                 {t.guideTitle2}
               </h2>
-              <p className="mt-2 text-xs leading-6 text-[#f0e1cb]">
+              <p className="mt-2 text-xs leading-6 text-[#eedecd]">
                 {t.guideDesc}
               </p>
             </div>
@@ -844,21 +844,21 @@ export default function Home() {
             <button
               type="button"
               onClick={openNearMe}
-              className="flex items-center gap-3 rounded-[1.7rem] border border-[#e6d5bd] bg-white/95 p-4 text-start shadow-sm backdrop-blur transition hover:border-[#94532d] active:scale-[0.99]"
+              className="flex items-center gap-3 rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 text-start shadow-sm backdrop-blur transition hover:border-[#a5492a] active:scale-[0.99]"
             >
-              <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#f3ebdf] text-[#94532d]">
+              <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#f2e9dd] text-[#a5492a]">
                 <LocateFixed className="size-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="font-['Alexandria'] block text-sm font-bold text-[#3a2a1c]">{language === "en" ? "Near me now" : "قريب مني الحين"}</span>
-                <span className="block text-xs text-[#786450]">{language === "en" ? "Nearest mosque, restroom and café" : "أقرب مسجد ودورة مياه ومقهى"}</span>
+                <span className="font-['IBM_Plex_Sans_Arabic'] block text-sm font-bold text-[#3f2a22]">{language === "en" ? "Near me now" : "قريب مني الحين"}</span>
+                <span className="block text-xs text-[#85695a]">{language === "en" ? "Nearest mosque, restroom and café" : "أقرب مسجد ودورة مياه ومقهى"}</span>
               </span>
             </button>
 
             <button
               type="button"
               onClick={() => setMoreOpen((v) => !v)}
-              className="flex items-center justify-between rounded-2xl border border-[#e6d5bd] bg-white/90 px-4 py-3 text-sm font-bold text-[#6c3a1c] shadow-sm lg:hidden"
+              className="flex items-center justify-between rounded-2xl border border-[#e2d5c6] bg-white/90 px-4 py-3 text-sm font-bold text-[#7d3a22] shadow-sm lg:hidden"
               aria-expanded={moreOpen}
             >
               {moreOpen
@@ -876,34 +876,34 @@ export default function Home() {
 
             {/* Weather Card */}
             {weatherData && (
-              <div className="rounded-[1.7rem] border border-[#e6d5bd] bg-white p-4 shadow-sm">
+              <div className="rounded-[1.7rem] border border-[#e2d5c6] bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-[#faf4ea] border border-[#ede0cb] px-2 py-0.5 text-[11px] font-bold text-[#844826]">
+                  <span className="rounded-full bg-[#fbf6ee] border border-[#ebdfce] px-2 py-0.5 text-[11px] font-bold text-[#8f3f24]">
                     Google Weather
                   </span>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
-                    <CloudSun className="size-4 text-[#94532d]" />
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#3f2a22]">
+                    <CloudSun className="size-4 text-[#a5492a]" />
                     <span>{t.weatherNow}</span>
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between">
                   <button
                     onClick={() => askQuestion(language === "en" ? "What is the weather in Al-Qasab now?" : "ما هو طقس القصب الآن؟")}
-                    className="rounded-xl border border-[#e6d5bd] bg-[#faf4ea] px-3 py-1.5 text-[11px] font-bold text-[#6c3a1c] hover:bg-[#f5eadb] transition"
+                    className="rounded-xl border border-[#e2d5c6] bg-[#fbf6ee] px-3 py-1.5 text-[11px] font-bold text-[#7d3a22] hover:bg-[#f1e7da] transition"
                   >
                     {t.askAssistant}
                   </button>
                   <div className="text-left">
-                    <p className="text-2xl font-bold text-[#844826]">{weatherData.temperature}°</p>
-                    <p className="text-[11px] text-[#786450] text-right">{weatherData.conditionText}</p>
+                    <p className="text-2xl font-bold text-[#8f3f24]">{weatherData.temperature}°</p>
+                    <p className="text-[11px] text-[#85695a] text-right">{weatherData.conditionText}</p>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Policy Badge Card */}
-            <div className="rounded-[1.4rem] border border-[#e6d5bd] bg-white/85 p-4 text-[11px] leading-5 text-[#685140] flex items-center gap-2">
-              <BadgeCheck className="size-4 text-[#94532d] shrink-0" />
+            <div className="rounded-[1.4rem] border border-[#e2d5c6] bg-white/85 p-4 text-[11px] leading-5 text-[#694a3f] flex items-center gap-2">
+              <BadgeCheck className="size-4 text-[#a5492a] shrink-0" />
               <span>{t.scopeNotice}</span>
             </div>
             </div>
@@ -913,14 +913,14 @@ export default function Home() {
           <section id="chat-panel" className="order-1 scroll-mt-3 lg:order-none flex-1 flex min-h-[78vh] lg:min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] heritage-frame bg-white/80 backdrop-blur-sm">
             <div className="sadu-strip" aria-hidden="true" />
             {/* Top Bar inside Chat */}
-            <div className="flex items-center justify-between border-b border-[#ede1cd] bg-white px-5 py-3.5">
+            <div className="flex items-center justify-between border-b border-[#eddecd] bg-white px-5 py-3.5">
               <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
                 <Timer className="size-3 text-emerald-600 animate-pulse" />
                 <span>{t.sevenSecondBadge}</span>
               </div>
               <div className="text-right">
-                <p className="text-xs font-bold text-[#3a2a1c]">{t.chatHeaderTitle}</p>
-                <p className="text-[11px] text-[#786450]">{t.chatHeaderSubtitle}</p>
+                <p className="text-xs font-bold text-[#3f2a22]">{t.chatHeaderTitle}</p>
+                <p className="text-[11px] text-[#85695a]">{t.chatHeaderSubtitle}</p>
               </div>
             </div>
 
@@ -929,12 +929,12 @@ export default function Home() {
               {messages.length === 0 ? (
                 /* Welcome screen: the photo behind the visitor right now, then questions with icons */
                 <div className="mx-auto flex min-h-[400px] max-w-xl flex-col items-center justify-center text-center">
-                  <div className="najdi-arch mb-3 border border-[#d9c09f] bg-white p-1.5 pt-3 shadow-md ring-1 ring-[#b8893d]/30 ring-offset-2 ring-offset-[#fbf6ee]">
+                  <div className="najdi-arch mb-3 border border-[#daad9e] bg-white p-1.5 pt-3 shadow-md ring-1 ring-[#c46f57]/30 ring-offset-2 ring-offset-[#faf5ef]">
                     <MalhAlQasabLogo size="lg" />
                   </div>
-                  <h2 className="font-kufi text-2xl font-bold text-[#3a2a1c] sm:text-3xl">{t.welcomeTitle}</h2>
+                  <h2 className="font-kufi text-2xl font-bold text-[#3f2a22] sm:text-3xl">{t.welcomeTitle}</h2>
                   <div className="orn-divider mt-2 w-48" aria-hidden="true"><i /></div>
-                  <p className="mt-2 max-w-md text-sm leading-6 text-[#685140]">{t.welcomeDesc}</p>
+                  <p className="mt-2 max-w-md text-sm leading-6 text-[#694a3f]">{t.welcomeDesc}</p>
 
                   {(() => {
                     const slide = SLIDES[slideIdx] || SLIDES[0];
@@ -944,15 +944,15 @@ export default function Home() {
                         key={slide.src}
                         disabled={isStreaming}
                         onClick={() => askQuestion(language === "en" ? slide.ask.en : slide.ask.ar)}
-                        className="ec-photo group relative mt-5 block aspect-[16/8] w-full overflow-hidden rounded-3xl border border-[#d9c09f] bg-[#2a2016] text-start shadow-md ring-1 ring-[#b8893d]/40 ring-offset-2 ring-offset-[#fbf6ee]"
+                        className="ec-photo group relative mt-5 block aspect-[16/8] w-full overflow-hidden rounded-3xl border border-[#daad9e] bg-[#291c17] text-start shadow-md ring-1 ring-[#c46f57]/40 ring-offset-2 ring-offset-[#faf5ef]"
                       >
                         <img src={isNarrow ? slide.src.replace("/images/bg/", "/images/bg-sm/") : slide.src} alt={language === "en" ? slide.en : slide.ar} className="size-full object-cover transition duration-700 group-hover:scale-105" />
                         <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/75 via-black/30 to-transparent p-3.5 pt-12">
                           <span>
                             <span className="block text-[11px] font-semibold text-white/80">{language === "en" ? "Behind you right now" : "اللي وراك الحين"}</span>
-                            <span className="font-['Alexandria'] block text-base font-bold text-white">{language === "en" ? slide.en : slide.ar}</span>
+                            <span className="font-['IBM_Plex_Sans_Arabic'] block text-base font-bold text-white">{language === "en" ? slide.en : slide.ar}</span>
                           </span>
-                          <span className="shrink-0 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#6c3a1c] shadow">
+                          <span className="shrink-0 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#7d3a22] shadow">
                             {language === "en" ? "Tell me about it" : "علّمني عنه"}
                           </span>
                         </span>
@@ -974,9 +974,9 @@ export default function Home() {
                         type="button"
                         disabled={isStreaming || !q}
                         onClick={() => q && askQuestion(q)}
-                        className="heritage-frame group flex items-center gap-2.5 rounded-2xl bg-white p-3 text-start text-sm font-bold text-[#3a2a1c] transition hover:-translate-y-0.5 hover:bg-[#faf4ea] active:scale-[0.98]"
+                        className="heritage-frame group flex items-center gap-2.5 rounded-2xl bg-white p-3 text-start text-sm font-bold text-[#3f2a22] transition hover:-translate-y-0.5 hover:bg-[#fbf6ee] active:scale-[0.98]"
                       >
-                        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#f3ebdf] text-[#94532d] ring-1 ring-[#b8893d]/50 transition group-hover:bg-[#94532d] group-hover:text-white">
+                        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#f2e9dd] text-[#a5492a] ring-1 ring-[#c46f57]/50 transition group-hover:bg-[#a5492a] group-hover:text-white">
                           <Icon className="size-4.5" />
                         </span>
                         <span className="min-w-0 leading-tight">{language === "en" ? enLabel : ar}</span>
@@ -1003,7 +1003,7 @@ export default function Home() {
                           href={m.mapsUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="pg-enter mt-2 inline-flex items-center gap-1.5 rounded-xl border border-[#e6d5bd] bg-white px-3 py-2 text-xs font-bold text-[#6c3a1c] shadow-sm hover:bg-[#faf4ea]"
+                          className="pg-enter mt-2 inline-flex items-center gap-1.5 rounded-xl border border-[#e2d5c6] bg-white px-3 py-2 text-xs font-bold text-[#7d3a22] shadow-sm hover:bg-[#fbf6ee]"
                         >
                           <ExternalLink className="size-3.5" />
                           {language === "en" ? "More photos on Google Maps" : "صور أكثر على Google Maps"}
@@ -1014,7 +1014,7 @@ export default function Home() {
                           href={m.ticketUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="pg-enter mt-2 ms-2 inline-flex items-center gap-1.5 rounded-xl bg-[#B2512F] px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#963f22]"
+                          className="pg-enter mt-2 ms-2 inline-flex items-center gap-1.5 rounded-xl bg-[#b04e2c] px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#993e1f]"
                         >
                           <Ticket className="size-3.5" />
                           {language === "en" ? "Book your free ticket" : "احجز تذكرتك المجانية"}
@@ -1025,7 +1025,7 @@ export default function Home() {
                           href={m.link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="pg-enter mt-2 ms-2 inline-flex items-center gap-1.5 rounded-xl border border-[#e4d2ba] bg-white px-3 py-2 text-xs font-bold text-[#B2512F] shadow-sm hover:bg-[#f3ebdf]"
+                          className="pg-enter mt-2 ms-2 inline-flex items-center gap-1.5 rounded-xl border border-[#e4d0ba] bg-white px-3 py-2 text-xs font-bold text-[#b04e2c] shadow-sm hover:bg-[#f2e9dd]"
                         >
                           <ExternalLink className="size-3.5" />
                           {m.link.label}
@@ -1041,9 +1041,9 @@ export default function Home() {
                               key={q}
                               type="button"
                               onClick={() => askQuestion(q)}
-                              className="inline-flex items-center gap-1.5 rounded-full border border-[#d6b98a] bg-[#fdfaf5] px-3 py-1.5 text-xs font-semibold text-[#6c3a1c] shadow-xs hover:border-[#b8893d] hover:bg-[#f5eadb] transition active:scale-95"
+                              className="inline-flex items-center gap-1.5 rounded-full border border-[#d89688] bg-[#fdf9f3] px-3 py-1.5 text-xs font-semibold text-[#7d3a22] shadow-xs hover:border-[#c46f57] hover:bg-[#f1e7da] transition active:scale-95"
                             >
-                              <CornerDownLeft className={`size-3.5 text-[#94532d] ${language === "en" ? "-scale-x-100" : ""}`} />
+                              <CornerDownLeft className={`size-3.5 text-[#a5492a] ${language === "en" ? "-scale-x-100" : ""}`} />
                               {q}
                             </button>
                           ))}
@@ -1057,7 +1057,7 @@ export default function Home() {
             </div>
 
             {/* Bottom Quick Topic Pills & Input Bar */}
-            <div className="border-t border-[#ede1cd] bg-white/90 p-3 sm:p-5">
+            <div className="border-t border-[#eddecd] bg-white/90 p-3 sm:p-5">
               {/* Quick Pills row */}
               <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto pb-2.5 scroll-smooth justify-center">
                 {[
@@ -1072,7 +1072,7 @@ export default function Home() {
                     type="button"
                     disabled={isStreaming}
                     onClick={() => askQuestion(chip.q)}
-                    className="shrink-0 rounded-full border border-[#e5d2b8] bg-[#fdfaf5] px-3 py-1.5 text-[11px] font-semibold text-[#6c3a1c] shadow-xs hover:border-[#94532d] hover:bg-[#f5eadb] transition active:scale-95 disabled:opacity-50"
+                    className="shrink-0 rounded-full border border-[#e5d0b8] bg-[#fdf9f3] px-3 py-1.5 text-[11px] font-semibold text-[#7d3a22] shadow-xs hover:border-[#a5492a] hover:bg-[#f1e7da] transition active:scale-95 disabled:opacity-50"
                   >
                     {chip.label}
                   </button>
@@ -1085,29 +1085,29 @@ export default function Home() {
                   <div className="mb-2 flex items-center gap-2 px-1">
                     {pendingPhoto && (
                       <div className="relative">
-                        <img src={pendingPhoto.preview} alt={language === "en" ? "Photo to send" : "الصورة اللي بترسلها"} className="size-14 rounded-xl border border-[#e6d5bd] object-cover shadow-xs" />
+                        <img src={pendingPhoto.preview} alt={language === "en" ? "Photo to send" : "الصورة اللي بترسلها"} className="size-14 rounded-xl border border-[#e2d5c6] object-cover shadow-xs" />
                         <button
                           type="button"
                           onClick={() => setPendingPhoto(null)}
-                          className="absolute -top-2 -left-2 grid size-6 place-items-center rounded-full bg-[#3a2a1c] text-white shadow"
+                          className="absolute -top-2 -left-2 grid size-6 place-items-center rounded-full bg-[#3f2a22] text-white shadow"
                           aria-label={language === "en" ? "Remove photo" : "احذف الصورة"}
                         >
                           <X className="size-3.5" />
                         </button>
                       </div>
                     )}
-                    <p className={`text-[11px] ${photoError ? "text-[#94532d]" : "text-[#786450]"}`}>
+                    <p className={`text-[11px] ${photoError ? "text-[#a5492a]" : "text-[#85695a]"}`}>
                       {photoError || (language === "en" ? "Add a question, or just send: Al-Dahiya will tell you what it is." : "اكتب سؤالك أو أرسلها كذا، والداهية يقول لك وش هي.")}
                     </p>
                   </div>
                 )}
-                <div className="flex items-center gap-2 rounded-[1.35rem] border border-[#e4cfb3] bg-white p-2 shadow-sm focus-within:border-[#94532d] focus-within:ring-2 focus-within:ring-[#94532d]/10">
+                <div className="flex items-center gap-2 rounded-[1.35rem] border border-[#e5bab2] bg-white p-2 shadow-sm focus-within:border-[#a5492a] focus-within:ring-2 focus-within:ring-[#a5492a]/10">
                   <button
                     ref={callButtonRef}
                     type="button"
                     onClick={handleStartCall}
                     disabled={isCallAnimating}
-                    className="relative size-11 shrink-0 rounded-2xl bg-[#6c3a1c] text-white flex items-center justify-center hover:bg-[#72130c] transition shadow-sm disabled:opacity-80 cursor-pointer"
+                    className="relative size-11 shrink-0 rounded-2xl bg-[#7d3a22] text-white flex items-center justify-center hover:bg-[#72130c] transition shadow-sm disabled:opacity-80 cursor-pointer"
                     title={t.liveCallTooltip}
                   >
                     <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
@@ -1122,7 +1122,7 @@ export default function Home() {
                     onClick={handleStartCall}
                     disabled={isCallAnimating}
                     // Opens the same voice call as the phone button: hidden on phones to leave room for typing
-                    className="hidden sm:flex size-11 shrink-0 rounded-2xl bg-[#f5eadb] hover:bg-[#eedbc1] text-[#94532d] items-center justify-center transition shadow-xs disabled:opacity-80 cursor-pointer"
+                    className="hidden sm:flex size-11 shrink-0 rounded-2xl bg-[#f1e7da] hover:bg-[#ebd8c4] text-[#a5492a] items-center justify-center transition shadow-xs disabled:opacity-80 cursor-pointer"
                     title={t.micHoldTooltip}
                   >
                     <Mic className="size-5" />
@@ -1142,7 +1142,7 @@ export default function Home() {
                     type="button"
                     onClick={() => photoInputRef.current?.click()}
                     disabled={isStreaming}
-                    className="size-11 shrink-0 rounded-2xl bg-[#f5eadb] hover:bg-[#eedbc1] text-[#94532d] flex items-center justify-center transition shadow-xs disabled:opacity-60 cursor-pointer"
+                    className="size-11 shrink-0 rounded-2xl bg-[#f1e7da] hover:bg-[#ebd8c4] text-[#a5492a] flex items-center justify-center transition shadow-xs disabled:opacity-60 cursor-pointer"
                     title={language === "en" ? "Snap & ask: send a photo" : "صوّر واسأل"}
                     aria-label={language === "en" ? "Snap & ask: send a photo" : "صوّر واسأل"}
                   >
@@ -1165,7 +1165,7 @@ export default function Home() {
                     type="submit"
                     aria-label={language === "en" ? "Send" : "إرسال"}
                     disabled={(!input.trim() && !pendingPhoto) || isStreaming}
-                    className="size-11 shrink-0 rounded-2xl bg-[#94532d] text-white flex items-center justify-center hover:bg-[#78411f] transition disabled:opacity-50"
+                    className="size-11 shrink-0 rounded-2xl bg-[#a5492a] text-white flex items-center justify-center hover:bg-[#86391f] transition disabled:opacity-50"
                   >
                     {isStreaming ? (
                       <Loader2 className="size-5 animate-spin" />
@@ -1174,7 +1174,7 @@ export default function Home() {
                     )}
                   </button>
                 </div>
-                <p className="mt-2 text-center text-[11px] text-[#8d7259]">
+                <p className="mt-2 text-center text-[11px] text-[#8e6558]">
                   {t.iphoneNotice}
                 </p>
               </form>
@@ -1182,7 +1182,7 @@ export default function Home() {
           </section>
         </section>
 
-        <footer className="pb-2 text-center text-[11px] text-[#8d7259]">
+        <footer className="pb-2 text-center text-[11px] text-[#8e6558]">
           {t.footerText}
         </footer>
       </div>

@@ -30,16 +30,16 @@ export function DidYouKnow({ language = "ar", onAsk }: { language?: Language; on
     <button
       type="button"
       onClick={() => onAsk?.(en ? f.askEn : f.askAr)}
-      className="group block w-full overflow-hidden rounded-[1.7rem] border border-[#e6d5bd] bg-white/95 p-4 text-start shadow-sm backdrop-blur transition hover:shadow-md"
+      className="group block w-full overflow-hidden rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 text-start shadow-sm backdrop-blur transition hover:shadow-md"
     >
-      <span className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
-        <Lightbulb className="size-4 text-[#c08a3e]" />
+      <span className="flex items-center gap-1.5 text-xs font-bold text-[#3f2a22]">
+        <Lightbulb className="size-4 text-[#c9705e]" />
         {en ? "Did you know?" : "هل تعلم؟"}
       </span>
-      <p key={i} className="dyk-fade mt-2 min-h-[3.2rem] text-[13px] leading-6 text-[#584535]">
+      <p key={i} className="dyk-fade mt-2 min-h-[3.2rem] text-[13px] leading-6 text-[#5d4437]">
         {en ? f.en : f.ar}
       </p>
-      <span className="mt-1 inline-block text-[11px] font-bold text-[#94532d] group-hover:underline">
+      <span className="mt-1 inline-block text-[11px] font-bold text-[#a5492a] group-hover:underline">
         {en ? "Tell me more ›" : "‹ علمني أكثر"}
       </span>
     </button>

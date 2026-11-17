@@ -271,8 +271,8 @@ export default function GrandpaCall({
         overflow: 'hidden',
         position: 'relative',
         // Shown while the paintings load
-        background: 'url(/images/shayeb/base.jpg) center 2% / 113% no-repeat, #d9b483',
-        boxShadow: '0 25px 60px rgba(0,0,0,0.55)',
+        background: 'url(/images/shayeb/base.jpg) center 2% / 113% no-repeat, #d69386',
+        boxShadow: '0 25px 60px rgba(0, 0, 0,0.55)',
         ...style,
       }}
     >

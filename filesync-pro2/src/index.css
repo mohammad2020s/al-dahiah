@@ -3,20 +3,20 @@
 @source "../index.html";
 
 :root {
-  --primary: #94532d;
+  --primary: #a5492a;
   --primary-foreground: #ffffff;
-  --background: #f8f2e9;
-  --foreground: #2e2218;
+  --background: #f1e7da;
+  --foreground: #33241d;
   --card: #ffffff;
-  --card-foreground: #2e2218;
-  --muted: #f4ece0;
-  --muted-foreground: #775c46;
-  --border: #e6d5bd;
+  --card-foreground: #33241d;
+  --muted: #f1e7da;
+  --muted-foreground: #85695a;
+  --border: #e2d5c6;
 }
 
 body {
   margin: 0;
-  font-family: "Alexandria", system-ui, -apple-system, sans-serif;
+  font-family: "IBM Plex Sans Arabic", system-ui, -apple-system, sans-serif;
   background-color: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
@@ -27,15 +27,20 @@ body {
 }
 
 .salt-dot-pattern {
-  background-image: radial-gradient(rgba(148, 83, 45, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(165, 73, 42, 0.12) 1px, transparent 1px);
   background-size: 17px 17px;
 }
 
+/* Page background: beige with the season guide's topographic contour lines (salt-lake shapes) */
 .soft-grid {
-  background-image: linear-gradient(rgba(148, 83, 45, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 83, 45, 0.035) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-color: #f1e7da;
+  background-image: url(/images/theme/contour.svg);
+  background-size: 640px 640px;
+  background-attachment: fixed;
 }
+/* Contour lines on rust banners and dark panels */
+.contour-light { background-image: url(/images/theme/contour-light.svg); background-size: 520px 520px; }
+.contour-dark { background-image: url(/images/theme/contour-dark.svg); background-size: 640px 640px; }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -76,7 +81,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 1rem;
-  border: 2px solid var(--c, #d9a066);
+  border: 2px solid var(--c, #dc8163);
   pointer-events: none;
   animation: vc-ring 760ms ease-out forwards;
 }
@@ -182,8 +187,8 @@ body {
 }
 .vc-talk-ring { animation: vc-talk-ring 1.1s ease-out infinite; }
 @keyframes vc-talk-ring {
-  from { box-shadow: 0 0 0 0 rgba(201, 138, 75, 0.75), 0 25px 60px rgba(0, 0, 0, 0.55); }
-  to { box-shadow: 0 0 0 60px rgba(201, 138, 75, 0), 0 25px 60px rgba(0, 0, 0, 0.55); }
+  from { box-shadow: 0 0 0 0 rgba(204, 105, 72, 0.75), 0 25px 60px rgba(0, 0, 0, 0.55); }
+  to { box-shadow: 0 0 0 60px rgba(204, 105, 72, 0), 0 25px 60px rgba(0, 0, 0, 0.55); }
 }
 
 /* Main mic button: a ripple from the exact press point */
@@ -254,10 +259,10 @@ body {
 .sc-salt {
   opacity: 0.55;
   background-image:
-    radial-gradient(circle at 12% 30%, rgba(148, 83, 45, 0.10) 0 2px, transparent 3px),
-    radial-gradient(circle at 78% 18%, rgba(148, 83, 45, 0.08) 0 1.5px, transparent 2.5px),
-    radial-gradient(circle at 60% 80%, rgba(148, 83, 45, 0.09) 0 2px, transparent 3px),
-    radial-gradient(circle at 30% 70%, rgba(148, 83, 45, 0.07) 0 1.5px, transparent 2.5px);
+    radial-gradient(circle at 12% 30%, rgba(165, 73, 42, 0.10) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 18%, rgba(165, 73, 42, 0.08) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 60% 80%, rgba(165, 73, 42, 0.09) 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 70%, rgba(165, 73, 42, 0.07) 0 1.5px, transparent 2.5px);
   background-size: 90px 90px;
   animation: sc-drift 18s linear infinite;
 }
@@ -273,9 +278,9 @@ body {
   height: 30px;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  background: #94532d;
+  background: #a5492a;
   border: 3px solid #fff;
-  box-shadow: 0 4px 10px rgba(70, 40, 15, 0.35);
+  box-shadow: 0 4px 10px rgba(67, 31, 18, 0.35);
   display: grid;
   place-items: center;
   transition: transform 200ms ease;
@@ -283,10 +288,10 @@ body {
 .lm-pin span {
   transform: rotate(45deg);
   color: #fff;
-  font: 700 12px/1 "Alexandria", system-ui, sans-serif;
+  font: 700 12px/1 "IBM Plex Sans Arabic", system-ui, sans-serif;
 }
-.lm-pin-cafe { background: #8a5a2b; }
-.lm-pin-nature { background: #c27a12; }
+.lm-pin-cafe { background: #8c4229; }
+.lm-pin-nature { background: #c63c0e; }
 .lm-pin-mosque { background: #2f7d4f; }
 .lm-pin-wc { background: #2563a8; }
 .lm-pin-active {
@@ -297,7 +302,7 @@ body {
   0%, 100% { transform: rotate(-45deg) translate(0, 0); }
   40% { transform: rotate(-45deg) translate(6px, -6px); }
 }
-.lm-tip { font: 600 12px/1.4 "Alexandria", system-ui, sans-serif; direction: rtl; }
+.lm-tip { font: 600 12px/1.4 "IBM Plex Sans Arabic", system-ui, sans-serif; direction: rtl; }
 @media (prefers-reduced-motion: reduce) { .lm-pin-active { animation: none; } }
 
 /* ───────── Tour route sheet (tr-*) ───────── */
@@ -332,8 +337,8 @@ body {
 .bgs-veil {
   /* Light touch: the photos read clearly at the edges; the cards carry their own backgrounds */
   background:
-    radial-gradient(ellipse at 50% 40%, rgba(248, 242, 233, 0.38) 0%, rgba(248, 242, 233, 0.08) 75%),
-    linear-gradient(180deg, rgba(248, 242, 233, 0.05) 0%, rgba(248, 242, 233, 0.3) 100%);
+    radial-gradient(ellipse at 50% 40%, rgba(241, 231, 218, 0.38) 0%, rgba(241, 231, 218, 0.08) 75%),
+    linear-gradient(180deg, rgba(241, 231, 218, 0.05) 0%, rgba(241, 231, 218, 0.3) 100%);
 }
 .bgs-caption { animation: bgs-cap 0.9s ease both; }
 @keyframes bgs-cap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -344,7 +349,8 @@ body {
 }
 
 /* ---------- Heritage touches ---------- */
-.font-kufi { font-family: "Reem Kufi", "Alexandria", system-ui, sans-serif; letter-spacing: 0; word-spacing: 0.28em; }
+/* Titles: IBM Plex Sans Arabic Bold, like the official season guide */
+.font-kufi { font-family: "IBM Plex Sans Arabic", system-ui, sans-serif; font-weight: 700; letter-spacing: 0; word-spacing: normal; }
 
 /* Sadu weave ribbon (Najdi tent-weaving pattern) */
 .sadu-strip {
@@ -352,7 +358,7 @@ body {
   flex-shrink: 0;
   background-repeat: repeat-x;
   background-size: 32px 10px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='10' viewBox='0 0 32 10'%3E%3Crect width='32' height='10' fill='%236c3a1c'/%3E%3Crect width='32' height='1.6' fill='%232b1a10'/%3E%3Crect y='8.4' width='32' height='1.6' fill='%232b1a10'/%3E%3Cpath d='M0 8.4 4 1.6 8 8.4zM16 8.4 20 1.6 24 8.4z' fill='%23eadcc4'/%3E%3Cpath d='M8 1.6 12 8.4 16 1.6zM24 1.6 28 8.4 32 1.6z' fill='%23b2512f'/%3E%3Cpath d='M4 4.2 5.2 5.6 4 7 2.8 5.6zM20 4.2 21.2 5.6 20 7 18.8 5.6z' fill='%232b1a10'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='10' viewBox='0 0 32 10'%3E%3Crect width='32' height='10' fill='%237d3a22'/%3E%3Crect width='32' height='1.6' fill='%232a1a14'/%3E%3Crect y='8.4' width='32' height='1.6' fill='%232a1a14'/%3E%3Cpath d='M0 8.4 4 1.6 8 8.4zM16 8.4 20 1.6 24 8.4z' fill='%23ead8c4'/%3E%3Cpath d='M8 1.6 12 8.4 16 1.6zM24 1.6 28 8.4 32 1.6z' fill='%23b04e2c'/%3E%3Cpath d='M4 4.2 5.2 5.6 4 7 2.8 5.6zM20 4.2 21.2 5.6 20 7 18.8 5.6z' fill='%232a1a14'/%3E%3C/svg%3E");
 }
 
 /* First-visit welcome card and the empty-chat photo */
@@ -363,54 +369,54 @@ body {
 @media (prefers-reduced-motion: reduce) { .wg-in, .ec-photo, .fab-call { animation: none; } }
 
 /* ---------- Night look (after Maghrib, or picked by the visitor) ---------- */
-.night { background-color: #1b130d; color: #efe3d0; }
-.night .soft-grid, .night.soft-grid { background-image: none; }
+.night { background-color: #1a110e; color: #efe1d0; }
+.night .soft-grid, .night.soft-grid { background-color: #1a110e; background-image: url(/images/theme/contour-dark.svg); }
 .night .bgs-veil {
   background:
-    radial-gradient(ellipse at 50% 40%, rgba(22, 14, 9, 0.55) 0%, rgba(22, 14, 9, 0.3) 75%),
-    linear-gradient(180deg, rgba(22, 14, 9, 0.25) 0%, rgba(22, 14, 9, 0.6) 100%);
+    radial-gradient(ellipse at 50% 40%, rgba(21, 13, 10, 0.55) 0%, rgba(21, 13, 10, 0.3) 75%),
+    linear-gradient(180deg, rgba(21, 13, 10, 0.25) 0%, rgba(21, 13, 10, 0.6) 100%);
 }
-.night [class*="bg-white"] { background-color: rgba(42, 29, 20, 0.92); }
-.night [class*="bg-[#faf4ea]"], .night [class*="bg-[#fbf6ee]"], .night [class*="bg-[#fdfaf5]"],
-.night [class*="bg-[#f5eadb]"], .night [class*="bg-[#f3ebdf]"], .night [class*="bg-[#f8f2e9]"],
-.night [class*="bg-[#f1e8df]"], .night [class*="bg-[#eedbc1]"], .night .bg-emerald-50, .night .bg-amber-50,
-.night [class*="bg-[#fcf8f1]"], .night [class*="bg-[#fcf7ef]"], .night [class*="bg-[#f8efe2]"], .night [class*="bg-[#f6ecdd]"],
-.night [class*="bg-[#fbf5ec]"], .night [class*="bg-[#ede1ce]"], .night [class*="bg-[#eadbc6]"] {
-  background-color: #3a281b;
+.night [class*="bg-white"] { background-color: rgba(41, 26, 21, 0.92); }
+.night [class*="bg-[#fbf6ee]"], .night [class*="bg-[#faf5ef]"], .night [class*="bg-[#fdf9f3]"],
+.night [class*="bg-[#f1e7da]"], .night [class*="bg-[#f2e9dd]"], .night [class*="bg-[#f1e7da]"],
+.night [class*="bg-[#f1e8df]"], .night [class*="bg-[#ebd8c4]"], .night .bg-emerald-50, .night .bg-amber-50,
+.night [class*="bg-[#fbf7f2]"], .night [class*="bg-[#faf6f1]"], .night [class*="bg-[#f6ede4]"], .night [class*="bg-[#f4eadf]"],
+.night [class*="bg-[#fbf6ee]"], .night [class*="bg-[#eddfce]"], .night [class*="bg-[#ead9c6]"] {
+  background-color: #38241d;
 }
-.night [class*="from-amber-50"], .night [class*="to-[#fbf5ec]"], .night [class*="to-[#f7f1e7]"] { background-image: none; background-color: rgba(42, 29, 20, 0.92); }
-.night [class*="text-[#3a2a1c]"], .night [class*="text-[#2e2218]"], .night [class*="text-[#584535]"],
-.night [class*="text-[#685140]"], .night [class*="text-[#5c331b]"], .night [class*="text-[#4a3626]"],
-.night [class*="text-[#33251a]"], .night [class*="text-[#241515]"], .night [class*="text-[#4a2f2d]"], .night [class*="text-[#6d2520]"],
-.night .text-amber-900, .night .text-amber-800 { color: #f1e6d4; }
-.night [class*="text-[#786450]"], .night [class*="text-[#775c46]"], .night [class*="text-[#8d7259]"],
-.night [class*="text-[#947760]"], .night [class*="text-[#a8744a]"], .night [class*="text-[#775d46]"],
-.night [class*="text-[#8a6866]"] { color: #cbb69c; }
-.night [class*="text-[#94532d]"], .night [class*="text-[#6c3a1c]"], .night [class*="text-[#844826]"],
-.night [class*="text-[#78411f]"], .night [class*="text-[#B2512F]"], .night .text-emerald-800 { color: #e6b07e; }
-.night [class*="border-[#e"], .night [class*="border-[#d9c09f]"], .night .border-amber-200, .night .border-emerald-200 { border-color: #4d3727; }
-.night [class*="border-[#94532d]"], .night [class*="border-[#B2512F]"] { border-color: #c98a57; }
-.night textarea, .night input { color: #f1e6d4; }
-.night textarea::placeholder { color: #a8927a; }
+.night [class*="from-amber-50"], .night [class*="to-[#fbf6ee]"], .night [class*="to-[#f7f0e7]"] { background-image: none; background-color: rgba(41, 26, 21, 0.92); }
+.night [class*="text-[#3f2a22]"], .night [class*="text-[#33241d]"], .night [class*="text-[#5d4437]"],
+.night [class*="text-[#694a3f]"], .night [class*="text-[#6a3420]"], .night [class*="text-[#483028]"],
+.night [class*="text-[#38261f]"], .night [class*="text-[#241515]"], .night [class*="text-[#4a2f2d]"], .night [class*="text-[#6d2520]"],
+.night .text-amber-900, .night .text-amber-800 { color: #f1e4d4; }
+.night [class*="text-[#85695a]"], .night [class*="text-[#85695a]"], .night [class*="text-[#8e6558]"],
+.night [class*="text-[#956c5f]"], .night [class*="text-[#aa6048]"], .night [class*="text-[#85695a]"],
+.night [class*="text-[#8a6866]"] { color: #cca79b; }
+.night [class*="text-[#a5492a]"], .night [class*="text-[#7d3a22]"], .night [class*="text-[#8f3f24]"],
+.night [class*="text-[#86391f]"], .night [class*="text-[#b04e2c]"], .night .text-emerald-800 { color: #e9977b; }
+.night [class*="border-[#e"], .night [class*="border-[#daad9e]"], .night .border-amber-200, .night .border-emerald-200 { border-color: #4b3229; }
+.night [class*="border-[#a5492a]"], .night [class*="border-[#b04e2c]"] { border-color: #cc7254; }
+.night textarea, .night input { color: #f1e4d4; }
+.night textarea::placeholder { color: #a98579; }
 .night .leaflet-container [class*="bg-white"] { background-color: #fff; }
 
 /* ═════════ Heritage luxe: Najdi mud architecture, Sadu and thin gold ═════════ */
-:root { --gold: #b8893d; --gold-soft: rgba(184, 137, 61, 0.38); }
+:root { --gold: #c46f57; --gold-soft: rgba(196, 111, 87, 0.38); }
 
 /* Double frame: the card edge, a hair of cream, then a thin gold line inside */
 .heritage-frame {
-  border: 1px solid #e2cfb2;
-  box-shadow: inset 0 0 0 3px #fffaf2, inset 0 0 0 4px var(--gold-soft), 0 8px 24px rgba(58, 42, 28, 0.08);
+  border: 1px solid #e0cfbd;
+  box-shadow: inset 0 0 0 3px #fffaf4, inset 0 0 0 4px var(--gold-soft), 0 8px 24px rgba(63, 42, 34, 0.08);
 }
 .night .heritage-frame {
-  border-color: #4d3727;
-  box-shadow: inset 0 0 0 3px rgba(42, 29, 20, 0.92), inset 0 0 0 4px rgba(214, 168, 74, 0.32), 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: #4b3229;
+  box-shadow: inset 0 0 0 3px rgba(41, 26, 21, 0.92), inset 0 0 0 4px rgba(208, 131, 114, 0.32), 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 #season-panel > div > div[class*="rounded-[1.7rem]"], #season-panel > div[class*="rounded-[1.7rem]"], #season-panel > button[class*="rounded-[1.7rem]"] {
-  box-shadow: inset 0 0 0 3px rgba(255, 250, 242, 0.9), inset 0 0 0 4px var(--gold-soft), 0 8px 22px rgba(58, 42, 28, 0.07);
+  box-shadow: inset 0 0 0 3px rgba(255, 250, 244, 0.9), inset 0 0 0 4px var(--gold-soft), 0 8px 22px rgba(63, 42, 34, 0.07);
 }
 .night #season-panel > div > div[class*="rounded-[1.7rem]"], .night #season-panel > div[class*="rounded-[1.7rem]"], .night #season-panel > button[class*="rounded-[1.7rem]"] {
-  box-shadow: inset 0 0 0 3px rgba(42, 29, 20, 0.9), inset 0 0 0 4px rgba(214, 168, 74, 0.3), 0 8px 22px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 0 3px rgba(41, 26, 21, 0.9), inset 0 0 0 4px rgba(208, 131, 114, 0.3), 0 8px 22px rgba(0, 0, 0, 0.3);
 }
 
 /* Shurrafat: the stepped crenellations on top of Najdi mud walls */
@@ -419,14 +425,14 @@ body {
   background-repeat: repeat-x;
   background-size: 28px 14px;
   background-position: center bottom;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'%3E%3Cpath d='M4 14V9h3V5l3-3 3 3v4h3v5z' fill='%2394532d'/%3E%3Cpath d='M10 4.2 11.2 5.6 10 7 8.8 5.6z' fill='%23d6a84a'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'%3E%3Cpath d='M4 14V9h3V5l3-3 3 3v4h3v5z' fill='%23a5492a'/%3E%3Cpath d='M10 4.2 11.2 5.6 10 7 8.8 5.6z' fill='%23d08372'/%3E%3C/svg%3E");
 }
 .night .merlons { filter: brightness(0.85); }
 
 /* Ornamental divider: line · diamond · line */
 .orn-divider { display: flex; align-items: center; gap: 10px; color: var(--gold); }
 .orn-divider::before, .orn-divider::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, var(--gold-soft), transparent); }
-.orn-divider > i { width: 8px; height: 8px; transform: rotate(45deg); background: var(--gold); box-shadow: 0 0 0 3px rgba(184, 137, 61, 0.18); }
+.orn-divider > i { width: 8px; height: 8px; transform: rotate(45deg); background: var(--gold); box-shadow: 0 0 0 3px rgba(196, 111, 87, 0.18); }
 
 /* Najdi arch (door / window) */
 .najdi-arch { border-radius: 999px 999px 22px 22px; }
@@ -445,27 +451,27 @@ body {
 
 /* Answer avatar: the grandfather's face in a gold ring */
 .dahiah-avatar {
-  background: url(/images/shayeb/base.jpg) center 22% / 210% no-repeat, #d9b483;
-  box-shadow: 0 0 0 2px #fffaf2, 0 0 0 3.5px var(--gold);
+  background: url(/images/shayeb/base.jpg) center 22% / 210% no-repeat, #d69386;
+  box-shadow: 0 0 0 2px #fffaf4, 0 0 0 3.5px var(--gold);
 }
 
 /* Call screen: warm mud-wall room with carved triangles */
 .vc-heritage {
-  background-color: #1f150e !important;
+  background-color: #24170f !important;
   background-image:
-    radial-gradient(ellipse at 50% 38%, rgba(148, 83, 45, 0.45), transparent 62%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M0 44 11 33 22 44zM22 44l11-11 11 11zM11 22l11-11 11 11z' fill='%23d6a84a' fill-opacity='.05'/%3E%3C/svg%3E");
+    radial-gradient(ellipse at 50% 38%, rgba(165, 73, 42, 0.45), transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M0 44 11 33 22 44zM22 44l11-11 11 11zM11 22l11-11 11 11z' fill='%23d08372' fill-opacity='.05'/%3E%3C/svg%3E");
 }
 .vc-halo { position: absolute; inset: -16px; border-radius: 9999px; pointer-events: none; }
-.vc-halo::before { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 2px solid rgba(214, 168, 74, 0.75); box-shadow: 0 0 0 6px rgba(214, 168, 74, 0.08), 0 0 40px rgba(214, 168, 74, 0.25); }
-.vc-halo::after { content: ""; position: absolute; inset: -12px; border-radius: inherit; border: 1.5px dashed rgba(214, 168, 74, 0.45); animation: vc-halo-spin 40s linear infinite; }
+.vc-halo::before { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 2px solid rgba(208, 131, 114, 0.75); box-shadow: 0 0 0 6px rgba(208, 131, 114, 0.08), 0 0 40px rgba(208, 131, 114, 0.25); }
+.vc-halo::after { content: ""; position: absolute; inset: -12px; border-radius: inherit; border: 1.5px dashed rgba(208, 131, 114, 0.45); animation: vc-halo-spin 40s linear infinite; }
 @keyframes vc-halo-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .vc-halo::after { animation: none; } }
 
 
 /* ───────────── season map viewer ───────────── */
-.venue-frame { box-shadow: 0 0 0 3px #4a2614, 0 0 0 6px #d6a84a, 0 0 0 9px #4a2614, 0 0 0 10px #b8893d, 0 30px 80px rgba(0,0,0,.45); }
-.venue-card { box-shadow: 0 0 0 2px #d6a84a, 0 0 0 5px #4a2614, 0 10px 24px rgba(58,42,28,.25); }
+.venue-frame { box-shadow: 0 0 0 3px #4f2e22, 0 0 0 6px #d08372, 0 0 0 9px #4f2e22, 0 0 0 10px #c46f57, 0 30px 80px rgba(0, 0, 0,.45); }
+.venue-card { box-shadow: 0 0 0 2px #d08372, 0 0 0 5px #4f2e22, 0 10px 24px rgba(63, 42, 34,.25); }
 .venue-route { animation: venue-dash 1.2s linear infinite; }
 @keyframes venue-dash { to { stroke-dashoffset: -40; } }
 .venue-pulse { transform-box: fill-box; transform-origin: center; animation: venue-pulse 1.6s ease-out infinite; }

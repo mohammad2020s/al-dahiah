@@ -108,18 +108,18 @@ export function NearMe({ language = "ar" }: { language?: Language }) {
       <div
         dir={en ? "ltr" : "rtl"}
         onClick={(e) => e.stopPropagation()}
-        className="tr-sheet max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-[1.8rem] border border-[#e6d5bd] bg-[#fdfaf5] p-4 pb-6 shadow-2xl sm:rounded-[1.8rem]"
+        className="tr-sheet max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-[1.8rem] border border-[#e2d5c6] bg-[#fdf9f3] p-4 pb-6 shadow-2xl sm:rounded-[1.8rem]"
       >
         <div className="sadu-strip -mx-4 -mt-4 mb-3 rounded-t-[1.8rem]" />
         <div className="flex items-center justify-between">
-          <h2 className="font-['Alexandria'] flex items-center gap-2 text-lg font-bold text-[#3a2a1c]">
-            <LocateFixed className="size-5 text-[#94532d]" />
+          <h2 className="font-['IBM_Plex_Sans_Arabic'] flex items-center gap-2 text-lg font-bold text-[#3f2a22]">
+            <LocateFixed className="size-5 text-[#a5492a]" />
             {en ? "Near me now" : "قريب مني الحين"}
           </h2>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="grid size-9 place-items-center rounded-full bg-[#f3ebdf] text-[#6c3a1c] hover:bg-[#eadbc6]"
+            className="grid size-9 place-items-center rounded-full bg-[#f2e9dd] text-[#7d3a22] hover:bg-[#ead9c6]"
             aria-label={en ? "Close" : "إغلاق"}
           >
             <X className="size-4" />
@@ -127,14 +127,14 @@ export function NearMe({ language = "ar" }: { language?: Language }) {
         </div>
 
         {busy && (
-          <p className="mt-6 flex items-center justify-center gap-2 py-6 text-sm font-semibold text-[#6c3a1c]">
+          <p className="mt-6 flex items-center justify-center gap-2 py-6 text-sm font-semibold text-[#7d3a22]">
             <Loader2 className="size-4 animate-spin" />
             {en ? "Finding where you are…" : "أشوف وينك…"}
           </p>
         )}
 
         {!busy && fromVillage && (
-          <p className="mt-2 rounded-xl bg-[#f3ebdf] px-3 py-2 text-xs leading-5 text-[#6c3a1c]">
+          <p className="mt-2 rounded-xl bg-[#f2e9dd] px-3 py-2 text-xs leading-5 text-[#7d3a22]">
             {fromVillage === "far"
               ? en
                 ? "You seem to be outside Al-Qasab, so distances are from the heritage village."
@@ -148,7 +148,7 @@ export function NearMe({ language = "ar" }: { language?: Language }) {
         {!busy &&
           groups.map(({ key, title, Icon, items }) => (
             <div key={key} className="mt-3">
-              <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-[#94532d]">
+              <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold text-[#a5492a]">
                 <Icon className="size-4" />
                 {title}
               </p>
@@ -156,11 +156,11 @@ export function NearMe({ language = "ar" }: { language?: Language }) {
                 {items.map((s, i) => (
                   <div
                     key={s.name}
-                    className={`flex items-center gap-2 rounded-2xl border px-3 py-2.5 ${i === 0 ? "border-[#d9c09f] bg-white" : "border-[#ede0cb] bg-white/70"}`}
+                    className={`flex items-center gap-2 rounded-2xl border px-3 py-2.5 ${i === 0 ? "border-[#daad9e] bg-white" : "border-[#ebdfce] bg-white/70"}`}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold text-[#3a2a1c]">{en ? s.nameEn : s.name}</p>
-                      <p className="text-xs text-[#786450]">{fmtDist(s.d, en)}</p>
+                      <p className="truncate text-sm font-bold text-[#3f2a22]">{en ? s.nameEn : s.name}</p>
+                      <p className="text-xs text-[#85695a]">{fmtDist(s.d, en)}</p>
                     </div>
                     <button
                       type="button"
@@ -168,7 +168,7 @@ export function NearMe({ language = "ar" }: { language?: Language }) {
                         setOpen(false);
                         openNavigation({ lat: s.lat, lng: s.lng, name: en ? s.nameEn : s.name });
                       }}
-                      className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-[#94532d] px-3 py-2 text-xs font-bold text-white hover:bg-[#78411f] active:scale-95"
+                      className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-[#a5492a] px-3 py-2 text-xs font-bold text-white hover:bg-[#86391f] active:scale-95"
                     >
                       <Navigation className="size-3.5" />
                       {en ? "Take me" : "خذني"}

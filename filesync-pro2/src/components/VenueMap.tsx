@@ -140,17 +140,17 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
   const stroke = Math.max(4, 9 / zoom);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#1c0f07]/70 p-2 backdrop-blur-sm sm:p-5" dir={en ? "ltr" : "rtl"} role="dialog" aria-modal="true" aria-label={en ? "Season map" : "خريطة الموسم"} onClick={() => setOpen(false)}>
-      <div className="venue-frame relative flex max-h-full w-full max-w-6xl flex-col overflow-hidden rounded-[26px] bg-[#fbf3e4] text-[#2b1a10]" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#1b0d08]/70 p-2 backdrop-blur-sm sm:p-5" dir={en ? "ltr" : "rtl"} role="dialog" aria-modal="true" aria-label={en ? "Season map" : "خريطة الموسم"} onClick={() => setOpen(false)}>
+      <div className="venue-frame relative flex max-h-full w-full max-w-6xl flex-col overflow-hidden rounded-[26px] bg-[#fbf6ee] text-[#2a1a14]" onClick={(e) => e.stopPropagation()}>
         <div className="merlons absolute inset-x-0 top-0 h-[13px] opacity-90" aria-hidden="true" />
         {/* header */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-[#e6d5bd] bg-[#4a2614] px-4 pb-3 pt-5 text-[#fbf3e4]">
-          <MapIcon className="size-5 text-[#d6a84a]" />
+        <div className="flex flex-wrap items-center gap-2 border-b border-[#e2d5c6] bg-[#4f2e22] px-4 pb-3 pt-5 text-[#fbf6ee]">
+          <MapIcon className="size-5 text-[#d08372]" />
           <h2 className="me-auto text-lg font-extrabold">{en ? "Salt Season map" : "خريطة موسم ملح القْصَب"}</h2>
-          <a href={VENUE_MAP.pdf} download="خريطة-موسم-ملح-القصب.pdf" className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-[#d6a84a] px-3 text-sm font-bold text-[#2b1a10] hover:brightness-110">
+          <a href={VENUE_MAP.pdf} download="خريطة-موسم-ملح-القصب.pdf" className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-[#d08372] px-3 text-sm font-bold text-[#2a1a14] hover:brightness-110">
             <Download className="size-4" /> {en ? "Download PDF" : "حمّل PDF"}
           </a>
-          <a href={VENUE_MAP.pdf} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-[#d6a84a]/70 px-3 text-sm font-bold hover:bg-white/10">
+          <a href={VENUE_MAP.pdf} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-[#d08372]/70 px-3 text-sm font-bold hover:bg-white/10">
             <ExternalLink className="size-4" /> {en ? "Open" : "افتح"}
           </a>
           <button type="button" onClick={() => setOpen(false)} className="grid size-10 place-items-center rounded-xl hover:bg-white/10" aria-label={en ? "Close" : "إغلاق"}>
@@ -159,12 +159,12 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
         </div>
 
         {/* where you are / where to */}
-        <div className="grid gap-2 border-b border-[#e6d5bd] px-4 py-3 sm:grid-cols-2">
+        <div className="grid gap-2 border-b border-[#e2d5c6] px-4 py-3 sm:grid-cols-2">
           <label className="flex items-center gap-2 text-sm font-bold">
             <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#1d6fd8] text-white"><LocateFixed className="size-4" /></span>
             <span className="shrink-0">{en ? "You are at" : "أنت عند"}</span>
             <select
-              className="min-h-10 w-full rounded-xl border border-[#e6d5bd] bg-white px-2 text-sm"
+              className="min-h-10 w-full rounded-xl border border-[#e2d5c6] bg-white px-2 text-sm"
               value={here.id || ""}
               onChange={(e) => { const n = venueNode(e.target.value); if (n) { manual.current = true; setGps({ state: "idle" }); setHere({ x: n.x, y: n.y, id: n.id }); } }}
             >
@@ -175,14 +175,14 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
           <label className="flex items-center gap-2 text-sm font-bold">
             <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#b42318] text-white"><Navigation className="size-4" /></span>
             <span className="shrink-0">{en ? "Going to" : "تبي تروح"}</span>
-            <select className="min-h-10 w-full rounded-xl border border-[#e6d5bd] bg-white px-2 text-sm" value={toId} onChange={(e) => setToId(e.target.value)}>
+            <select className="min-h-10 w-full rounded-xl border border-[#e2d5c6] bg-white px-2 text-sm" value={toId} onChange={(e) => setToId(e.target.value)}>
               <option value="">{en ? "Choose a place…" : "اختر مكان…"}</option>
               {options.map((n) => <option key={n.id} value={n.id}>{label(n)}</option>)}
               <option value="WC2">{en ? "Nearest restroom" : "أقرب دورة مياه"}</option>
             </select>
           </label>
           <div className="flex flex-wrap items-center gap-2 text-xs sm:col-span-2">
-            <span className={`font-bold ${gps.state === "found" ? "text-[#0f766e]" : gps.state === "finding" ? "text-[#1d6fd8]" : "text-[#7a5a45]"}`}>
+            <span className={`font-bold ${gps.state === "found" ? "text-[#0f766e]" : gps.state === "finding" ? "text-[#1d6fd8]" : "text-[#7b5244]"}`}>
               {gps.state === "finding" && (en ? "Al-Dahiya is finding where you are…" : "الداهية يحدد موقعك…")}
               {gps.state === "found" && (en ? `Al-Dahiya found you on the map (about ±${gps.acc} m).` : `الداهية حدد موقعك على الخريطة (تقريباً ±${gps.acc} متر).`)}
               {gps.state === "away" && (en ? `You are not at the season yet (about ${((gps.metres || 0) / 1000).toFixed(1)} km away), so the route starts at the entrance.` : `أنت للحين مو في الموسم (تبعد تقريباً ${((gps.metres || 0) / 1000).toFixed(1)} كم)، فبديت لك الطريق من الدخول.`)}
@@ -200,7 +200,7 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
 
         {/* the map */}
         <div className="relative min-h-0 flex-1">
-          <div ref={box} dir="ltr" className="h-[58vh] overflow-auto overscroll-contain bg-[#efe2cc] sm:h-[62vh]" style={{ touchAction: "pan-x pan-y" }}>
+          <div ref={box} dir="ltr" className="h-[58vh] overflow-auto overscroll-contain bg-[#eedfcd] sm:h-[62vh]" style={{ touchAction: "pan-x pan-y" }}>
             <div className="relative" style={{ width: `${zoom * 100}%`, aspectRatio: `${W} / ${H}` }}>
               <img src={VENUE_MAP.image} alt={en ? "Official map of the 4th Al-Qasab Salt Season" : "خريطة موسم ملح القصب الرابع الرسمية"} className="absolute inset-0 size-full select-none" draggable={false} />
               <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 size-full cursor-crosshair" onClick={onMapTap}>
@@ -228,20 +228,20 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
                   <circle r={13} fill="#1d6fd8" stroke="#fff" strokeWidth={5} />
                   <g transform="translate(0,-28)">
                     <rect x={-62} y={-30} width={124} height={34} rx={17} fill="#1d6fd8" stroke="#fff" strokeWidth={3} />
-                    <text y={-7} textAnchor="middle" fontSize="20" fontWeight="800" fill="#fff" fontFamily="Alexandria, system-ui, sans-serif">{en ? "You are here" : "أنت هنا"}</text>
+                    <text y={-7} textAnchor="middle" fontSize="20" fontWeight="800" fill="#fff" fontFamily="'IBM Plex Sans Arabic', system-ui, sans-serif">{en ? "You are here" : "أنت هنا"}</text>
                   </g>
                 </g>
               </svg>
             </div>
           </div>
           <div className="absolute bottom-3 end-3 flex flex-col gap-1.5" dir="ltr">
-            <button type="button" onClick={() => setZoom((z) => Math.min(4, +(z + 0.5).toFixed(1)))} className="grid size-11 place-items-center rounded-xl bg-white text-[#4a2614] shadow-md ring-1 ring-[#e6d5bd]" aria-label={en ? "Zoom in" : "تكبير"}><Plus className="size-5" /></button>
-            <button type="button" onClick={() => setZoom((z) => Math.max(1, +(z - 0.5).toFixed(1)))} className="grid size-11 place-items-center rounded-xl bg-white text-[#4a2614] shadow-md ring-1 ring-[#e6d5bd]" aria-label={en ? "Zoom out" : "تصغير"}><Minus className="size-5" /></button>
+            <button type="button" onClick={() => setZoom((z) => Math.min(4, +(z + 0.5).toFixed(1)))} className="grid size-11 place-items-center rounded-xl bg-white text-[#4f2e22] shadow-md ring-1 ring-[#e2d5c6]" aria-label={en ? "Zoom in" : "تكبير"}><Plus className="size-5" /></button>
+            <button type="button" onClick={() => setZoom((z) => Math.max(1, +(z - 0.5).toFixed(1)))} className="grid size-11 place-items-center rounded-xl bg-white text-[#4f2e22] shadow-md ring-1 ring-[#e2d5c6]" aria-label={en ? "Zoom out" : "تصغير"}><Minus className="size-5" /></button>
           </div>
         </div>
 
         {/* directions */}
-        <div className="max-h-[26vh] overflow-auto border-t border-[#e6d5bd] bg-white/70 px-4 py-3 text-sm leading-7">
+        <div className="max-h-[26vh] overflow-auto border-t border-[#e2d5c6] bg-white/70 px-4 py-3 text-sm leading-7">
           {route && destNode ? (
             <ol className="space-y-1">
               <li><b className="text-[#1d6fd8]">{en ? "You are here:" : "أنت هنا:"}</b> {here.id ? name(here.id) : (en ? `near ${hereNode?.en}` : `قرب ${hereNode?.ar}`)}</li>
@@ -258,7 +258,7 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
               <li><b className="text-[#b42318]">{en ? "You arrive at:" : "توصل:"}</b> {label(destNode)}</li>
             </ol>
           ) : (
-            <p className="text-[#7a5a45]">{en ? "Pick where you want to go, and the route shows on the map." : "اختر وين تبي تروح، ويطلع لك الطريق على الخريطة."}</p>
+            <p className="text-[#7b5244]">{en ? "Pick where you want to go, and the route shows on the map." : "اختر وين تبي تروح، ويطلع لك الطريق على الخريطة."}</p>
           )}
         </div>
       </div>
@@ -274,18 +274,18 @@ export function VenueMapCard({ language = "ar", to, from, compact }: { language?
     <button
       type="button"
       onClick={() => openVenueMap({ to, from })}
-      className={`venue-card group block w-full overflow-hidden rounded-2xl bg-[#4a2614] text-start text-[#fbf3e4] ${compact ? "mt-2 max-w-md" : ""}`}
+      className={`venue-card group block w-full overflow-hidden rounded-2xl bg-[#4f2e22] text-start text-[#fbf6ee] ${compact ? "mt-2 max-w-md" : ""}`}
     >
       <div className="relative">
         <img src={VENUE_MAP.thumb} alt="" className="aspect-[1684/1191] w-full object-cover transition group-hover:scale-[1.02]" loading="lazy" />
-        <span className="absolute start-2 top-2 rounded-full bg-[#4a2614]/90 px-2.5 py-1 text-[11px] font-bold ring-1 ring-[#d6a84a]">{en ? "Official map · PDF" : "الخريطة الرسمية · PDF"}</span>
+        <span className="absolute start-2 top-2 rounded-full bg-[#4f2e22]/90 px-2.5 py-1 text-[11px] font-bold ring-1 ring-[#d08372]">{en ? "Official map · PDF" : "الخريطة الرسمية · PDF"}</span>
       </div>
       <div className="flex items-center gap-2 px-3 py-2.5">
-        <MapIcon className="size-4 shrink-0 text-[#d6a84a]" />
+        <MapIcon className="size-4 shrink-0 text-[#d08372]" />
         <span className="text-sm font-extrabold">
           {t ? (en ? `Show me the way to ${t.en}` : `دلني على ${t.ar}`) : en ? "Salt Season map" : "خريطة الموسم"}
         </span>
-        <span className="ms-auto text-xs font-bold text-[#e8d3b4]">{en ? "Open →" : "افتح ←"}</span>
+        <span className="ms-auto text-xs font-bold text-[#e6cfb6]">{en ? "Open →" : "افتح ←"}</span>
       </div>
     </button>
   );

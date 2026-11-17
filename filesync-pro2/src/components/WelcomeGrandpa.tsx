@@ -83,7 +83,7 @@ export function WelcomeGrandpa({ language = "ar", onCall }: { language?: Languag
   return (
     <div
       dir={en ? "ltr" : "rtl"}
-      className="wg-in fixed inset-x-3 bottom-24 z-[45] mx-auto max-w-sm overflow-hidden rounded-[1.6rem] border border-[#e6d5bd] bg-[#fdfaf5] shadow-2xl lg:inset-x-auto lg:bottom-6 lg:start-6"
+      className="wg-in fixed inset-x-3 bottom-24 z-[45] mx-auto max-w-sm overflow-hidden rounded-[1.6rem] border border-[#e2d5c6] bg-[#fdf9f3] shadow-2xl lg:inset-x-auto lg:bottom-6 lg:start-6"
       role="dialog"
       aria-label={en ? "Welcome" : "ترحيب"}
     >
@@ -92,21 +92,21 @@ export function WelcomeGrandpa({ language = "ar", onCall }: { language?: Languag
         <img
           src="/images/shayeb/base.jpg"
           alt=""
-          className="size-16 shrink-0 rounded-2xl border border-[#e6d5bd] object-cover object-top"
+          className="size-16 shrink-0 rounded-2xl border border-[#e2d5c6] object-cover object-top"
         />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <p className="font-['Alexandria'] text-base font-bold text-[#3a2a1c]">{en ? "Welcome!" : "يا هلا والله!"}</p>
-            <button type="button" onClick={close} className="-mt-1 grid size-7 shrink-0 place-items-center rounded-full text-[#786450] hover:bg-[#f3ebdf]" aria-label={en ? "Close" : "إغلاق"}>
+            <p className="font-['IBM_Plex_Sans_Arabic'] text-base font-bold text-[#3f2a22]">{en ? "Welcome!" : "يا هلا والله!"}</p>
+            <button type="button" onClick={close} className="-mt-1 grid size-7 shrink-0 place-items-center rounded-full text-[#85695a] hover:bg-[#f2e9dd]" aria-label={en ? "Close" : "إغلاق"}>
               <X className="size-4" />
             </button>
           </div>
-          <p className="mt-0.5 text-xs leading-5 text-[#584535]">{en ? TEXT_EN : TEXT_AR}</p>
+          <p className="mt-0.5 text-xs leading-5 text-[#5d4437]">{en ? TEXT_EN : TEXT_AR}</p>
           <div className="mt-2.5 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={play}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#94532d] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#78411f] active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#a5492a] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#86391f] active:scale-95"
             >
               {state === "loading" ? <Loader2 className="size-3.5 animate-spin" /> : state === "playing" ? <Square className="size-3.5" /> : <Play className="size-3.5" />}
               {state === "playing" ? (en ? "Stop" : "وقّف") : en ? "Hear his welcome" : "اسمع ترحيبه"}
@@ -117,7 +117,7 @@ export function WelcomeGrandpa({ language = "ar", onCall }: { language?: Languag
                 close();
                 onCall?.();
               }}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-[#94532d] px-3 py-1.5 text-xs font-bold text-[#94532d] hover:bg-[#f3ebdf] active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#a5492a] px-3 py-1.5 text-xs font-bold text-[#a5492a] hover:bg-[#f2e9dd] active:scale-95"
             >
               <Phone className="size-3.5" />
               {en ? "Call him" : "اتصل عليه"}

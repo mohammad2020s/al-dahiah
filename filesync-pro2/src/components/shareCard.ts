@@ -5,10 +5,10 @@ import { BONUS_STOPS, CORE_STOPS } from "../../server/saltPassport.ts";
 const W = 1080;
 const H = 1350;
 // «ملح القصب» brand identity palette
-const BRAND = "#B2512F";
+const BRAND = "#b04e2c";
 const DARK = "#8f3c22";
-const SOFT = "#D18372";
-const INK = "#33251a";
+const SOFT = "#d18372";
+const INK = "#38261f";
 const MUTED = "#8a6a67";
 
 const digits = (n: number, en: boolean) => (en ? String(n) : n.toLocaleString("ar-SA"));
@@ -36,7 +36,7 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 function fitText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, weight: number, size: number) {
   let s = size;
   do {
-    ctx.font = `${weight} ${s}px Alexandria, "Noto Naskh Arabic", sans-serif`;
+    ctx.font = `${weight} ${s}px "IBM Plex Sans Arabic", "Noto Naskh Arabic", sans-serif`;
     if (ctx.measureText(text).width <= maxWidth) break;
     s -= 2;
   } while (s > 18);
@@ -46,8 +46,8 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   const en = opts.lang === "en";
   try {
     await Promise.all([
-      document.fonts?.load('800 72px Alexandria'),
-      document.fonts?.load('600 34px Alexandria'),
+      document.fonts?.load('700 72px "IBM Plex Sans Arabic"'),
+      document.fonts?.load('600 34px "IBM Plex Sans Arabic"'),
     ]);
   } catch {
     /* system font is fine */
@@ -66,7 +66,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   const bonus = BONUS_STOPS.filter((s) => opts.stamps[s.id]).length;
 
   // Background + red header
-  ctx.fillStyle = "#f3ebdf";
+  ctx.fillStyle = "#f2e9dd";
   ctx.fillRect(0, 0, W, H);
   const grad = ctx.createLinearGradient(0, 0, W, 460);
   grad.addColorStop(0, DARK);
@@ -104,8 +104,8 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
   const title = complete ? (en ? "Al-Qasab Explorer" : "مستكشف القْصَب") : en ? "I visited Al-Qasab" : "زرت القْصَب";
   fitText(ctx, title, W - 120, 800, 84);
   ctx.fillText(title, W / 2, 290);
-  ctx.font = '600 34px Alexandria, sans-serif';
-  ctx.fillStyle = "#f3ebdf";
+  ctx.font = '600 34px "IBM Plex Sans Arabic", sans-serif';
+  ctx.fillStyle = "#f2e9dd";
   ctx.fillText(en ? "Al-Qasab Salt Season · Salt Passport" : "موسم ملح القْصَب · جواز الملح", W / 2, 375);
 
   // Name / certificate line
@@ -116,7 +116,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
     const line1 = name ? (en ? `«Al-Dahiya» certifies that ${name}` : `يشهد «الداهية» أن ${name}`) : en ? "«Al-Dahiya» certifies that you" : "يشهد «الداهية» إنك";
     fitText(ctx, line1, W - 140, 700, 46);
     ctx.fillText(line1, W / 2, y);
-    ctx.font = '600 32px Alexandria, sans-serif';
+    ctx.font = '600 32px "IBM Plex Sans Arabic", sans-serif';
     ctx.fillStyle = MUTED;
     ctx.fillText(en ? "visited all six landmarks of Al-Qasab" : "زار معالم القْصَب الست كلها", W / 2, y + 56);
   } else if (name) {
@@ -140,7 +140,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
     ctx.save();
     ctx.lineWidth = 8;
     if (stamped) {
-      ctx.fillStyle = "rgba(178,81,47,0.10)";
+      ctx.fillStyle = "rgba(176, 78, 44,0.10)";
       ctx.strokeStyle = BRAND;
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -156,7 +156,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
       ctx.lineTo(cx + 25, cy - 16);
       ctx.stroke();
     } else {
-      ctx.strokeStyle = "#e4d2ba";
+      ctx.strokeStyle = "#e4d0ba";
       ctx.setLineDash([14, 12]);
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -164,14 +164,14 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
     }
     ctx.restore();
 
-    ctx.fillStyle = stamped ? INK : "#b3a08a";
+    ctx.fillStyle = stamped ? INK : "#b49489";
     fitText(ctx, en ? stop.en : stop.ar, cellW - 40, 700, 32);
     ctx.fillText(en ? stop.en : stop.ar, cx, cy + 90);
   });
 
   // Progress + footer
   ctx.fillStyle = BRAND;
-  ctx.font = '700 36px Alexandria, sans-serif';
+  ctx.font = '700 36px "IBM Plex Sans Arabic", sans-serif';
   const progress = en
     ? `${done.length} of ${CORE_STOPS.length} stamps${bonus ? ` + ${bonus} bonus` : ""}`
     : `${digits(done.length, false)} من ${digits(CORE_STOPS.length, false)} أختام${bonus ? ` + ${digits(bonus, false)} إضافية` : ""}`;
@@ -184,7 +184,7 @@ export async function drawShareCard(opts: { stamps: Record<string, number>; name
     ctx.drawImage(seasonLogo, en ? W - 60 - lw : 60, H - 150, lw, lh);
   }
   ctx.fillStyle = MUTED;
-  ctx.font = '600 28px Alexandria, sans-serif';
+  ctx.font = '600 28px "IBM Plex Sans Arabic", sans-serif';
   ctx.fillText(en ? "Ask «Al-Dahiya» · al-dahiah.com" : "اسأل «الداهية» · al-dahiah.com", W / 2, H - 56);
 
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/png"));

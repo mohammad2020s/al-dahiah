@@ -19,7 +19,7 @@ function links(text: string, keyBase: string) {
         target="_blank"
         rel="noopener noreferrer"
         dir="ltr"
-        className="inline-block font-bold underline decoration-[#94532d]/40 underline-offset-2 hover:decoration-[#94532d]"
+        className="inline-block font-bold underline decoration-[#a5492a]/40 underline-offset-2 hover:decoration-[#a5492a]"
       >
         {p.replace(/^https?:\/\//i, "")}
       </a>
@@ -61,7 +61,7 @@ export function RichText({ text, className = "" }: { text: string; className?: s
         if (num) {
           return (
             <div key={i} className="mt-1 flex gap-2">
-              <span className="mt-[0.3em] grid size-5 shrink-0 select-none place-items-center rounded-full bg-[#94532d] text-[11px] font-bold leading-none text-white">
+              <span className="mt-[0.3em] grid size-5 shrink-0 select-none place-items-center rounded-full bg-[#a5492a] text-[11px] font-bold leading-none text-white">
                 {num[1]}
               </span>
               <span className="min-w-0">{inline(line.slice(num[0].length), String(i))}</span>
@@ -72,7 +72,7 @@ export function RichText({ text, className = "" }: { text: string; className?: s
         if (bullet) {
           return (
             <div key={i} className="flex gap-2">
-              <span className="mt-[0.15em] select-none text-[#94532d]">•</span>
+              <span className="mt-[0.15em] select-none text-[#a5492a]">•</span>
               <span className="min-w-0">{inline(line.slice(bullet[0].length), String(i))}</span>
             </div>
           );

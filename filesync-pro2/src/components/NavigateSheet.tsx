@@ -41,7 +41,7 @@ type Step = {
 };
 type Route = { line: [number, number][]; steps: Step[]; distance: number; duration: number };
 
-const BRAND = "#94532d";
+const BRAND = "#a5492a";
 // Where a visitor without location can start from
 const START_POINTS = [
   { ar: "من بوابة الموسم", en: "From the season gate", lat: 25.2983509, lng: 45.5072574 },
@@ -397,9 +397,9 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
   const google = `https://www.google.com/maps/dir/?api=1&destination=${target.lat},${target.lng}&travelmode=${mode === "car" ? "driving" : "walking"}`;
 
   return (
-    <div className="fixed inset-0 z-[70] flex flex-col bg-[#21160e]" dir={en ? "ltr" : "rtl"}>
+    <div className="fixed inset-0 z-[70] flex flex-col bg-[#20140f]" dir={en ? "ltr" : "rtl"}>
       {/* Next instruction */}
-      <div className="relative z-[2] flex items-center gap-3 bg-[#6c3a1c] px-4 py-3 text-white shadow-lg">
+      <div className="relative z-[2] flex items-center gap-3 bg-[#7d3a22] px-4 py-3 text-white shadow-lg">
         <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white/15">
           {arrived ? <Flag className="size-7" /> : <StepIcon step={next} className="size-7" />}
         </div>
@@ -447,7 +447,7 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
               setFollow(true);
               if (pos) mapRef.current?.setView(pos, 17);
             }}
-            className={`grid size-11 place-items-center rounded-full shadow-lg ${follow ? "bg-[#94532d] text-white" : "bg-white text-[#94532d]"}`}
+            className={`grid size-11 place-items-center rounded-full shadow-lg ${follow ? "bg-[#a5492a] text-white" : "bg-white text-[#a5492a]"}`}
             aria-label={en ? "Follow me" : "تابع مكاني"}
           >
             <LocateFixed className="size-5" />
@@ -455,15 +455,15 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
           <button
             type="button"
             onClick={() => setVoice((v) => !v)}
-            className="grid size-11 place-items-center rounded-full bg-white text-[#94532d] shadow-lg"
+            className="grid size-11 place-items-center rounded-full bg-white text-[#a5492a] shadow-lg"
             aria-label={voice ? (en ? "Mute" : "كتم الصوت") : en ? "Voice guidance" : "التوجيه الصوتي"}
           >
             {voice ? <Volume2 className="size-5" /> : <VolumeX className="size-5" />}
           </button>
         </div>
         {!pos && locIssue && (
-          <div className="absolute inset-x-3 top-3 z-[500] space-y-2 rounded-2xl bg-white/97 p-3 text-xs text-[#3a2a1c] shadow-lg">
-            <p className="font-bold text-[#6c3a1c]">
+          <div className="absolute inset-x-3 top-3 z-[500] space-y-2 rounded-2xl bg-white/97 p-3 text-xs text-[#3f2a22] shadow-lg">
+            <p className="font-bold text-[#7d3a22]">
               {locIssue === "device-off"
                 ? en
                   ? "Your device's location service is off."
@@ -476,7 +476,7 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
                     ? "Couldn't find your location."
                     : "ما قدرت أحدد مكانك."}
             </p>
-            <p className="leading-5 text-[#584535]">
+            <p className="leading-5 text-[#5d4437]">
               {locIssue === "device-off"
                 ? en
                   ? "Turn it on: Windows → Settings → Privacy & security → Location; iPhone → Settings → Privacy → Location Services → your browser; Android → Settings → Location."
@@ -495,40 +495,40 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
                   key={p.ar}
                   type="button"
                   onClick={() => startFrom([p.lat, p.lng])}
-                  className="rounded-lg bg-[#94532d] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#78411f]"
+                  className="rounded-lg bg-[#a5492a] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#86391f]"
                 >
                   {en ? p.en : p.ar}
                 </button>
               ))}
             </div>
-            <p className="text-[11px] text-[#786450]">{en ? "…or tap the map where you are." : "…أو اضغط على الخريطة في مكانك."}</p>
+            <p className="text-[11px] text-[#85695a]">{en ? "…or tap the map where you are." : "…أو اضغط على الخريطة في مكانك."}</p>
           </div>
         )}
         {manual && route && (
-          <div className="absolute inset-x-3 top-3 z-[500] rounded-xl bg-white/95 px-3 py-2 text-[11px] font-bold text-[#6c3a1c] shadow">
+          <div className="absolute inset-x-3 top-3 z-[500] rounded-xl bg-white/95 px-3 py-2 text-[11px] font-bold text-[#7d3a22] shadow">
             {en ? "Route from the start point you chose (live tracking is off)." : "الطريق من نقطة البداية اللي اخترتها (بدون تتبّع مباشر)."}
           </div>
         )}
         {error && route && (
-          <div className="absolute inset-x-3 top-3 z-[500] rounded-xl bg-white/95 px-3 py-2 text-xs font-bold text-[#6c3a1c] shadow">{error}</div>
+          <div className="absolute inset-x-3 top-3 z-[500] rounded-xl bg-white/95 px-3 py-2 text-xs font-bold text-[#7d3a22] shadow">{error}</div>
         )}
       </div>
 
       {/* Trip summary */}
-      <div className="relative z-[2] space-y-3 bg-[#fbf5ec] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_rgba(0,0,0,0.18)]">
+      <div className="relative z-[2] space-y-3 bg-[#fbf6ee] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_rgba(0, 0, 0,0.18)]">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-lg font-bold text-[#3a2a1c]">{remaining ? fmtDuration(remaining.duration, en) : "—"}</p>
-            <p className="text-xs text-[#786450]">{remaining ? fmtDistance(remaining.distance, en) : en ? "Distance…" : "المسافة…"}</p>
+            <p className="text-lg font-bold text-[#3f2a22]">{remaining ? fmtDuration(remaining.duration, en) : "—"}</p>
+            <p className="text-xs text-[#85695a]">{remaining ? fmtDistance(remaining.distance, en) : en ? "Distance…" : "المسافة…"}</p>
           </div>
-          <div className="flex rounded-xl border border-[#e6d5bd] bg-white p-1">
+          <div className="flex rounded-xl border border-[#e2d5c6] bg-white p-1">
             {(["car", "foot"] as Mode[]).map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => switchMode(m)}
                 className={`flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                  mode === m ? "bg-[#94532d] text-white" : "text-[#6c3a1c]"
+                  mode === m ? "bg-[#a5492a] text-white" : "text-[#7d3a22]"
                 }`}
               >
                 {m === "car" ? <Car className="size-4" /> : <Footprints className="size-4" />}
@@ -538,17 +538,17 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
           </div>
         </div>
         {route && route.steps.length > 1 && (
-          <div className="max-h-28 space-y-1 overflow-y-auto rounded-xl border border-[#e6d5bd] bg-white p-2">
+          <div className="max-h-28 space-y-1 overflow-y-auto rounded-xl border border-[#e2d5c6] bg-white p-2">
             {route.steps.slice(stepIdx + 1).map((s, i) => (
-              <div key={i} className={`flex items-center gap-2 text-xs ${i === 0 ? "font-bold text-[#3a2a1c]" : "text-[#584535]"}`}>
-                <StepIcon step={s} className="size-4 shrink-0 text-[#94532d]" />
+              <div key={i} className={`flex items-center gap-2 text-xs ${i === 0 ? "font-bold text-[#3f2a22]" : "text-[#5d4437]"}`}>
+                <StepIcon step={s} className="size-4 shrink-0 text-[#a5492a]" />
                 <span className="min-w-0 flex-1 truncate">{instruction(s, en)}</span>
-                <span className="shrink-0 text-[11px] text-[#786450]">{fmtDistance(s.distance, en)}</span>
+                <span className="shrink-0 text-[11px] text-[#85695a]">{fmtDistance(s.distance, en)}</span>
               </div>
             ))}
           </div>
         )}
-        <a href={google} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1 text-[11px] text-[#786450] underline">
+        <a href={google} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1 text-[11px] text-[#85695a] underline">
           <ExternalLink className="size-3" />
           {en ? "Open in Google Maps instead" : "أو افتحها في خرائط Google"}
         </a>

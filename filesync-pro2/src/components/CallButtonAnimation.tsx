@@ -115,7 +115,7 @@ export const CallButtonAnimation: React.FC<CallButtonAnimationProps> = ({
 
       {/* Step A -> B -> C -> D: The animated call button */}
       <div
-        className="absolute flex items-center justify-center rounded-2xl bg-[#6c3a1c] text-white shadow-xl"
+        className="absolute flex items-center justify-center rounded-2xl bg-[#7d3a22] text-white shadow-xl"
         style={{
           left: 0,
           top: 0,

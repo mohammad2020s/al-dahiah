@@ -123,17 +123,17 @@ export function PrayerTimes({ language = "ar", onAsk }: { language?: Language; o
   const left = next === prayers[0] && times.fajr <= now.h ? times.fajr + 24 - now.h : times[next.key] - now.h;
 
   return (
-    <div className="overflow-hidden rounded-[1.7rem] border border-[#e6d5bd] bg-white/95 p-4 shadow-sm backdrop-blur">
+    <div className="overflow-hidden rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 shadow-sm backdrop-blur">
       <div className="flex items-center justify-between">
-        <span className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
-          <Clock className="size-4 text-[#94532d]" />
+        <span className="flex items-center gap-1.5 text-xs font-bold text-[#3f2a22]">
+          <Clock className="size-4 text-[#a5492a]" />
           {en ? "Prayer times in Al-Qasab" : "أوقات الصلاة في القْصَب"}
         </span>
-        <span className="rounded-full border border-[#e4d2ba] bg-[#f3ebdf] px-2 py-0.5 text-[11px] font-bold text-[#94532d]">
+        <span className="rounded-full border border-[#e4d0ba] bg-[#f2e9dd] px-2 py-0.5 text-[11px] font-bold text-[#a5492a]">
           {en ? "Umm Al-Qura" : "تقويم أم القرى"}
         </span>
       </div>
-      <div className="mt-3 rounded-2xl bg-gradient-to-l from-[#6c3a1c] to-[#94532d] px-3 py-2.5 text-white">
+      <div className="mt-3 rounded-2xl bg-gradient-to-l from-[#7d3a22] to-[#a5492a] px-3 py-2.5 text-white">
         <p className="text-[11px] text-white/80">{en ? "Next prayer" : "الصلاة الجاية"}</p>
         <p className="text-base font-bold">
           {en ? next.en : next.ar}{en ? " · " : "، "}{fmtClock(times[next.key], en)}
@@ -145,19 +145,19 @@ export function PrayerTimes({ language = "ar", onAsk }: { language?: Language; o
           <div
             key={key}
             className={`rounded-xl border px-1.5 py-1.5 text-center ${
-              key === next.key ? "border-[#94532d] bg-[#faf4ea]" : "border-[#ede0cb] bg-white"
+              key === next.key ? "border-[#a5492a] bg-[#fbf6ee]" : "border-[#ebdfce] bg-white"
             }`}
           >
-            <Icon className="mx-auto size-3.5 text-[#94532d]" />
-            <p className="mt-0.5 text-[11px] font-bold text-[#584535]">{en ? enName : ar}</p>
-            <p className="text-[11px] font-bold tabular-nums text-[#3a2a1c]">{fmtClock(times[key], en)}</p>
+            <Icon className="mx-auto size-3.5 text-[#a5492a]" />
+            <p className="mt-0.5 text-[11px] font-bold text-[#5d4437]">{en ? enName : ar}</p>
+            <p className="text-[11px] font-bold tabular-nums text-[#3f2a22]">{fmtClock(times[key], en)}</p>
           </div>
         ))}
       </div>
       <button
         type="button"
         onClick={() => onAsk?.(en ? "Where is the nearest mosque?" : "وين أقرب مسجد؟")}
-        className="mt-2.5 w-full rounded-xl border border-[#94532d] bg-white px-3 py-2 text-xs font-bold text-[#94532d] transition hover:bg-[#faf4ea] active:scale-[0.98]"
+        className="mt-2.5 w-full rounded-xl border border-[#a5492a] bg-white px-3 py-2 text-xs font-bold text-[#a5492a] transition hover:bg-[#fbf6ee] active:scale-[0.98]"
       >
         {en ? "Nearest mosque" : "وين أقرب مسجد؟"}
       </button>

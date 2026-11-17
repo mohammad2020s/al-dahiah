@@ -15,7 +15,7 @@ function TicketLink({ isEn }: { isEn: boolean }) {
       href={TICKETS_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#B2512F] bg-white px-3 py-2 text-xs font-bold text-[#B2512F] hover:bg-[#f3ebdf] active:scale-[0.98] transition"
+      className="relative mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#b04e2c] bg-white px-3 py-2 text-xs font-bold text-[#b04e2c] hover:bg-[#f2e9dd] active:scale-[0.98] transition"
     >
       <Ticket className="size-4" />
       {isEn ? "Get your free ticket" : "سجّل واحصل على تذكرتك المجانية"}
@@ -44,17 +44,17 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
   if (left <= 0) {
     return (
       <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
-        <div className="flex items-center gap-2 text-sm font-bold text-[#5c331b]">
+        <div className="flex items-center gap-2 text-sm font-bold text-[#6a3420]">
           <PartyPopper className="size-5 text-amber-600" />
           {isEn ? "Al-Qasab Salt Season is on now!" : "موسم ملح القْصَب انطلق، حيّاكم!"}
         </div>
         <button
           onClick={() => onAsk(isEn ? "What's on at the Salt Season?" : "وش فعاليات موسم الملح؟")}
-          className="mt-3 w-full rounded-xl bg-[#94532d] px-3 py-2 text-xs font-bold text-white hover:bg-[#78411f] active:scale-[0.98] transition"
+          className="mt-3 w-full rounded-xl bg-[#a5492a] px-3 py-2 text-xs font-bold text-white hover:bg-[#86391f] active:scale-[0.98] transition"
         >
           {isEn ? "What's on?" : "وش فيه بالموسم؟"}
         </button>
-        <p className="mt-2 text-center text-[11px] font-medium text-[#786450]">
+        <p className="mt-2 text-center text-[11px] font-medium text-[#85695a]">
           {isEn ? "Daily 4:00–11:00 pm until 28 November · free entry" : "يومياً من ٤ العصر إلى ١١ الليل حتى ٢٨ نوفمبر، والدخول مجاني"}
         </p>
         <TicketLink isEn={isEn} />
@@ -71,7 +71,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
   ];
 
   return (
-    <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-[#e4d2ba] bg-white p-4 shadow-sm">
+    <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-[#e4d0ba] bg-white p-4 shadow-sm">
       {/* Salt crystals drifting in the background */}
       <div className="sc-salt pointer-events-none absolute inset-0" aria-hidden="true" />
       {/* Contour pattern from the «ملح القصب» brand identity */}
@@ -82,11 +82,11 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
       />
       <div className="relative flex items-center justify-between gap-3">
         <div>
-          <span className="flex items-center gap-1.5 text-xs font-bold text-[#3a2a1c]">
-            <CalendarDays className="size-4 text-[#B2512F]" />
+          <span className="flex items-center gap-1.5 text-xs font-bold text-[#3f2a22]">
+            <CalendarDays className="size-4 text-[#b04e2c]" />
             {isEn ? "Salt Season countdown" : "باقي على موسم ملح القْصَب"}
           </span>
-          <span className="mt-1 inline-block rounded-full border border-[#e4d2ba] bg-[#f3ebdf] px-2 py-0.5 text-[11px] font-bold text-[#B2512F]">
+          <span className="mt-1 inline-block rounded-full border border-[#e4d0ba] bg-[#f2e9dd] px-2 py-0.5 text-[11px] font-bold text-[#b04e2c]">
             {isEn ? "4th edition · official" : "النسخة الرابعة · رسمي"}
           </span>
         </div>
@@ -94,13 +94,13 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
       </div>
       <div className="relative mt-3 grid grid-cols-4 gap-1.5" dir={isEn ? "ltr" : "rtl"}>
         {units.map(([value, ar, en]) => (
-          <div key={en} className="rounded-2xl bg-gradient-to-b from-[#b07a4f] to-[#7a4322] px-1 py-2 text-center text-white shadow-sm">
+          <div key={en} className="rounded-2xl bg-gradient-to-b from-[#b2664d] to-[#7c3720] px-1 py-2 text-center text-white shadow-sm">
             <span key={value} className="sc-tick block text-xl font-bold leading-none tabular-nums">{num(value)}</span>
             <span className="mt-1 block text-[11px] text-white/80">{isEn ? en : ar}</span>
           </div>
         ))}
       </div>
-      <p className="relative mt-2.5 text-center text-[11px] font-medium text-[#786450]">
+      <p className="relative mt-2.5 text-center text-[11px] font-medium text-[#85695a]">
         {isEn ? `19–28 November 2026 · daily 4:00–11:00 pm · free entry` : `من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً ٤ العصر إلى ١١ الليل، والدخول مجاني`}
       </p>
       <TicketLink isEn={isEn} />
