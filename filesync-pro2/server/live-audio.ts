@@ -269,7 +269,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     // Only with a paid key: the free speech quota runs out after a few calls a day, and every answer
     // then waits for it to fail before playing (slow). LIVE_TTS=on forces it, =off turns it off.
     const readMyText =
-      lang === "ar" && process.env.LIVE_TTS !== "off" && (process.env.LIVE_TTS === "on" || !!process.env.GEMINI_PAID_API_KEY);
+      lang === "ar" && process.env.LIVE_TTS !== "off" && (process.env.LIVE_TTS === "on" || !!process.env.GEMINI_PAID_API_KEY) && !exp.has("own");
     const toClient = (obj: any) => { if (clientWs.isOpen()) clientWs.send(JSON.stringify(obj)); };
     // spoken: characters handed to TTS so far; failAt: where the first refused piece starts (-1 = none)
     type Turn = { gen: number; pending: string; first: boolean; liveAudio: string[]; sent: boolean; failed: boolean; spoken: number; failAt: number };
