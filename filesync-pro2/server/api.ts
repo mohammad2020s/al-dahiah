@@ -675,7 +675,12 @@ apiRouter.post("/pron-test", async (req: Request, res: Response) => {
       const r = await ai.models.generateContent({
         model: ttsModel,
         contents: [{ parts: [{ text: prompt }] }],
-        config: { responseModalities: [Modality.AUDIO], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } } },
+        config: {
+          responseModalities: [Modality.AUDIO],
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } },
+          ...(typeof req.body?.temperature === "number" ? { temperature: req.body.temperature } : {}),
+          ...(typeof req.body?.seed === "number" ? { seed: req.body.seed } : {}),
+        },
       });
       const part: any = r.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData?.data);
       if (!part) { out.push({ text, error: "no audio" }); continue; }
