@@ -587,7 +587,9 @@ export function buildSpeechPrompt(transcript: string): string {
   return [
     "Read ONLY the transcript below, word for word, exactly as it is written and vowelled. Never read these notes.",
     "### DIRECTOR'S NOTES",
-    "Voice: a lively, warm old man from Najd (central Saudi Arabia), smiling and genuinely interested in the listener. Najdi Arabic, natural brisk pace, never sleepy, never Egyptian. In القَصَبْ and مَرْقَب the ق is a deep classical Q, never G.",
+    // Tested 17 Nov (7 owner words, listener check): naming Najd/Najdi made the voice say every ق as
+    // «گ» whatever the notes said; a neutral voice line + this positive ق line got all 7 words right.
+    "Voice: a lively, warm old Arab man, smiling and genuinely interested in the listener, natural brisk pace, never sleepy, never Egyptian. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in القَصَبْ and مَرقَب.",
     "#### TRANSCRIPT",
     transcript,
   ].join("\n");
@@ -631,7 +633,15 @@ export const pcmSeconds = (buf: Buffer) => toPcm(buf).length / 48000;
  * clean «qaSab» 8 times out of 8 in owner tests. Only what the voice reads changes; the written name
  * stays «القْصَبْ».
  */
-export const ttsSpelling = (text: string) => text.replace(/قْصَبْ/g, "قَصَبْ");
+export const ttsSpelling = (text: string) => {
+  const M = "[\\u064B-\\u0652\\u0670]*";
+  return text
+    .replace(/قْصَبْ/g, "قَصَبْ")
+    // «الصْبَخَة» was read «الصَّبْخة» (doubled ص); «إصبَخَة» came out «إصْ-بَ-خَة» 4 times out of 4
+    .replace(new RegExp(`(?<![\\p{L}\\p{M}])([وفبكل]${M})?(?:ا${M})?ل${M}ص${M}ب${M}خ${M}[ةه]${M}(?![\\p{L}\\p{M}])`, "gu"), (_m, pre?: string) => `${pre ? pre.replace(/[\u064B-\u0652]/g, "") : ""}إصبَخَة`)
+    // «مَرْقَب» was read «مرگب»; «مَرقَب» (no sukun on ر) kept the deep ق
+    .replace(new RegExp(`(?<![\\p{L}\\p{M}])((?:[وفبكل]${M})?(?:ا${M}ل${M})?)م${M}ر${M}ق${M}ب${M}(?![\\p{L}\\p{M}])`, "gu"), (_m, pre: string) => `${pre}مَرقَب`);
+};
 
 /** Longest believable reading of `text` (anything longer = the model read the notes too). */
 export const maxSpeechSeconds = (text: string) => 4 + text.replace(/[\u064B-\u0670\s]/g, "").length * 0.35;
@@ -660,7 +670,7 @@ apiRouter.post("/pron-test", async (req: Request, res: Response) => {
   for (const text of texts) {
     try {
       // The same text the call voice reads (owner spellings + taught words), unless raw
-      const spoken = raw ? text : speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(najdify(text))));
+      const spoken = raw ? text : ttsSpelling(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(najdify(text)))));
       const prompt = raw ? text : buildSpeechPrompt(spoken);
       const r = await ai.models.generateContent({
         model: ttsModel,
