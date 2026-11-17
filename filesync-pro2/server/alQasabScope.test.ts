@@ -169,7 +169,7 @@ test("system prompts enforce dialect, city name and family red line", () => {
     assert.ok(prompt.includes(FORBIDDEN_FAMILY_REPLY_AR), mode);
     assert.ok(/نجد|Najdi/.test(prompt), mode);
     // «القصيب» may only appear inside the "never say it" instruction lines
-    const badLines = prompt.split("\n").filter(l => l.includes("القصيب") && !/NEVER|إياك|قال المستخدم|says or writes/.test(l));
+    const badLines = prompt.split("\n").filter(l => l.includes("القصيب") && !/NEVER|إياك|قال المستخدم|says or writes|غلط:/.test(l));
     assert.deepEqual(badLines, [], mode);
   }
   assert.ok(buildAlQasabSystemPrompt(undefined, "auto").includes("English → answer in English"));

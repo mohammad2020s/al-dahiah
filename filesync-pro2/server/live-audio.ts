@@ -210,7 +210,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           responseModalities: ["AUDIO"],
           // Calmer sampling: names come out the same way every time
           // Low: the same words and the same accent every call
-          temperature: 0.45,
+          temperature: 0.3, // lower: the owner's spellings come out the same way more often
           // (thinkingConfig budget 0 / level minimal: both refused by gemini-3.8-live, tested 16 Nov)
           speechConfig: {
             voiceConfig: {
@@ -271,7 +271,11 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     // Only with a paid key: the free speech quota runs out after a few calls a day, and every answer
     // then waits for it to fail before playing (slow). LIVE_TTS=on forces it, =off turns it off.
     const readMyText =
-      lang === "ar" && process.env.LIVE_TTS !== "off" && (process.env.LIVE_TTS === "on" || !!process.env.GEMINI_PAID_API_KEY) && !exp.has("own");
+      // Off by default since 17 Nov: the call model sends its text at speaking pace and each sentence
+      // then took 2–3 s to read, so the guide stopped and started; the reading voice is also capped
+      // at 10 a minute / 100 a day. Own voice = continuous, ~1 s to start, no cap. LIVE_TTS=on (or
+      // the owner's ?exp=tts) brings the reading voice back.
+      lang === "ar" && (process.env.LIVE_TTS === "on" || exp.has("tts"));
     const toClient = (obj: any) => { if (clientWs.isOpen()) clientWs.send(JSON.stringify(obj)); };
     // spoken: characters handed to TTS so far; failAt: where the first refused piece starts (-1 = none)
     type Turn = { gen: number; pending: string; first: boolean; pieces: number; liveAudio: string[]; sent: boolean; failed: boolean; spoken: number; failAt: number };
@@ -497,10 +501,10 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           }
         }
         logSpokenNames(text);
-        // Every 3 answers, the owner's rule is put in front of the voice again (silent, no reply)
+        // After every answer, the owner's pronunciation rules go in front of the voice again (silent, no reply)
         if (lang === "ar" && text.includes('"turnComplete"')) {
           answers++;
-          if (answers % 3 === 0 && ws.isOpen()) {
+          if (ws.isOpen()) { // before every answer: the rules stay fresh in a long call
             ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm("(تذكير من صاحب الموقع، لا ترد عليه ولا تذكره، بس طبّقه في الرد الجاي): " + ownerCommandAr(), speakableTownName) }] }], turnComplete: false } }));
           }
         }
