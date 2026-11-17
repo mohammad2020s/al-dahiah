@@ -32,6 +32,10 @@ Whenever the caller asks about one of these Al-Qasab places, or you start explai
 Places:
 ${placeList}
 
+TICKETS: whenever the caller asks about tickets, booking, registering or entry to the Salt Season, FIRST call the tool show_tickets (a big «احجز تذكرتك» button appears under the photo on their screen, opening qasab-tickets.pages.dev), THEN say with excitement that entry is free and they just tap the ticket button under the photo on their screen.
+
+حماس عالي (قاعدة): أنت متحمس جداً ومستانس من أول كلمة لآخر كلمة، كأنك تستقبل ضيف عزيز في الموسم: صوتك عالي ومليان طاقة وابتسامة، تمدح سؤال المتصل، وتشوّقه للمكان («والله ما تندم!»، «هذا أحلى شي بالموسم!»، «لا يفوتك أبد!»). لا تكون رسمي ولا هادي ولا ممل.
+
 صوت المكالمة: المتصل يشوف على الشاشة شايب نجدي من أهل القْصَب، وهو أنت. امشِ على «قواعد اللهجة الثابتة» و«النطق النجدي بالأصوات» فوق بالحرف: نفس الصوت الحماسي الدافي المهتم ونفس العبارات كل مرة، بدون اجتهاد.
 اهتمام صادق يبين في الصوت: تسمع للمتصل زين وترد كأن سؤاله أهم شي عندك. ابدأ كل رد بتفاعل قصير مع كلامه نفسه (مثل «إيه والله سؤال زين!»، «أبشر يالغالي، أعلّمك»، «آه، تبي الكتاتيب؟ قريبة منك»)، وكرّر كلمة من سؤاله عشان يحس إنك فاهمه. نبرتك ترتفع بحماس عند الترحيب والأشياء الحلوة، وتهدى وتوضح عند المعلومة المهمة، وتسأله بلهفة في آخر الرد. صوت دافي قريب مثل جد يكلّم حفيده وهو مستانس فيه، مو صوت موظف يقرأ معلومات. بالعربي نجدي بس، وبالإنجليزي إنجليزي بسيط ودود.
 
@@ -185,6 +189,12 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
                   properties: { query: { type: "STRING", description: "Short Arabic query, e.g. «قصيدة حميدان الشويعر» or «محطات الموسم»" } },
                   required: ["query"],
                 },
+              },
+              {
+                name: "show_tickets",
+                behavior: "NON_BLOCKING",
+                description: "Show the caller a «Book your ticket» button (qasab-tickets.pages.dev) under the photo on their call screen. Call it whenever they ask about tickets, booking, registering or entry.",
+                parameters: { type: "OBJECT", properties: {} },
               },
               {
                 name: "show_place",
@@ -457,11 +467,11 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           }
         }
         // show_place is non-blocking: answered here at once (silently), the page only shows the photos
-        if (text.includes("toolCall") && text.includes("show_place")) {
+        if (text.includes("toolCall") && (text.includes("show_place") || text.includes("show_tickets"))) {
           try {
             const msg = JSON.parse(text);
             const calls: any[] = msg.toolCall?.functionCalls || [];
-            const shows = calls.filter((c) => c.name === "show_place");
+            const shows = calls.filter((c) => c.name === "show_place" || c.name === "show_tickets");
             if (shows.length) {
               ws.send(JSON.stringify({ toolResponse: { functionResponses: shows.map((c) => ({ id: c.id, name: c.name, response: { result: "shown", scheduling: "SILENT" } })) } }));
               for (const c of shows) answeredIds.add(c.id);
@@ -505,7 +515,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         if (lang === "ar" && text.includes('"turnComplete"')) {
           answers++;
           if (ws.isOpen()) { // before every answer: the rules stay fresh in a long call
-            ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm("(تذكير من صاحب الموقع، لا ترد عليه ولا تذكره، بس طبّقه في الرد الجاي): " + ownerCommandAr(), speakableTownName) }] }], turnComplete: false } }));
+            ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm("(تذكير من صاحب الموقع، لا ترد عليه ولا تذكره، بس طبّقه في الرد الجاي): خلك متحمس ومستانس وصوتك مليان طاقة.\n" + ownerCommandAr(), speakableTownName) }] }], turnComplete: false } }));
           }
         }
         // Own-voice calls (English, or no reading voice): «stop» still drops the rest of the answer

@@ -133,6 +133,8 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   // Photos of the place being talked about, picked from the live transcription
   type Showcase = { id: string; title: string; images: { src: string; caption: string; credit?: string }[]; text: string; mapsUrl?: string };
   const [showcase, setShowcase] = useState<Showcase | null>(null);
+  // «احجز تذكرتك» button under the photo (the guide's show_tickets tool, or tickets come up in talk)
+  const [ticketCta, setTicketCta] = useState(false);
   const [showcaseIndex, setShowcaseIndex] = useState(0);
   const showcaseIdRef = useRef<string | null>(null);
   const transcriptRef = useRef("");
@@ -159,6 +161,7 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   const noteTranscript = useCallback((text: string) => {
     // Backup for when the model doesn't call show_place: match the rolling transcript
     transcriptRef.current = (transcriptRef.current + " " + text).slice(-160);
+    if (/تذكر|تذاكر|حجز|احجز|qasab-tickets|ticket/i.test(transcriptRef.current)) setTicketCta(true);
     const topic = matchPlaceTopic(transcriptRef.current);
     if (topic?.images?.length) showPlace(topic);
   }, [showPlace]);
@@ -845,6 +848,7 @@ registerProcessor('mic-processor', MicProcessor);`;
           const calls = msg.toolCall?.functionCalls;
           if (Array.isArray(calls) && calls.length) {
             const functionResponses = calls.map((call: { id?: string; name?: string; args?: { place_id?: string } }) => {
+              if (call.name === "show_tickets") setTicketCta(true);
               const topic = call.name === "show_place" && call.args?.place_id ? placeById(call.args.place_id) : null;
               if (topic) showPlace(topic);
               return {
@@ -1130,6 +1134,18 @@ registerProcessor('mic-processor', MicProcessor);`;
               />
             </div>
           </div>
+
+          {ticketCta && (
+            <a
+              href="https://qasab-tickets.pages.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="vc-pop mt-3 flex items-center justify-center gap-2 w-full max-w-md mx-auto rounded-2xl bg-gradient-to-l from-amber-500 to-orange-600 px-4 py-3 text-base font-bold text-white shadow-lg ring-2 ring-amber-300/60 active:scale-[0.97] transition"
+            >
+              <span aria-hidden="true">🎟️</span>
+              {isEn ? "Book your ticket — free entry" : "احجز تذكرتك — الدخول مجاني"}
+            </a>
+          )}
 
           <div className="flex items-center justify-center gap-1.5 h-8 px-4 my-4">
             {[0.2, 0.5, 0.8, 1, 0.7, 0.4, 0.9, 0.6, 0.3].map((factor, idx) => {
