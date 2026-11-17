@@ -227,10 +227,9 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           automaticActivityDetection: {
             // LOW start: steady car/street noise doesn't count as the caller talking.
             // HIGH end + 450 ms: answers as soon as the caller stops (the page also mutes pure noise).
-            // The page already turns background noise into silence (and keeps the guide's own voice
-            // out), so start can be sensitive: the caller's first word is caught at once, and 400 ms
-            // of quiet ends the turn.
-            startOfSpeechSensitivity: "START_SENSITIVITY_HIGH",
+            // LOW start: a noise burst that slips past the page's gate must not count as the caller
+            // talking (that stops the answer being written). 400 ms of quiet ends the caller's turn.
+            startOfSpeechSensitivity: "START_SENSITIVITY_LOW",
             endOfSpeechSensitivity: "END_SENSITIVITY_HIGH",
             prefixPaddingMs: 150,
             silenceDurationMs: 400
@@ -275,17 +274,15 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
       lang === "ar" && process.env.LIVE_TTS !== "off" && (process.env.LIVE_TTS === "on" || !!process.env.GEMINI_PAID_API_KEY) && !exp.has("own");
     const toClient = (obj: any) => { if (clientWs.isOpen()) clientWs.send(JSON.stringify(obj)); };
     // spoken: characters handed to TTS so far; failAt: where the first refused piece starts (-1 = none)
-    type Turn = { gen: number; pending: string; first: boolean; liveAudio: string[]; sent: boolean; failed: boolean; spoken: number; failAt: number };
+    type Turn = { gen: number; pending: string; first: boolean; pieces: number; liveAudio: string[]; sent: boolean; failed: boolean; spoken: number; failAt: number };
     let gen = 0;
-    const newTurn = (): Turn => ({ gen, pending: "", first: true, liveAudio: [], sent: false, failed: false, spoken: 0, failAt: -1 });
+    const newTurn = (): Turn => ({ gen, pending: "", first: true, pieces: 0, liveAudio: [], sent: false, failed: false, spoken: 0, failAt: -1 });
     let turn = newTurn();
     let turnPassthrough = false; // this answer is played in the model's own voice (no TTS quota left)
     let chain: Promise<void> = Promise.resolve(); // keeps the spoken sentences in order
     let playUntil = 0; // when the audio already sent will have finished playing
-    let heardWords = 0; // words the caller said over the guide while he is talking
-    let playStartedAt = 0; // when the current stretch of guide audio began
+    let callerSpokeAfterTurn = false; // the caller said words since the guide's last answer ended
     const sendPcm = (pcm: Buffer) => {
-      if (playUntil < Date.now()) { playStartedAt = Date.now(); heardWords = 0; }
       for (let i = 0; i < pcm.length; i += 24000) {
         toClient({ serverContent: { modelTurn: { parts: [{ inlineData: { mimeType: "audio/pcm;rate=24000", data: pcm.subarray(i, i + 24000).toString("base64") } }] } } });
       }
@@ -339,17 +336,19 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         // First piece and still no comma after a few words: send them now, the voice starts sooner
         if (t.first && t.pending.length >= 24) {
           const sp = t.pending.lastIndexOf(" ");
-          if (sp >= 12) { speakSegment(t, t.pending.slice(0, sp)); t.pending = t.pending.slice(sp); t.first = false; }
+          if (sp >= 12) { speakSegment(t, t.pending.slice(0, sp)); t.pending = t.pending.slice(sp); t.first = false; t.pieces++; }
         }
         return;
       }
       const cut = m[m.length - 1].index! + 1;
       // First piece short (the voice starts fast), then bigger pieces: every piece is one TTS request,
       // and the paid key allows 10 a minute / 100 a day per voice model
-      if (cut < (t.first ? 8 : 170)) return;
+      // 1st piece tiny (starts fast), 2nd medium (ready before the 1st ends), then big (TTS quota)
+      if (cut < (t.first ? 8 : t.pieces < 2 ? 60 : 170)) return;
       speakSegment(t, t.pending.slice(0, cut));
       t.pending = t.pending.slice(cut);
       t.first = false;
+      t.pieces++;
     };
     // Returns the message to pass on to the page (or null), after taking the model's own audio out
     const reshape = (msg: any): any | null => {
@@ -368,14 +367,16 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         if (sc.turnComplete) turnPassthrough = false;
         return msg;
       }
-      // Only real words stop the guide (2+ words): a cough, a car horn or a stray «آه» doesn't
-      // (counted only once the guide has been talking 1 s: the tail of the question can arrive late)
-      if (Date.now() < playUntil && Date.now() - playStartedAt > 1000) {
-        heardWords += (sc.inputTranscription?.text || "").replace(/[^\p{L}\s]/gu, " ").split(/\s+/).filter((w: string) => w.length >= 2).length;
+      // The caller said something after the last answer ended (words, not just noise)
+      if ((sc.inputTranscription?.text || "").replace(/[^\p{L}\s]/gu, " ").split(/\s+/).some((w: string) => w.length >= 2)) {
+        callerSpokeAfterTurn = true;
       }
-      if (heardWords >= 2 && Date.now() < playUntil) {
-        heardWords = 0;
-        // the caller talks over the guide: stop what is still playing or queued
+      // The caller asked something new while the guide is still talking: the old answer stops when
+      // the new one begins. (Words heard while he talks no longer stop him on their own: the late
+      // transcript of the caller's own «السلام عليكم» used to cut his greeting off after 3 words.)
+      const newAnswerStarts = turn.first && !turn.pending && turn.liveAudio.length === 0 && (sc.modelTurn || sc.outputTranscription);
+      if (newAnswerStarts && callerSpokeAfterTurn && Date.now() < playUntil) {
+        callerSpokeAfterTurn = false;
         gen++; turn = newTurn(); playUntil = 0;
         toClient({ serverContent: { interrupted: true } });
       }
@@ -393,6 +394,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         const t = turn;
         takeSentences(t, true);
         turn = newTurn();
+        callerSpokeAfterTurn = false;
         delete sc.turnComplete;
         chain = chain.then(() => {
           if (t.gen !== gen || clientGone) return;
