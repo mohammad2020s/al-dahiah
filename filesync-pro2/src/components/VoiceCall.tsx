@@ -446,6 +446,15 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
     }, prefersReducedMotion() ? 0 : 440);
   }, [closingVia, fire, onClose]);
 
+  // Stop the guide mid-answer (big button): silence here at once, and the server drops the rest
+  const stopGuide = useCallback(() => {
+    stopAllPlayback();
+    updateGeminiSpeaking(false);
+    guideStoppedAtRef.current = 0; // the caller may talk right away, no echo grace period
+    if (wsRef.current?.readyState === WebSocket.OPEN) wsRef.current.send(JSON.stringify({ stop_guide: true }));
+    setStatus("listening");
+  }, [stopAllPlayback, updateGeminiSpeaking]);
+
   const toggleMute = useCallback(() => {
     fire("mic");
     setIsMuted((prev) => !prev);
@@ -1253,7 +1262,10 @@ registerProcessor('mic-processor', MicProcessor);`;
               const r = e.currentTarget.getBoundingClientRect();
               setRipple({ x: `${e.clientX - r.left}px`, y: `${e.clientY - r.top}px` });
               fire("main");
-              toggleMute();
+              // The big button never mutes (visitors pressed it to talk and muted themselves):
+              // muted → mic back on; guide talking → stop him so the caller can talk; else nothing.
+              if (isMuted) toggleMute();
+              else if (isGeminiSpeakingRef.current) stopGuide();
             }}
             className={`relative overflow-hidden flex-1 py-3 sm:py-4 px-4 min-h-[48px] rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-md select-none flex items-center justify-center active:scale-[0.97] ${
               isMuted
@@ -1270,14 +1282,19 @@ registerProcessor('mic-processor', MicProcessor);`;
               {isMuted ? (
                 <>
                   <MicOff className={`size-4 sm:size-5 ${isEn ? "mr-1.5" : "ml-1.5"}`} />
-                  {isEn ? "Unmute Live Mic" : "إلغاء كتم المايك"}
+                  {isEn ? "Tap to turn the mic on" : "اضغط لتشغيل المايك"}
+                </>
+              ) : isGeminiSpeaking ? (
+                <>
+                  <Mic className={`size-4 sm:size-5 ${isEn ? "mr-1.5" : "ml-1.5"}`} />
+                  {isEn ? "Tap to stop him and talk" : "اضغط لإيقافه وتكلّم"}
                 </>
               ) : (
                 <>
                   <Mic className={`size-4 sm:size-5 ${isEn ? "mr-1.5" : "ml-1.5"} ${status === "user_speaking" ? "animate-pulse" : ""}`} />
                   {isEn
-                    ? status === "user_speaking" ? "Transmitting Speech..." : "Live Microphone Active"
-                    : status === "user_speaking" ? "جاري الإرسال المباشر..." : "المايك المباشر نشط"}
+                    ? status === "user_speaking" ? "Listening..." : "Talk, I'm listening"
+                    : status === "user_speaking" ? "أسمعك…" : "تكلّم، أنا أسمعك"}
                 </>
               )}
             </span>

@@ -282,6 +282,8 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     let chain: Promise<void> = Promise.resolve(); // keeps the spoken sentences in order
     let playUntil = 0; // when the audio already sent will have finished playing
     let callerSpokeAfterTurn = false; // the caller said words since the guide's last answer ended
+    let geminiTurnOpen = false; // the model is still sending the current answer
+    let dropTurn = false; // the caller pressed «stop»: ignore the rest of the answer being sent
     const sendPcm = (pcm: Buffer) => {
       for (let i = 0; i < pcm.length; i += 24000) {
         toClient({ serverContent: { modelTurn: { parts: [{ inlineData: { mimeType: "audio/pcm;rate=24000", data: pcm.subarray(i, i + 24000).toString("base64") } }] } } });
@@ -354,6 +356,18 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     const reshape = (msg: any): any | null => {
       const sc = msg?.serverContent;
       if (!sc) return msg;
+      if (sc.modelTurn || sc.outputTranscription) geminiTurnOpen = true;
+      if (sc.turnComplete || sc.interrupted) geminiTurnOpen = false;
+      if (dropTurn) {
+        // The rest of a stopped answer: no audio, no text to speak; the turn end still goes through
+        if (sc.modelTurn?.parts) {
+          const rest = sc.modelTurn.parts.filter((p: any) => !p.inlineData?.data);
+          if (rest.length) sc.modelTurn.parts = rest; else delete sc.modelTurn;
+        }
+        delete sc.outputTranscription;
+        if (sc.turnComplete || sc.interrupted) { dropTurn = false; turn = newTurn(); }
+        return Object.keys(sc).length ? msg : null;
+      }
       if (sc.interrupted) {
         gen++; turn = newTurn(); playUntil = 0;
         turnPassthrough = false;
@@ -490,6 +504,25 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
             ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm("(تذكير من صاحب الموقع، لا ترد عليه ولا تذكره، بس طبّقه في الرد الجاي): " + ownerCommandAr(), speakableTownName) }] }], turnComplete: false } }));
           }
         }
+        // Own-voice calls (English, or no reading voice): «stop» still drops the rest of the answer
+        if (!readMyText && text.includes("serverContent")) {
+          try {
+            const msg = JSON.parse(text);
+            const sc = msg.serverContent;
+            if (sc.modelTurn || sc.outputTranscription) geminiTurnOpen = true;
+            if (sc.turnComplete || sc.interrupted) geminiTurnOpen = false;
+            if (dropTurn) {
+              if (sc.turnComplete || sc.interrupted) dropTurn = false;
+              if (sc.modelTurn?.parts) {
+                const rest = sc.modelTurn.parts.filter((p: any) => !p.inlineData?.data);
+                if (rest.length) sc.modelTurn.parts = rest; else delete sc.modelTurn;
+              }
+              delete sc.outputTranscription;
+              if (Object.keys(sc).length && clientWs.isOpen()) clientWs.send(JSON.stringify(msg));
+              return;
+            }
+          } catch {}
+        }
         if (readMyText && text.includes("serverContent")) {
           try {
             const out = reshape(JSON.parse(text));
@@ -530,6 +563,13 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
       if (!geminiWs.isOpen()) return;
       let text = raw;
       {
+        // «Stop» pressed on the page: drop what is queued and the rest of the answer, keep listening
+        if (text.includes('"stop_guide"')) {
+          gen++; turn = newTurn(); playUntil = 0; turnPassthrough = false;
+          dropTurn = geminiTurnOpen;
+          callerSpokeAfterTurn = false;
+          return;
+        }
         // The page still answers show_place (older pages): those ids were answered already, drop them
         if (answeredIds.size && text.includes('"toolResponse"')) {
           try {
