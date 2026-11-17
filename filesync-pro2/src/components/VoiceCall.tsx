@@ -103,6 +103,7 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   const isMutedRef = useRef<boolean>(false);
   const isSessionActiveRef = useRef<boolean>(false);
   const isGeminiSpeakingRef = useRef<boolean>(false);
+  const guideStoppedAtRef = useRef<number>(0); // when the guide's voice last went quiet (noise gate)
   const [isGeminiSpeaking, setIsGeminiSpeaking] = useState<boolean>(false);
   const turnCooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -234,6 +235,7 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   }, [isMuted]);
 
   const updateGeminiSpeaking = useCallback((speaking: boolean) => {
+    if (isGeminiSpeakingRef.current && !speaking) guideStoppedAtRef.current = Date.now();
     isGeminiSpeakingRef.current = speaking;
     // Mirror into state so the memoji re-renders (and closes its mouth) when speech ends
     setIsGeminiSpeaking(speaking);
@@ -656,7 +658,12 @@ registerProcessor('mic-processor', MicProcessor);`;
       let warmChunks = 0;
       let hangover = 0;
       let held: Uint8Array | null = null; // the chunk before speech starts (word onsets)
-      const SPEECH_RATIO = 2.0, MIN_SPEECH_RMS = 0.006, HANGOVER_CHUNKS = 6;
+      // Caller's turn: sensitive (1.8× the noise), so a voice gets through even in a noisy car.
+      // While the guide talks: only clearly louder speech held for 300 ms gets through (that is the
+      // caller interrupting him); noise and the guide's own echo never cut him off.
+      const SPEECH_RATIO = 1.8, MIN_SPEECH_RMS = 0.005, HANGOVER_CHUNKS = 6;
+      const BARGE_RATIO = 3.5, BARGE_CHUNKS = 3;
+      let strongRun = 0;
       // The level is measured above ~300 Hz only: car and road noise is mostly low rumble, voices
       // are not (tested on a recording made in a car: speech and pauses separate cleanly).
       const hpA = (() => { const rc = 1 / (2 * Math.PI * 300), dt = 1 / captureCtx.sampleRate; return rc / (rc + dt); })();
@@ -721,7 +728,12 @@ registerProcessor('mic-processor', MicProcessor);`;
         if (warmChunks < 5) { noiseFloor = warmChunks === 0 ? level : Math.min(noiseFloor, level) * 0.5 + level * 0.5; warmChunks++; }
         else if (level < noiseFloor) noiseFloor = noiseFloor * 0.7 + level * 0.3;
         else noiseFloor = noiseFloor * 0.996 + Math.min(level, noiseFloor * SPEECH_RATIO) * 0.004;
-        const isSpeech = warmChunks >= 5 && level > Math.max(MIN_SPEECH_RMS, noiseFloor * SPEECH_RATIO);
+        const guideTalking = isGeminiSpeakingRef.current || Date.now() - guideStoppedAtRef.current < 400;
+        const strong = warmChunks >= 5 && level > Math.max(MIN_SPEECH_RMS * 2, noiseFloor * BARGE_RATIO);
+        strongRun = strong ? strongRun + 1 : 0;
+        const isSpeech = guideTalking
+          ? strongRun >= BARGE_CHUNKS
+          : warmChunks >= 5 && level > Math.max(MIN_SPEECH_RMS, noiseFloor * SPEECH_RATIO);
 
         if (isSpeech) {
           if (hangover === 0 && held) sendPcm16(held); // the moment just before the first word

@@ -227,10 +227,13 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           automaticActivityDetection: {
             // LOW start: steady car/street noise doesn't count as the caller talking.
             // HIGH end + 450 ms: answers as soon as the caller stops (the page also mutes pure noise).
-            startOfSpeechSensitivity: "START_SENSITIVITY_LOW",
+            // The page already turns background noise into silence (and keeps the guide's own voice
+            // out), so start can be sensitive: the caller's first word is caught at once, and 400 ms
+            // of quiet ends the turn.
+            startOfSpeechSensitivity: "START_SENSITIVITY_HIGH",
             endOfSpeechSensitivity: "END_SENSITIVITY_HIGH",
-            prefixPaddingMs: 200,
-            silenceDurationMs: 450
+            prefixPaddingMs: 150,
+            silenceDurationMs: 400
           }
         }
       }
@@ -279,7 +282,10 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     let turnPassthrough = false; // this answer is played in the model's own voice (no TTS quota left)
     let chain: Promise<void> = Promise.resolve(); // keeps the spoken sentences in order
     let playUntil = 0; // when the audio already sent will have finished playing
+    let heardWords = 0; // words the caller said over the guide while he is talking
+    let playStartedAt = 0; // when the current stretch of guide audio began
     const sendPcm = (pcm: Buffer) => {
+      if (playUntil < Date.now()) { playStartedAt = Date.now(); heardWords = 0; }
       for (let i = 0; i < pcm.length; i += 24000) {
         toClient({ serverContent: { modelTurn: { parts: [{ inlineData: { mimeType: "audio/pcm;rate=24000", data: pcm.subarray(i, i + 24000).toString("base64") } }] } } });
       }
@@ -329,11 +335,18 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     const takeSentences = (t: Turn, final: boolean) => {
       if (final) { speakSegment(t, t.pending); t.pending = ""; return; }
       const m = [...t.pending.matchAll(/[.!?؟\n]|،(?=\s)/g)];
-      if (!m.length) return;
+      if (!m.length) {
+        // First piece and still no comma after a few words: send them now, the voice starts sooner
+        if (t.first && t.pending.length >= 24) {
+          const sp = t.pending.lastIndexOf(" ");
+          if (sp >= 12) { speakSegment(t, t.pending.slice(0, sp)); t.pending = t.pending.slice(sp); t.first = false; }
+        }
+        return;
+      }
       const cut = m[m.length - 1].index! + 1;
       // First piece short (the voice starts fast), then bigger pieces: every piece is one TTS request,
       // and the paid key allows 10 a minute / 100 a day per voice model
-      if (cut < (t.first ? 12 : 170)) return;
+      if (cut < (t.first ? 8 : 170)) return;
       speakSegment(t, t.pending.slice(0, cut));
       t.pending = t.pending.slice(cut);
       t.first = false;
@@ -355,7 +368,13 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         if (sc.turnComplete) turnPassthrough = false;
         return msg;
       }
-      if (sc.inputTranscription?.text?.trim() && Date.now() < playUntil) {
+      // Only real words stop the guide (2+ words): a cough, a car horn or a stray «آه» doesn't
+      // (counted only once the guide has been talking 1 s: the tail of the question can arrive late)
+      if (Date.now() < playUntil && Date.now() - playStartedAt > 1000) {
+        heardWords += (sc.inputTranscription?.text || "").replace(/[^\p{L}\s]/gu, " ").split(/\s+/).filter((w: string) => w.length >= 2).length;
+      }
+      if (heardWords >= 2 && Date.now() < playUntil) {
+        heardWords = 0;
         // the caller talks over the guide: stop what is still playing or queued
         gen++; turn = newTurn(); playUntil = 0;
         toClient({ serverContent: { interrupted: true } });
