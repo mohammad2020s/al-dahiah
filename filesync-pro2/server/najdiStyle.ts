@@ -51,6 +51,8 @@ const SWAPS: [string, string][] = [
   ["يا بعد حيي", "يالغالي"],
   ["يا بعد حيّي", "يالغالي"],
   ["يابعد حيي", "يالغالي"],
+  // «تونّس» (have fun) with its shadda, so it never reads like the country
+  ["تونس", "تونّس"],
 ];
 
 const RULES = SWAPS.map(([from, to]) => ({
