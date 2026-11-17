@@ -335,10 +335,8 @@ body {
 @keyframes bgs-kb-a { from { transform: scale(1.12) translate(1.5%, 1%); } to { transform: scale(1) translate(0, 0); } }
 @keyframes bgs-kb-b { from { transform: scale(1) translate(-1%, 0); } to { transform: scale(1.12) translate(1%, -1%); } }
 .bgs-veil {
-  /* Light touch: the photos read clearly at the edges; the cards carry their own backgrounds */
-  background:
-    radial-gradient(ellipse at 50% 40%, rgba(241, 231, 218, 0.38) 0%, rgba(241, 231, 218, 0.08) 75%),
-    linear-gradient(180deg, rgba(241, 231, 218, 0.05) 0%, rgba(241, 231, 218, 0.3) 100%);
+  /* The season guide's look: beige paper with topographic contour lines; the photos only tint it */
+  background: url(/images/theme/contour.svg) 0 0 / 640px 640px, rgba(241, 231, 218, 0.9);
 }
 .bgs-caption { animation: bgs-cap 0.9s ease both; }
 @keyframes bgs-cap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -372,9 +370,7 @@ body {
 .night { background-color: #1a110e; color: #efe1d0; }
 .night .soft-grid, .night.soft-grid { background-color: #1a110e; background-image: url(/images/theme/contour-dark.svg); }
 .night .bgs-veil {
-  background:
-    radial-gradient(ellipse at 50% 40%, rgba(21, 13, 10, 0.55) 0%, rgba(21, 13, 10, 0.3) 75%),
-    linear-gradient(180deg, rgba(21, 13, 10, 0.25) 0%, rgba(21, 13, 10, 0.6) 100%);
+  background: url(/images/theme/contour-dark.svg) 0 0 / 640px 640px, rgba(26, 17, 14, 0.9);
 }
 .night [class*="bg-white"] { background-color: rgba(41, 26, 21, 0.92); }
 .night [class*="bg-[#fbf6ee]"], .night [class*="bg-[#faf5ef]"], .night [class*="bg-[#fdf9f3]"],
