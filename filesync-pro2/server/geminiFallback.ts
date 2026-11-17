@@ -197,12 +197,13 @@ export async function streamChatWithFallback(opts: {
 }
 
 /**
- * Live call: free key first, paid key after its quota. Generated speech (TTS): paid key first,
- * because the free speech quota is gone after a few answers a day and waiting for it to refuse
- * made every answer start late.
+ * Voice calls: the paid key first for both the call model (the "brain") and the generated speech,
+ * the free key only if the paid one is refused. (The owner's choice, 17 Nov 2026: the free key's
+ * limits made calls slow; LIVE_FREE_FIRST=on puts the free key first again for the call model.)
  */
 export function voiceKeys(kind: "live" | "tts"): { tier: Tier; key: string }[] {
-  return ((kind === "tts" ? ["paid", "free"] : ["free", "paid"]) as Tier[])
+  const order: Tier[] = kind === "live" && process.env.LIVE_FREE_FIRST === "on" ? ["free", "paid"] : ["paid", "free"];
+  return (order as Tier[])
     .filter((tier) => keyFor(tier) && !isPaused({ tier, model: kind }))
     .map((tier) => ({ tier, key: keyFor(tier) }));
 }

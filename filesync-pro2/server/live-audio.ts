@@ -127,7 +127,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     // Charon: in recorded tests it said «القْصَب» with two short syllables, where Puck often stretched it to «القصّاب»
     const voiceName = testVoice || process.env.LIVE_VOICE || "Algenib"; // Algenib: Gemini's gravelly, older-sounding male voice
 
-    // Free key first; the paid key (GEMINI_PAID_API_KEY) only if the free one is refused
+    // Paid key first (owner choice, 17 Nov); the free key only if the paid one is refused
     const keys = voiceKeys("live");
     if (keys.length === 0) {
       console.error("[Live Audio] No usable Gemini key (missing or quota used up)");
