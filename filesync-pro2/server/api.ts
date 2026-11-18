@@ -1,4 +1,4 @@
-import { najdify, speakableTownName, OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
+import { najdify, speakableTownName, OWNER_PRONUNCIATIONS_AR, stripWelcome, welcomeStripper } from "./najdiStyle.ts";
 import { parseTeach, teach, forget, taughtList, applyTaught, taughtRulesAr, addRule, removeRule, rulesList, loadTaught, loadRules } from "./pronMemory.ts";
 import { getStore } from "./store.ts";
 import { venueMapIntent } from "./venueMap.ts";
@@ -452,6 +452,9 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
           : [{ text: userPrompt }],
       });
 
+      // Not the first answer: no «يا هلا ومسهلا» again (held back from the stream too)
+      const laterAnswer = rawHistory.some((t: any) => t?.role === "assistant" && String(t?.content || "").trim());
+      const stream = laterAnswer ? welcomeStripper((t) => sendEvent({ type: "chunk", content: t })) : null;
       const result = await streamChatWithFallback({
         contents,
         systemInstruction: withFileContext(buildAlQasabSystemPrompt(undefined, lang), userPrompt, rawHistory),
@@ -461,9 +464,10 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         // (a photo takes the models longer to look at: 15 s each, 35 s in all)
         budgetMs: photo ? 35_000 : 20_000,
         firstWordMs: photo ? 15_000 : undefined,
-        onChunk: (t) => sendEvent({ type: "chunk", content: t }),
+        onChunk: (t) => (stream ? stream.push(t) : sendEvent({ type: "chunk", content: t })),
         isCancelled: () => clientDisconnected,
       });
+      stream?.flush();
       rawAnswer = result.text;
       answeredBy = result.engine;
     }
@@ -488,6 +492,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     // Arabic answers: the fixed Qasabi wording is enforced here, not left to the model
     let finalAnswer = lang === "ar" ? najdify(applyNajdiPhoneticDiacritics(rawAnswer)) : normalizeCityName(rawAnswer);
     finalAnswer = cleanText(finalAnswer);
+    if (rawHistory.some((t: any) => t?.role === "assistant" && String(t?.content || "").trim())) finalAnswer = stripWelcome(finalAnswer);
 
     // Opened with «السلام عليكم»: answer the greeting first, like a host welcoming a guest
     if (isSalamMessage(userPrompt) && !/^\s*(وعليكم السلام|wa alaykum|wa alaikum)/i.test(finalAnswer)) {

@@ -516,7 +516,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         if (lang === "ar" && text.includes('"turnComplete"')) {
           answers++;
           if (ws.isOpen()) { // before every answer: the rules stay fresh in a long call
-            ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm("(تذكير من صاحب الموقع، لا ترد عليه ولا تذكره، بس طبّقه في الرد الجاي): خلك متحمس ومستانس وصوتك مليان طاقة.\n" + ownerCommandAr(), speakableTownName) }] }], turnComplete: false } }));
+            ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm("(تذكير من صاحب الموقع، لا ترد عليه ولا تذكره، بس طبّقه في الرد الجاي): خلك متحمس ومستانس وصوتك مليان طاقة. ولا تبدأ ردك بـ«يا هلا» ولا «ومسهلا» ولا «حيّاك الله» ولا أي ترحيب، الترحيب كان أول المكالمة بس: ادخل في الجواب على طول.\n" + ownerCommandAr(), speakableTownName) }] }], turnComplete: false } }));
           }
         }
         // Own-voice calls (English, or no reading voice): «stop» still drops the rest of the answer

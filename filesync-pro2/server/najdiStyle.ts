@@ -111,3 +111,37 @@ export const OWNER_PRONUNCIATIONS_AR = `قاموس النطق المعتمد م�
 ٦) كلمة «ديرتنا» = «ديرَتْنَا»: الدال بدون حركة مكتوبة (تنقال طبيعية)، والراء مفتوحة بس مرقّقة (رفيعة من مقدّم الفم، لأن قبلها ياء)، أبداً مو مفخّمة. ونفسها «ديرة» = «ديرَة».
 ٤) «الصْبَخَة» = «الصْبَخَة»: صاد ساكنة بدون تشديد، ثم باء مفتوحة، ثم خاء مفتوحة. غلط: «الصَّبْخة» (تشديد الصاد وسكون الباء)، «السبخة». و«مرقب» = «مَرْقَب»: ميم مفتوحة، راء ساكنة، قاف فصيحة عميقة مفتوحة (أبداً مو «گ» النجدية)، باء ساكنة. غلط: «مرگب».
 ٥) «الجفار» = «الجْفَارْ»: جيم معطّشة ساكنة، ثم فاء مفتوحة ممدودة، والراء ساكنة. غلط: «القفار» و«الجْفَارْ» بكسرة. «المَمْلَحَة» بفتح الميم الأولى وسكون الثانية.`;
+
+// «يا هلا ومسهلا» belongs to the first answer only (owner's rule): later answers start with the answer.
+const DIA = "[\\u064B-\\u0652\\u0670]*";
+const loose = (w: string) => [...w].map((c) => (c === " " ? "\\s+" : c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + DIA)).join("");
+const WELCOME_HEAD = new RegExp(
+  "^\\s*(?:(?:" + ["يا هلا", "ياهلا", "هلا", "يا مرحبا", "مرحبا", "أهلا", "اهلا"].map(loose).join("|") + ")" +
+    "(?:\\s+(?:" + ["والله", "و مسهلا", "ومسهلا", "مسهلا", "وألف هلا", "وغلا", "ومرحبا", "وسهلا", "يالغالي", "بك", "فيك"].map(loose).join("|") + "))*" +
+    "\\s*[،,!.]?\\s*)?" +
+    "(?:" + loose("حياك الله") + "[^،,!.\\n]{0,40}[،,!.]\\s*)?" +
+    "(?:" + loose("نورت") + "[^،,!.\\n]{0,30}[،,!.]\\s*)?"
+);
+/** Drops a leading welcome («يا هلا ومسهلا، حيّاك الله في ديرتنا!») from a later answer. */
+export function stripWelcome(text: string): string {
+  const out = text.replace(WELCOME_HEAD, "");
+  return out.trim() ? out : text;
+}
+/** Wraps a chunk sender: holds the first ~60 characters, strips a welcome there, then streams as is. */
+export function welcomeStripper(send: (t: string) => void) {
+  let head = "";
+  let passed = false;
+  return {
+    push(t: string) {
+      if (passed) return send(t);
+      head += t;
+      if (head.length >= 60 || /[؟?\n]/.test(head)) {
+        passed = true;
+        send(stripWelcome(head));
+      }
+    },
+    flush() {
+      if (!passed && head) { passed = true; send(stripWelcome(head)); }
+    },
+  };
+}
