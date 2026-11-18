@@ -31,16 +31,16 @@ body {
   background-size: 17px 17px;
 }
 
-/* Page background: beige with the season guide's topographic contour lines (salt-lake shapes) */
+/* Page background: beige with the season guide's own contour lines (traced from its pages, mirrored to tile) */
 .soft-grid {
   background-color: #f1e7da;
   background-image: url(/images/theme/contour.svg);
-  background-size: 640px 640px;
+  background-size: calc(2 * clamp(360px, 100vw, 620px)) auto;
   background-attachment: fixed;
 }
 /* Contour lines on rust banners and dark panels */
-.contour-light { background-image: url(/images/theme/contour-light.svg); background-size: 520px 520px; }
-.contour-dark { background-image: url(/images/theme/contour-dark.svg); background-size: 640px 640px; }
+.contour-light { background-image: url(/images/theme/contour-light.svg); background-size: calc(2 * clamp(360px, 100vw, 620px)) auto; }
+.contour-dark { background-image: url(/images/theme/contour-dark.svg); background-size: calc(2 * clamp(360px, 100vw, 620px)) auto; }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -336,7 +336,7 @@ body {
 @keyframes bgs-kb-b { from { transform: scale(1) translate(-1%, 0); } to { transform: scale(1.12) translate(1%, -1%); } }
 .bgs-veil {
   /* The season guide's look: beige paper with topographic contour lines; the photos only tint it */
-  background: url(/images/theme/contour.svg) 0 0 / 640px 640px, rgba(241, 231, 218, 0.9);
+  background: url(/images/theme/contour.svg) 0 0 / calc(2 * clamp(360px, 100vw, 620px)) auto, rgba(241, 231, 218, 0.9);
 }
 .bgs-caption { animation: bgs-cap 0.9s ease both; }
 @keyframes bgs-cap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -370,7 +370,7 @@ body {
 .night { background-color: #1a110e; color: #efe1d0; }
 .night .soft-grid, .night.soft-grid { background-color: #1a110e; background-image: url(/images/theme/contour-dark.svg); }
 .night .bgs-veil {
-  background: url(/images/theme/contour-dark.svg) 0 0 / 640px 640px, rgba(26, 17, 14, 0.9);
+  background: url(/images/theme/contour-dark.svg) 0 0 / calc(2 * clamp(360px, 100vw, 620px)) auto, rgba(26, 17, 14, 0.9);
 }
 .night [class*="bg-white"] { background-color: rgba(41, 26, 21, 0.92); }
 .night [class*="bg-[#fbf6ee]"], .night [class*="bg-[#faf5ef]"], .night [class*="bg-[#fdf9f3]"],

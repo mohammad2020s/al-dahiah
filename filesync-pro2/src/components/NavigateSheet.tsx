@@ -399,7 +399,7 @@ export function NavigateSheet({ language = "ar" }: { language?: "ar" | "en" }) {
   return (
     <div className="fixed inset-0 z-[70] flex flex-col bg-[#20140f]" dir={en ? "ltr" : "rtl"}>
       {/* Next instruction */}
-      <div className="relative z-[2] flex items-center gap-3 bg-[#7d3a22] px-4 py-3 text-white shadow-lg">
+      <div className="contour-light relative z-[2] flex items-center gap-3 bg-[#7d3a22] px-4 py-3 text-white shadow-lg">
         <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white/15">
           {arrived ? <Flag className="size-7" /> : <StepIcon step={next} className="size-7" />}
         </div>
