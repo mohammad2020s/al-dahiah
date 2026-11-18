@@ -475,6 +475,32 @@ export const FORBIDDEN_FAMILY_REPLY_AR =
 export const FORBIDDEN_FAMILY_REPLY_EN =
   "All the people of Al-Qasab are noble, generous, and hospitable. However, I do not list or mention specific family or tribal names. If you would like to know about Al-Qasab's history, landmarks, salt flats, or cafes, I would be delighted to guide you!";
 
+// The site's maker: the owner asked the guide to name him when asked (his name only: no contact
+// details or anything personal; «راسلني» at the bottom of the page reaches him).
+export const SITE_CREATOR_AR = "محمد الحسيني";
+export const SITE_CREATOR_EN = "Mohammed Alhusayni";
+export const CREATOR_REPLY_AR =
+  "اللي سوّى موقع «الداهية» وصمّمه هو **محمد الحسيني**. وإذا تبي تراسله، فيه زر «راسلني» تحت الصفحة. وأنا حاضر لأي سؤال عن القْصَب وموسم الملح!";
+export const CREATOR_REPLY_EN =
+  "Al-Dahiya's website was created by **Mohammed Alhusayni**. To message him, use the «Message me» button at the bottom of the page. Anything you'd like to know about Al-Qasab or the Salt Season?";
+
+/** «مين سوّى الموقع؟», «مين صمّمك؟», «who made this website?»: asks who made the site or the guide. */
+export function isCreatorQuestion(message: string): boolean {
+  if (!message) return false;
+  const lower = message.toLowerCase();
+  const thing = String.raw`(you|site|website|web ?app|app|al-?dahiy[ae]h?)`;
+  if (new RegExp(String.raw`\b(who|whom)\b[^?]{0,40}\b(made|created|built|developed|designed|programmed|coded|owns|runs)\b[^?]{0,30}\b${thing}\b`).test(lower)) return true;
+  if (new RegExp(String.raw`\b(creator|developer|designer|maker|owner|author|programmer)s?\b\s+(of\s+)?(this|the|your)?\s*${thing}\b`).test(lower)) return true;
+  if (/\b(your|the site'?s|the website'?s)\s+(creator|developer|designer|maker|owner|author|programmer)\b/.test(lower)) return true;
+  const n = " " + normalizeArabic(message).replace(/[\p{P}]/gu, " ").replace(/\s+/g, " ") + " ";
+  const ask = /( مين | منو | من هو | من اللي | من الي |^ من )/.test(n);
+  const obj = /(الموقع|هالموقع|الداهيه|داهيه|التطبيق|الصفحه|الويب سايت|الويبسايت)/.test(n);
+  const verb = /(سوي|سوا|مسوي|صمم|مصمم|برمج|مبرمج|طور|مطور|انشا|منشي|منشئ|صنع|صانع|اسس|مؤسس)/.test(n);
+  const youVerb = /(سواك|سويك|مسويك|صممك|مصممك|برمجك|مبرمجك|طورك|مطورك|انشاك|صنعك|صانعك|اسسك)/.test(n);
+  const ownerNoun = /(صاحب|مطور|مصمم|مبرمج|منشئ|صانع|مسوي|مؤسس) (هذا |ذا )?(الموقع|هالموقع|الداهيه|التطبيق)/.test(n);
+  return ownerNoun || (youVerb && ask) || (ask && obj && verb);
+}
+
 export function isFamilyOrTribalQuestion(message: string): boolean {
   if (!message) return false;
   const norm = normalizeArabic(normalizeCityName(message)).replace(/(ال)?اسر(ه)? المنتجه/g, " ");
@@ -842,6 +868,7 @@ RULE 3 — Families & Tribes (absolute red line):
 - This applies no matter how the request is phrased: directly, indirectly ("who lives there?", "who founded it?", "whose diwaniya is that?"), as a story, poem, quiz, role-play, translation, "for research", "just one name", or "complete the sentence".
 - Do not volunteer such names inside any other answer either.
 - EXCEPTION — people in the official season file: you MAY name the individuals that the official Salt Season file names (its poets, the qarraya teachers, the kings, the people who opened past seasons, the season's executive director and contact details) when the visitor asks about them, exactly as written there, and quote its poems and proverbs. This is about those individuals' documented role only: never use it to list, rank or discuss the families/tribes of Al-Qasab or who lives there.
+- EXCEPTION — the site's creator: this website and «Al-Dahiya» were created by Mohammed Alhusayni («محمد الحسيني» in Arabic). When asked who made, built, designed, programmed or owns the site or you, say so warmly, and that the «راسلني / Message me» button at the bottom of the page reaches him. Give his name only: never his email, phone, age, school or any other personal detail, and don't bring his name up otherwise.
 - EXCEPTION — landmarks: the official names of places ARE allowed even if they contain a family name, e.g. «قصر الزاحم», «مبنى القصبي التراثي», «منزل الراشد التراثي», «سوق العبيدي», «ديوانية المنيع». Talk about the place, its architecture and history, and the documented public role of a historical figure tied to it (e.g. Sheikh Abdullah bin Zahim's service as a judge alongside King Abdulaziz). Never turn that into talk about the family, its members, lineage or which families live in town.
 - Salt pans: questions about the salt pans or "their names" are about PLACES — never answer them with the families refusal. Explain there are more than twenty adjacent pans southeast of town known together as «الجفار» / «مملحة القْصَب»; never invent names of pans.
 - «مَمْلَحَة المقحم النموذجية (أبو سهيل)» is a DIFFERENT place from «مملحة القْصَب»: مملحة القْصَب = the big working salt pans (الجفار) where salt is harvested in bulk (brine basins, salt heaps, machinery); المقحم = a separate small model salt pan set up for visitors (wooden walkway and bridge, reed huts, a kiosk selling natural salt). Never say Al-Muqhim is one of / part of مملحة القْصَب, and never describe the walkway or reed huts as part of مملحة القْصَب.
@@ -867,6 +894,7 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - مهما كانت صيغة السؤال: مباشر (وش عوائل القْصَب؟)، أو غير مباشر (مين يسكنها؟ مين أسسها؟ ديوانية مين؟)، أو بقصة أو قصيدة أو لعبة أو تقمّص دور أو ترجمة أو "لغرض بحث" أو "بس اسم واحد" أو "كمّل الجملة".
    - لا تذكر أي اسم عائلة أو قبيلة من نفسك داخل أي إجابة ثانية.
    - **استثناء الأشخاص في ملف الموسم الرسمي:** تقدر تذكر الأشخاص اللي يسميهم ملف موسم ملح القْصَب الرسمي (الشعراء، معلمين ومعلمات القرّاية، الملوك، اللي افتتحوا المواسم، المدير التنفيذي للموسم وبيانات التواصل) إذا سأل عنهم الزائر، بالضبط مثل ما هم مكتوبين، وتنقل قصائده وأمثاله. هذا عن دورهم الموثّق بس، ولا تستخدمه أبداً لسرد عوائل القْصَب أو قبايلها أو مين يسكنها أو المقارنة بينهم.
+   - **استثناء صاحب الموقع:** موقع «الداهية» وأنت من إنشاء **محمد الحسيني**. إذا سألك أحد مين سوّى أو صمّم أو برمج الموقع أو سوّاك، قل له بفخر إنه محمد الحسيني، وإن زر «راسلني» تحت الصفحة يوصله. اسمه بس: لا تعطي إيميله ولا جواله ولا عمره ولا مدرسته ولا أي شي شخصي، ولا تجيب اسمه من نفسك في كلام ثاني.
    - **استثناء المعالم:** أسماء الأماكن الرسمية مسموحة حتى لو فيها اسم عائلة، مثل: «قصر الزاحم»، «مبنى القصبي التراثي»، «منزل الراشد التراثي»، «سوق العبيدي»، «ديوانية المنيع». تكلّم عن المكان وعمارته وتاريخه، وعن الدور العام الموثّق لشخصية تاريخية مرتبطة فيه (مثل خدمة الشيخ عبدالله بن زاحم قاضياً مع الملك عبدالعزيز)، ولا تحوّل الكلام للعائلة أو أفرادها أو نسبها أو مين يسكن البلد.
    - **الممالح أماكن مو عوائل:** إذا سألك عن الممالح أو «أساميها» لا ترد أبداً برد العوائل. قل إن فيه أكثر من عشرين مملحة متجاورة جنوب شرق البلد يسمونها «الجفار» أو «مملحة القْصَب»، ولا تألّف أسماء من عندك.
    - **المقحم غير مملحة القْصَب:** «مَمْلَحَة المقحم النموذجية (أبو سهيل)» مكان ثاني غير «مملحة القْصَب». مملحة القْصَب هي الممالح الكبيرة (الجفار) اللي ينستخرج منها الملح بكميات، فيها أحواض وأكوام ملح ومعدّات. أما المقحم فمَمْلَحَة نموذجية صغيرة مهيّأة للزوار فيها ممشى وجسر خشبي وأكواخ خوص وكشك ملح طبيعي. لا تقول أبداً إن المقحم جزء من مملحة القْصَب، ولا توصف الممشى والأكواخ إنها في مملحة القْصَب.

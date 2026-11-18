@@ -9,6 +9,7 @@ import { apiRouter } from "./server/api.ts";
 import { STATS_PAGE_HTML } from "./server/statsPage.ts";
 import { STAMPS_PAGE_HTML } from "./server/stampsPage.ts";
 import { TEACH_PAGE_HTML } from "./server/teachPage.ts";
+import { contactRouter, INBOX_PAGE_HTML, setMailBinding } from "./server/contact.ts";
 import { runCall, type Sock } from "./server/live-audio.ts";
 import { useD1, getStore } from "./server/store.ts";
 import { refreshMemory, loadTaught, loadRules } from "./server/pronMemory.ts";
@@ -59,6 +60,8 @@ app.use((req, res, next) => {
     }
   });
 });
+// «راسلني» (visitors → the owner) and the owner's inbox
+app.use("/api", contactRouter);
 app.use("/api", apiRouter);
 const ownerPage = (html: string) => (_req: express.Request, res: express.Response) => {
   res.set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" }).send(html);
@@ -66,6 +69,7 @@ const ownerPage = (html: string) => (_req: express.Request, res: express.Respons
 app.get("/stats", ownerPage(STATS_PAGE_HTML));
 app.get("/stamps", ownerPage(STAMPS_PAGE_HTML));
 app.get("/teach", ownerPage(TEACH_PAGE_HTML));
+app.get("/inbox", ownerPage(INBOX_PAGE_HTML));
 app.listen(3000);
 const expressHandler = httpServerHandler({ port: 3000 });
 
@@ -225,6 +229,8 @@ let memoryLoaded = false;
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     useD1(env.DB);
+    // Cloudflare Email Routing: present once the owner turns it on (then «راسلني» also emails him)
+    setMailBinding(env.SEND_EMAIL);
     // Plain settings and secrets also as process.env (the shared server code reads them there)
     for (const [k, v] of Object.entries(env)) if (typeof v === "string" && process.env[k] === undefined) process.env[k] = v;
     const url = new URL(request.url);
@@ -234,7 +240,7 @@ export default {
       return Response.redirect("https://al-dahiah.com" + url.pathname + url.search, 301);
     }
     if (url.hostname === "www.al-dahiah.com") return Response.redirect("https://al-dahiah.com" + url.pathname + url.search, 301);
-    const dynamic = url.pathname === "/live" || url.pathname.startsWith("/api/") || url.pathname === "/stats" || url.pathname === "/stamps" || url.pathname === "/teach";
+    const dynamic = url.pathname === "/live" || url.pathname.startsWith("/api/") || url.pathname === "/stats" || url.pathname === "/stamps" || url.pathname === "/teach" || url.pathname === "/inbox";
     if (!dynamic) return env.ASSETS.fetch(request);
 
     // Until the Gemini key is added here as a secret, the chat, the call and the owner pages are

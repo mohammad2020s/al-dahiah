@@ -40,6 +40,9 @@ import {
   getInstantSalamReply,
   generateLocalKnowledgeFallback,
   isFamilyOrTribalQuestion,
+  isCreatorQuestion,
+  CREATOR_REPLY_AR,
+  CREATOR_REPLY_EN,
   FORBIDDEN_FAMILY_REPLY_AR,
   FORBIDDEN_FAMILY_REPLY_EN,
 } from "./alQasabScope.ts";
@@ -333,6 +336,16 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
         // The three options from the greeting, as buttons
         followUps: GREETING_OPTIONS[lang],
       });
+      res.end();
+      return;
+    }
+
+    // «مين سوّى الموقع؟»: the site's maker (his name only), before any other guard
+    if (isCreatorQuestion(userPrompt)) {
+      const creatorAnswer = lang === "en" ? CREATOR_REPLY_EN : CREATOR_REPLY_AR;
+      recordQuestion(userPrompt, "local", "creator", lang);
+      sendEvent({ type: "chunk", content: creatorAnswer });
+      sendEvent({ type: "done", answer: creatorAnswer, guarded: true, showMap: false, locationData: null, weather: null });
       res.end();
       return;
     }

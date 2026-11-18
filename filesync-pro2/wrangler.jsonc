@@ -1,6 +1,7 @@
 // «الداهية» on Cloudflare Workers. Build: `npm run build` (Vite → dist/), then `npx wrangler deploy`.
 // Secrets (set in the Cloudflare dashboard, never in this file): GEMINI_API_KEY, GEMINI_PAID_API_KEY,
-// STATS_KEY, GOOGLE_MAPS_API_KEY, GOOGLE_WEATHER_API_KEY.
+// STATS_KEY, GOOGLE_MAPS_API_KEY, GOOGLE_WEATHER_API_KEY, OWNER_EMAIL (where «راسلني» messages go; kept out of
+// this public repo).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "al-dahiah",
@@ -11,7 +12,7 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/live", "/stats", "/stamps", "/teach"]
+    "run_worker_first": ["/api/*", "/live", "/stats", "/stamps", "/teach", "/inbox"]
   },
   "d1_databases": [{ "binding": "DB", "database_name": "al-dahiah", "database_id": "2c2e065d-5058-42e3-a8f7-ec8134be35ee" }],
   // Express's body-parser pulls in iconv-lite, which does not bundle for Workers

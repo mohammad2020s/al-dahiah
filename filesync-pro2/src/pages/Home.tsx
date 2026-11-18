@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Globe,
   Loader2,
+  Mail,
   MapPinned,
   Mic,
   Phone,
@@ -59,10 +60,7 @@ import { MobileBar, FloatingCall } from "../components/MobileBar";
 import { DidYouKnow } from "../components/DidYouKnow";
 import { SaltPassport } from "../components/SaltPassport";
 import { Language, translations } from "../i18n";
-
-// The site owner's contact address, shown in the footer (split so bots scanning the files miss it)
-const OWNER_MAIL_USER = "m7md.msh2020";
-const OWNER_MAIL_DOMAIN = "gmail.com";
+import { ContactSheet } from "../components/ContactSheet";
 
 type WeatherData = {
   source: "google" | "fallback";
@@ -481,6 +479,7 @@ function readTheme(): ThemePick {
 export default function Home() {
   const [language, setLanguage] = useState<Language>("ar");
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const [isVoiceCallOpen, setIsVoiceCallOpen] = useState(false);
   const [isCallAnimating, setIsCallAnimating] = useState(false);
   const [callOriginRect, setCallOriginRect] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -1175,28 +1174,25 @@ export default function Home() {
 
         <footer className="pb-2 text-center text-[11px] text-[#8e6558]">
           {t.footerText}
-          {/* Who made the site (the owner's own words). The address is put together here so simple
-              address-harvesting bots reading the files don't pick it up. */}
-          <div dir="rtl" className="mt-1.5 space-y-0.5 leading-5">
+          {/* Who made the site. «راسلني» opens a form: the message goes through the server, so his
+              email address is never on the page (nor in this public code). */}
+          <div dir={language === "en" ? "ltr" : "rtl"} className="mt-1.5 flex flex-col items-center gap-1.5 leading-5">
             <p>
-              تم إنشاء هذا الموقع بواسطة <b className="font-bold text-[#6a3420]">محمد الحسيني</b>
+              {language === "en" ? "This website was created by " : "تم إنشاء هذا الموقع بواسطة "}
+              <b className="font-bold text-[#6a3420]">{language === "en" ? "Mohammed Alhusayni" : "محمد الحسيني"}</b>
             </p>
-            <p>
-              البريد الإلكتروني:{" "}
-              <a
-                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${OWNER_MAIL_USER}%40${OWNER_MAIL_DOMAIN}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                dir="ltr"
-                className="font-semibold text-[#a5492a] underline decoration-dotted underline-offset-2 hover:decoration-solid"
-                title="راسلني على Gmail"
-              >
-                {OWNER_MAIL_USER}@{OWNER_MAIL_DOMAIN}
-              </a>
-            </p>
+            <button
+              type="button"
+              onClick={() => setContactOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#e2d5c6] bg-[#fbf6ee] px-3 py-1 text-[11px] font-bold text-[#a5492a] transition hover:border-[#a5492a] active:scale-[0.98]"
+            >
+              <Mail className="size-3.5" />
+              {language === "en" ? "Message me" : "راسلني"}
+            </button>
           </div>
         </footer>
       </div>
+      {contactOpen && <ContactSheet en={language === "en"} onClose={() => setContactOpen(false)} />}
     </main>
   );
 }

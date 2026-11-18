@@ -21,6 +21,9 @@ import {
   normalizeSabkha,
   normalizePlaceWords,
   isSabkhaQuestion,
+  isCreatorQuestion,
+  CREATOR_REPLY_AR,
+  CREATOR_REPLY_EN,
 } from "./alQasabScope.ts";
 import { getPlaceImages } from "./alQasabKnowledge.ts";
 
@@ -271,4 +274,18 @@ test("owner teaching: commands are understood and taught words reach the voice t
   await teach("شقراء", "شَگْرا");
   assert.equal(applyTaught("رحت شقراء وبشقراء"), "رحت شَگْرا وبشَگْرا");
   await forget("شقراء");
+});
+
+test("asking who made the site gets the maker's name; other «who built» questions don't", () => {
+  for (const q of ["مين سوّى الموقع؟", "مين اللي صمم موقع الداهية", "من برمج هالموقع", "مين سواك؟", "مين صاحب الموقع", "Who made this website?", "who created you", "who is the developer of al-dahiya"]) {
+    assert.equal(isCreatorQuestion(q), true, q);
+  }
+  for (const q of ["مين بنى قصر الزاحم؟", "وين موقع الموسم؟", "من صنع الملح في القصب", "وش سواك اليوم", "who built the old town?", "who made this salt?", "وش عوائل القصب؟"]) {
+    assert.equal(isCreatorQuestion(q), false, q);
+  }
+  assert.match(CREATOR_REPLY_AR, /محمد الحسيني/);
+  assert.match(CREATOR_REPLY_EN, /Mohammed Alhusayni/);
+  assert.ok(!/@|gmail/i.test(CREATOR_REPLY_AR + CREATOR_REPLY_EN));
+  assert.match(buildAlQasabSystemPrompt(undefined, "ar"), /استثناء صاحب الموقع/);
+  assert.match(buildAlQasabSystemPrompt(undefined, "en"), /Mohammed Alhusayni/);
 });
