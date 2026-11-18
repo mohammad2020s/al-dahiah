@@ -14,6 +14,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      // A new version went live while this page was loading (its files were replaced): reload once
+      // instead of showing a blank page. Covers the first load and parts loaded later (the call).
+      (function () {
+        function reloadOnce() {
+          try { if (sessionStorage.getItem("dh-reloaded")) return; sessionStorage.setItem("dh-reloaded", "1"); } catch (e) {}
+          location.reload();
+        }
+        window.addEventListener("error", function (e) {
+          var t = e && e.target;
+          if (t && (t.tagName === "SCRIPT" || t.tagName === "LINK") && /\/assets\//.test(t.src || t.href || "")) reloadOnce();
+        }, true);
+        window.addEventListener("vite:preloadError", function (e) { e.preventDefault(); reloadOnce(); });
+        window.addEventListener("unhandledrejection", function (e) {
+          if (/dynamically imported module|Importing a module script failed|MIME type/i.test(String(e.reason && e.reason.message || e.reason))) reloadOnce();
+        });
+        window.addEventListener("load", function () { setTimeout(function () { try { sessionStorage.removeItem("dh-reloaded"); } catch (e) {} }, 10000); });
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
