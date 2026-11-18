@@ -239,7 +239,8 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
             // HIGH end + 450 ms: answers as soon as the caller stops (the page also mutes pure noise).
             // LOW start: a noise burst that slips past the page's gate must not count as the caller
             // talking (that stops the answer being written). 400 ms of quiet ends the caller's turn.
-            startOfSpeechSensitivity: "START_SENSITIVITY_LOW",
+            // HIGH: a quiet phone voice still starts a turn (the page already turns noise into silence)
+            startOfSpeechSensitivity: "START_SENSITIVITY_HIGH",
             endOfSpeechSensitivity: "END_SENSITIVITY_HIGH",
             prefixPaddingMs: 150,
             silenceDurationMs: 400

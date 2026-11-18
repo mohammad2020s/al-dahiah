@@ -123,6 +123,8 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   const cameraStreamRef = useRef<MediaStream | null>(null);
   const cameraVideoRef = useRef<HTMLVideoElement | null>(null);
   const cameraTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastServerReplyAtRef = useRef(0);
+  const streamEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cameraCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isFlippingCamera, setIsFlippingCamera] = useState(false);
   const isCameraOnRef = useRef(false);
@@ -673,7 +675,8 @@ registerProcessor('mic-processor', MicProcessor);`;
       // Caller's turn: sensitive (1.8× the noise), so a voice gets through even in a noisy car.
       // While the guide talks: only clearly louder speech held for 300 ms gets through (that is the
       // caller interrupting him); noise and the guide's own echo never cut him off.
-      const SPEECH_RATIO = 1.8, MIN_SPEECH_RMS = 0.005, HANGOVER_CHUNKS = 6;
+      // iPhones (echo cancelling + auto gain) give a quiet voice: a lower floor and ratio let it through
+      const SPEECH_RATIO = 1.6, MIN_SPEECH_RMS = 0.003, HANGOVER_CHUNKS = 6, MAX_NOISE_FLOOR = 0.02;
       const BARGE_RATIO = 3.5, BARGE_CHUNKS = 3;
       let strongRun = 0;
       // The level is measured above ~300 Hz only: car and road noise is mostly low rumble, voices
@@ -740,6 +743,8 @@ registerProcessor('mic-processor', MicProcessor);`;
         if (warmChunks < 5) { noiseFloor = warmChunks === 0 ? level : Math.min(noiseFloor, level) * 0.5 + level * 0.5; warmChunks++; }
         else if (level < noiseFloor) noiseFloor = noiseFloor * 0.7 + level * 0.3;
         else noiseFloor = noiseFloor * 0.996 + Math.min(level, noiseFloor * SPEECH_RATIO) * 0.004;
+        // Speech in the first half second must not become the "noise" level that later speech has to beat
+        noiseFloor = Math.min(noiseFloor, MAX_NOISE_FLOOR);
         const guideTalking = isGeminiSpeakingRef.current || Date.now() - guideStoppedAtRef.current < 400;
         const strong = warmChunks >= 5 && level > Math.max(MIN_SPEECH_RMS * 2, noiseFloor * BARGE_RATIO);
         strongRun = strong ? strongRun + 1 : 0;
@@ -755,6 +760,17 @@ registerProcessor('mic-processor', MicProcessor);`;
         } else if (hangover > 0) {
           hangover--;
           sendPcm16(bytes);
+          // The caller just stopped: if Gemini hasn't started answering 1.5 s later, tell it the
+          // speech is over (it sometimes misses a quiet phone voice ending and keeps waiting)
+          if (hangover === 0 && !guideTalking) {
+            const endedAt = Date.now();
+            if (streamEndTimerRef.current) clearTimeout(streamEndTimerRef.current);
+            streamEndTimerRef.current = setTimeout(() => {
+              if (lastServerReplyAtRef.current < endedAt && !isGeminiSpeakingRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
+              }
+            }, 1500);
+          }
         } else {
           // Not speech: send the same length of silence (keeps the stream's timing), hold this chunk
           if (held) sendPcm16(new Uint8Array(held.length));
@@ -841,6 +857,7 @@ registerProcessor('mic-processor', MicProcessor);`;
             return;
           }
 
+          if (msg.serverContent || msg.toolCall) lastServerReplyAtRef.current = Date.now();
           const said = msg.serverContent?.outputTranscription?.text || msg.serverContent?.inputTranscription?.text;
           if (said) noteTranscript(said);
 
