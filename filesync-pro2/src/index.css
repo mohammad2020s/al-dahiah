@@ -408,13 +408,27 @@ body {
 
 /* Double frame: the card edge, a hair of cream, then a thin gold line inside */
 .heritage-frame {
+  position: relative;
   border: 1px solid #e0cfbd;
-  box-shadow: inset 0 0 0 3px #fffaf4, inset 0 0 0 4px var(--gold-soft), 0 8px 24px rgba(63, 42, 34, 0.08);
+  box-shadow: 0 8px 24px rgba(63, 42, 34, 0.08);
 }
+/* The inner coral line, drawn above the card's contents with soft round corners: an opaque header
+   inside the card used to cover its top, so it looked like it started there with square corners */
+.heritage-frame::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  z-index: 3;
+  border: 1px solid var(--gold-soft);
+  border-radius: inherit; /* round like the card it sits in */
+  pointer-events: none;
+}
+#chat-panel.heritage-frame::before { top: 13px; } /* starts under the Sadu strip */
 .night .heritage-frame {
   border-color: #4b3229;
-  box-shadow: inset 0 0 0 3px rgba(41, 26, 21, 0.92), inset 0 0 0 4px rgba(208, 131, 114, 0.32), 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
+.night .heritage-frame::before { border-color: rgba(208, 131, 114, 0.32); }
 #season-panel > div > div[class*="rounded-[1.7rem]"], #season-panel > div[class*="rounded-[1.7rem]"], #season-panel > button[class*="rounded-[1.7rem]"] {
   box-shadow: inset 0 0 0 3px rgba(255, 250, 244, 0.9), inset 0 0 0 4px var(--gold-soft), 0 8px 22px rgba(63, 42, 34, 0.07);
 }
