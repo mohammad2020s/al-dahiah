@@ -104,7 +104,7 @@ export function NearMe({ language = "ar" }: { language?: Language }) {
     : [];
 
   return (
-    <div className="fixed inset-0 z-[65] flex items-end justify-center bg-black/45 backdrop-blur-[2px] sm:items-center" onClick={() => setOpen(false)}>
+    <div className="fixed inset-0 z-[65] flex items-end justify-center bg-black/50 sm:items-center" onClick={() => setOpen(false)}>
       <div
         dir={en ? "ltr" : "rtl"}
         onClick={(e) => e.stopPropagation()}

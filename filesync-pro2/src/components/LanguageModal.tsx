@@ -21,7 +21,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 p-4 animate-in fade-in duration-200">
       <div className="relative w-full max-w-md overflow-hidden rounded-[2rem] border border-[#e2d5c6] bg-gradient-to-b from-white to-[#f7f0e7] p-6 shadow-2xl sm:p-8">
         <div className="pointer-events-none absolute -left-16 -top-16 size-48 rounded-full bg-amber-200/40 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-16 -right-16 size-48 rounded-full bg-orange-300/20 blur-2xl" />

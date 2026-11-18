@@ -753,7 +753,7 @@ export default function Home() {
       <div className="relative z-[1] mx-auto flex min-h-screen max-w-[1480px] flex-col px-4 pt-4 pb-28 sm:px-6 lg:px-8 lg:pb-4">
         {/* Header Bar */}
         <div className="merlons mx-10 -mb-px opacity-90" aria-hidden="true" />
-        <header className="card-contour heritage-frame flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-white/95 px-4 py-2.5 backdrop-blur">
+        <header className="card-contour heritage-frame flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-white/95 px-4 py-2.5">
           {/* Logo & Name */}
           <div className="flex items-center gap-3">
             <MalhAlQasabLogo size="md" className="rounded-2xl" />
@@ -844,7 +844,7 @@ export default function Home() {
             <button
               type="button"
               onClick={openNearMe}
-              className="card-contour flex items-center gap-3 rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 text-start shadow-sm backdrop-blur transition hover:border-[#a5492a] active:scale-[0.99]"
+              className="card-contour flex items-center gap-3 rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 text-start shadow-sm transition hover:border-[#a5492a] active:scale-[0.99]"
             >
               <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#f2e9dd] text-[#a5492a]">
                 <LocateFixed className="size-5" />
@@ -910,7 +910,7 @@ export default function Home() {
           </aside>
 
           {/* Main Chat Container */}
-          <section id="chat-panel" className="card-contour order-1 scroll-mt-3 lg:order-none flex-1 flex min-h-[78vh] lg:min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] heritage-frame bg-white/80 backdrop-blur-sm">
+          <section id="chat-panel" className="card-contour order-1 scroll-mt-3 lg:order-none flex-1 flex min-h-[78vh] lg:min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] heritage-frame bg-white/90">
             <div className="sadu-strip" aria-hidden="true" />
             {/* Top Bar inside Chat */}
             <div className="flex items-center justify-between border-b border-[#eddecd] bg-white px-5 py-3.5">

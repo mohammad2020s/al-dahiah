@@ -940,7 +940,7 @@ registerProcessor('mic-processor', MicProcessor);`;
 
   return (
     <div
-      className={`vc-heritage fixed inset-0 z-50 flex flex-col bg-[#20140f]/95 p-3 sm:p-5 backdrop-blur-xl text-[#fbf6ee] overflow-hidden ${
+      className={`vc-heritage fixed inset-0 z-50 flex flex-col bg-[#20140f] p-3 sm:p-5 text-[#fbf6ee] overflow-hidden ${
         closingVia ? "vc-closing" : "vc-call-enter"
       }`}
       dir={isEn ? "ltr" : "rtl"}
@@ -1062,7 +1062,7 @@ registerProcessor('mic-processor', MicProcessor);`;
                 ))}
                 {showcase.images.length === 0 && (
                   // No photos yet: an info card in the salt-season colours
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#6a3420] via-[#8f3f24] to-[#b34e2c] px-6 pt-24 pb-36 flex flex-col justify-start">
+                  <div className="absolute inset-0 overflow-hidden bg-gradient-to-br from-[#6a3420] via-[#8f3f24] to-[#b34e2c] px-6 pt-24 pb-36 flex flex-col justify-start">
                     <div className="sc-salt absolute inset-0 opacity-40" aria-hidden="true" />
                     <MapPin className="relative size-9 text-amber-200 vc-pop" />
                     <h3 className="relative mt-3 text-xl font-bold text-white text-balance">{showcase.title}</h3>

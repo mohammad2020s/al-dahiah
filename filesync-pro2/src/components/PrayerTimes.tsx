@@ -123,7 +123,7 @@ export function PrayerTimes({ language = "ar", onAsk }: { language?: Language; o
   const left = next === prayers[0] && times.fajr <= now.h ? times.fajr + 24 - now.h : times[next.key] - now.h;
 
   return (
-    <div className="card-contour overflow-hidden rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 shadow-sm backdrop-blur">
+    <div className="card-contour overflow-hidden rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 shadow-sm">
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-xs font-bold text-[#3f2a22]">
           <Clock className="size-4 text-[#a5492a]" />

@@ -30,7 +30,7 @@ export function DidYouKnow({ language = "ar", onAsk }: { language?: Language; on
     <button
       type="button"
       onClick={() => onAsk?.(en ? f.askEn : f.askAr)}
-      className="card-contour group block w-full overflow-hidden rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 text-start shadow-sm backdrop-blur transition hover:shadow-md"
+      className="card-contour group block w-full overflow-hidden rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 text-start shadow-sm transition hover:shadow-md"
     >
       <span className="flex items-center gap-1.5 text-xs font-bold text-[#3f2a22]">
         <Lightbulb className="size-4 text-[#c9705e]" />

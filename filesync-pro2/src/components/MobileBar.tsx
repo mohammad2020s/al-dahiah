@@ -23,7 +23,7 @@ export function MobileBar({
   return (
     <nav
       dir={en ? "ltr" : "rtl"}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e2d5c6] bg-[#fdf9f3]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_24px_rgba(63, 42, 34,0.12)] backdrop-blur-md lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#e2d5c6] bg-[#fdf9f3]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_24px_rgba(63, 42, 34,0.12)] lg:hidden"
       aria-label={en ? "Quick actions" : "اختصارات"}
     >
       <div className="merlons absolute inset-x-0 -top-[13px] opacity-95" aria-hidden="true" />

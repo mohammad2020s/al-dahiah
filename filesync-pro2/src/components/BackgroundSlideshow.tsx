@@ -68,11 +68,15 @@ export function BackgroundSlideshow({
   }, []);
 
   const current = SLIDES[index];
+  // Only the photo fading out, the current one and the next one stay on the page: each full-screen
+  // photo is a GPU layer, and nine of them at once made weak laptops lag.
+  const n = SLIDES.length;
+  const near = (i: number) => i === index || i === (index + 1) % n || i === (index + n - 1) % n;
   return (
     <>
       <div className="bgs-root pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
         {SLIDES.map((s, i) =>
-          loaded[i] ? (
+          loaded[i] && near(i) ? (
             <div
               key={s.src}
               className={`bgs-slide ${i === index ? "bgs-on" : ""} ${reduced ? "" : i % 2 ? "bgs-kb-b" : "bgs-kb-a"}`}
@@ -84,7 +88,7 @@ export function BackgroundSlideshow({
         <div className="bgs-veil absolute inset-0" />
       </div>
       {loaded[index] && (
-        <div key={current.src} className="bgs-caption fixed bottom-3 start-3 z-[5] hidden items-center gap-1 rounded-full border border-white/50 bg-[#3f2a22]/55 p-1 text-white shadow-lg backdrop-blur-md lg:flex">
+        <div key={current.src} className="bgs-caption fixed bottom-3 start-3 z-[5] hidden items-center gap-1 rounded-full border border-white/50 bg-[#3f2a22]/70 p-1 text-white shadow-lg lg:flex">
           <button
             type="button"
             onClick={() => onAsk?.(en ? current.ask.en : current.ask.ar)}

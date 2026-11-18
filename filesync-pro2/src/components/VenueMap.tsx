@@ -140,7 +140,7 @@ export function VenueMap({ language = "ar" }: { language?: Language }) {
   const stroke = Math.max(4, 9 / zoom);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#1b0d08]/70 p-2 backdrop-blur-sm sm:p-5" dir={en ? "ltr" : "rtl"} role="dialog" aria-modal="true" aria-label={en ? "Season map" : "خريطة الموسم"} onClick={() => setOpen(false)}>
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#1b0d08]/75 p-2 sm:p-5" dir={en ? "ltr" : "rtl"} role="dialog" aria-modal="true" aria-label={en ? "Season map" : "خريطة الموسم"} onClick={() => setOpen(false)}>
       <div className="venue-frame relative flex max-h-full w-full max-w-6xl flex-col overflow-hidden rounded-[26px] bg-[#fbf6ee] text-[#2a1a14]" onClick={(e) => e.stopPropagation()}>
         <div className="merlons absolute inset-x-0 top-0 h-[13px] opacity-90" aria-hidden="true" />
         {/* header */}

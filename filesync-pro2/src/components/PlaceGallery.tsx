@@ -117,7 +117,7 @@ export function PlaceGallery({ images, language = "ar" }: { images: PlaceImage[]
 
       {viewerOpen && createPortal(
         <div
-          className="pg-viewer fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black/92 p-4 backdrop-blur-sm"
+          className="pg-viewer fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black/95 p-4"
           onClick={() => setViewerOpen(false)}
           dir={isEn ? "ltr" : "rtl"}
         >
