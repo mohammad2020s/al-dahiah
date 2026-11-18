@@ -9,9 +9,11 @@ const RESET_VERSION = "2026-10-31-welcome";
 try {
   if (localStorage.getItem("dahiah:reset") !== RESET_VERSION) {
     const owner = localStorage.getItem("dahiah:ownerKey");
+    const vid = localStorage.getItem("dahiah:vid");
     localStorage.clear();
     sessionStorage.clear();
     if (owner) localStorage.setItem("dahiah:ownerKey", owner);
+    if (vid) localStorage.setItem("dahiah:vid", vid); // the visit counter's random id survives a reset
     localStorage.setItem("dahiah:reset", RESET_VERSION);
   }
 } catch {}
@@ -26,6 +28,23 @@ try {
     else localStorage.setItem("dahiah:ownerKey", k);
     u.searchParams.delete("teach");
     history.replaceState(null, "", u.pathname + u.search + u.hash);
+  }
+} catch {}
+
+// Visit counter for the owner's /visitors page: one small beacon per page load with a random id kept
+// on this device (no name, no IP stored). The owner's own device (it holds his code) is not counted.
+try {
+  if (!localStorage.getItem("dahiah:ownerKey")) {
+    let vid = localStorage.getItem("dahiah:vid");
+    if (!vid) {
+      vid = Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => b.toString(36).padStart(2, "0")).join("");
+      localStorage.setItem("dahiah:vid", vid);
+    }
+    const src = new URLSearchParams(location.search).get("src") || "";
+    const body = JSON.stringify({ vid, ref: document.referrer, src, lang: navigator.language, path: location.pathname });
+    if (!(navigator.sendBeacon && navigator.sendBeacon("/api/visit", new Blob([body], { type: "application/json" })))) {
+      fetch("/api/visit", { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true }).catch(() => {});
+    }
   }
 } catch {}
 

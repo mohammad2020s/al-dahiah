@@ -29,9 +29,11 @@ export function useD1(db: any) {
             .bind(h, k, String(v ?? "1"))
             .run();
           return 1;
-        case "HSETNX":
-          await db.prepare("INSERT OR IGNORE INTO kv (h, k, v) VALUES (?1, ?2, ?3)").bind(h, k, v).run();
-          return 1;
+        case "HSETNX": {
+          // 1 when the field was new, 0 when it was already there (as Redis answers)
+          const r = await db.prepare("INSERT OR IGNORE INTO kv (h, k, v) VALUES (?1, ?2, ?3)").bind(h, k, v).run();
+          return typeof r?.meta?.changes === "number" ? (r.meta.changes > 0 ? 1 : 0) : 1;
+        }
         case "HSET":
           await db.prepare("INSERT INTO kv (h, k, v) VALUES (?1, ?2, ?3) ON CONFLICT (h, k) DO UPDATE SET v = excluded.v").bind(h, k, v).run();
           return 1;

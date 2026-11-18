@@ -1,6 +1,7 @@
 import { najdify, speakableTownName, OWNER_PRONUNCIATIONS_AR, stripWelcome, welcomeStripper } from "./najdiStyle.ts";
 import { parseTeach, teach, forget, taughtList, applyTaught, taughtRulesAr, addRule, removeRule, rulesList, loadTaught, loadRules } from "./pronMemory.ts";
 import { getStore } from "./store.ts";
+import { countToday } from "./visits.ts";
 import { venueMapIntent } from "./venueMap.ts";
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
@@ -311,6 +312,7 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
     );
     const rawHistory = Array.isArray(req.body?.history) ? req.body.history : [];
 
+    if (userPrompt) countToday("chats");
     if (!userPrompt) {
       sendEvent({ type: "error", message: "Message is required" });
       res.end();
