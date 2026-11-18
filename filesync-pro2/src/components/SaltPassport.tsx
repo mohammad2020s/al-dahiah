@@ -181,7 +181,7 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
 
   return (
     <>
-      <div className="rounded-[1.7rem] border border-[#e2d5c6] bg-white p-4 shadow-sm">
+      <div className="card-contour rounded-[1.7rem] border border-[#e2d5c6] bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between">
           <span className="rounded-full bg-[#fbf6ee] border border-[#ebdfce] px-2 py-0.5 text-[11px] font-bold text-[#8f3f24]">
             {fmtNum(count, en)} / {fmtNum(total, en)}
@@ -217,7 +217,7 @@ export function SaltPassport({ language = "ar" }: { language?: Language }) {
               aria-modal="true"
               aria-label={en ? "Salt Passport" : "جواز الملح"}
               onClick={(e) => e.stopPropagation()}
-              className="tr-sheet flex max-h-[92vh] w-full max-w-xl flex-col overflow-hidden rounded-t-[1.8rem] sm:rounded-[1.8rem] bg-white shadow-2xl"
+              className="card-contour tr-sheet flex max-h-[92vh] w-full max-w-xl flex-col overflow-hidden rounded-t-[1.8rem] sm:rounded-[1.8rem] bg-white shadow-2xl"
             >
               <div className="flex items-center justify-between border-b border-[#eddecd] px-5 py-3.5">
                 <div>

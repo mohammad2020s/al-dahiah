@@ -43,7 +43,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
 
   if (left <= 0) {
     return (
-      <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
+      <div className="card-contour sc-card relative overflow-hidden rounded-[1.7rem] border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
         <div className="flex items-center gap-2 text-sm font-bold text-[#6a3420]">
           <PartyPopper className="size-5 text-amber-600" />
           {isEn ? "Al-Qasab Salt Season is on now!" : "موسم ملح القْصَب انطلق، حيّاكم!"}
@@ -71,7 +71,7 @@ export function SeasonCountdown({ language = "ar", onAsk }: { language?: Languag
   ];
 
   return (
-    <div className="sc-card relative overflow-hidden rounded-[1.7rem] border border-[#e4d0ba] bg-white p-4 shadow-sm">
+    <div className="card-contour sc-card relative overflow-hidden rounded-[1.7rem] border border-[#e4d0ba] bg-white p-4 shadow-sm">
       {/* Salt crystals drifting in the background */}
       <div className="sc-salt pointer-events-none absolute inset-0" aria-hidden="true" />
       {/* Contour pattern from the «ملح القصب» brand identity */}

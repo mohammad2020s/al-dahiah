@@ -83,7 +83,7 @@ export function WelcomeGrandpa({ language = "ar", onCall }: { language?: Languag
   return (
     <div
       dir={en ? "ltr" : "rtl"}
-      className="wg-in fixed inset-x-3 bottom-24 z-[45] mx-auto max-w-sm overflow-hidden rounded-[1.6rem] border border-[#e2d5c6] bg-[#fdf9f3] shadow-2xl lg:inset-x-auto lg:bottom-6 lg:start-6"
+      className="card-contour wg-in fixed inset-x-3 bottom-24 z-[45] mx-auto max-w-sm overflow-hidden rounded-[1.6rem] border border-[#e2d5c6] bg-[#fdf9f3] shadow-2xl lg:inset-x-auto lg:bottom-6 lg:start-6"
       role="dialog"
       aria-label={en ? "Welcome" : "ترحيب"}
     >

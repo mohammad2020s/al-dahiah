@@ -236,7 +236,7 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
   }, [servicePins, language, multiPin, allPlaces, location, activeCoordinates.lat, activeCoordinates.lng, locationTitle]);
 
   return (
-    <div className="my-4 overflow-hidden rounded-3xl border border-[#e5d0b8] bg-white shadow-lg shadow-gray-200/50 w-full">
+    <div className="card-contour my-4 overflow-hidden rounded-3xl border border-[#e5d0b8] bg-white shadow-lg shadow-gray-200/50 w-full">
       <LeafletMap
         className="h-64 sm:h-72"
         points={mapPoints}
@@ -753,7 +753,7 @@ export default function Home() {
       <div className="relative z-[1] mx-auto flex min-h-screen max-w-[1480px] flex-col px-4 pt-4 pb-28 sm:px-6 lg:px-8 lg:pb-4">
         {/* Header Bar */}
         <div className="merlons mx-10 -mb-px opacity-90" aria-hidden="true" />
-        <header className="heritage-frame flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-white/95 px-4 py-2.5 backdrop-blur">
+        <header className="card-contour heritage-frame flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-white/95 px-4 py-2.5 backdrop-blur">
           {/* Logo & Name */}
           <div className="flex items-center gap-3">
             <MalhAlQasabLogo size="md" className="rounded-2xl" />
@@ -844,7 +844,7 @@ export default function Home() {
             <button
               type="button"
               onClick={openNearMe}
-              className="flex items-center gap-3 rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 text-start shadow-sm backdrop-blur transition hover:border-[#a5492a] active:scale-[0.99]"
+              className="card-contour flex items-center gap-3 rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 text-start shadow-sm backdrop-blur transition hover:border-[#a5492a] active:scale-[0.99]"
             >
               <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-[#f2e9dd] text-[#a5492a]">
                 <LocateFixed className="size-5" />
@@ -876,7 +876,7 @@ export default function Home() {
 
             {/* Weather Card */}
             {weatherData && (
-              <div className="rounded-[1.7rem] border border-[#e2d5c6] bg-white p-4 shadow-sm">
+              <div className="card-contour rounded-[1.7rem] border border-[#e2d5c6] bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <span className="rounded-full bg-[#fbf6ee] border border-[#ebdfce] px-2 py-0.5 text-[11px] font-bold text-[#8f3f24]">
                     Google Weather
@@ -902,7 +902,7 @@ export default function Home() {
             )}
 
             {/* Policy Badge Card */}
-            <div className="rounded-[1.4rem] border border-[#e2d5c6] bg-white/85 p-4 text-[11px] leading-5 text-[#694a3f] flex items-center gap-2">
+            <div className="card-contour rounded-[1.4rem] border border-[#e2d5c6] bg-white/85 p-4 text-[11px] leading-5 text-[#694a3f] flex items-center gap-2">
               <BadgeCheck className="size-4 text-[#a5492a] shrink-0" />
               <span>{t.scopeNotice}</span>
             </div>
@@ -910,7 +910,7 @@ export default function Home() {
           </aside>
 
           {/* Main Chat Container */}
-          <section id="chat-panel" className="order-1 scroll-mt-3 lg:order-none flex-1 flex min-h-[78vh] lg:min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] heritage-frame bg-white/80 backdrop-blur-sm">
+          <section id="chat-panel" className="card-contour order-1 scroll-mt-3 lg:order-none flex-1 flex min-h-[78vh] lg:min-h-[640px] flex-col overflow-hidden rounded-[1.8rem] heritage-frame bg-white/80 backdrop-blur-sm">
             <div className="sadu-strip" aria-hidden="true" />
             {/* Top Bar inside Chat */}
             <div className="flex items-center justify-between border-b border-[#eddecd] bg-white px-5 py-3.5">

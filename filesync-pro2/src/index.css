@@ -40,6 +40,13 @@ body {
 }
 /* Contour lines on rust banners and dark panels */
 .contour-light { background-image: url(/images/theme/contour-light.svg); background-size: calc(2 * clamp(360px, 100vw, 620px)) auto; }
+/* Cards: the same guide lines inside, in a soft coral so they read apart from the page's lines */
+.card-contour {
+  background-image: url(/images/theme/contour-card.svg);
+  background-size: calc(2 * clamp(360px, 100vw, 620px)) auto;
+  background-position: 30% 20%;
+}
+.night .card-contour { background-image: url(/images/theme/contour-card-night.svg); }
 .contour-dark { background-image: url(/images/theme/contour-dark.svg); background-size: calc(2 * clamp(360px, 100vw, 620px)) auto; }
 
 .no-scrollbar::-webkit-scrollbar {
