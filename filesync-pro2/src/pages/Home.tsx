@@ -31,7 +31,7 @@ import {
   Landmark,
   ScrollText,
 } from "lucide-react";
-import { MalhAlQasabLogo, TanmiahLogo } from "../components/BrandLogos";
+import { MalhAlQasabLogo } from "../components/BrandLogos";
 import { RichText } from "../components/RichText";
 import { NavigateSheet, openNavigation } from "../components/NavigateSheet";
 // The call screen pulls in three.js and the salt bag; load it only when someone calls
@@ -59,6 +59,10 @@ import { MobileBar, FloatingCall } from "../components/MobileBar";
 import { DidYouKnow } from "../components/DidYouKnow";
 import { SaltPassport } from "../components/SaltPassport";
 import { Language, translations } from "../i18n";
+
+// The site owner's contact address, shown in the footer (split so bots scanning the files miss it)
+const OWNER_MAIL_USER = "m7md.msh2020";
+const OWNER_MAIL_DOMAIN = "gmail.com";
 
 type WeatherData = {
   source: "google" | "fallback";
@@ -767,19 +771,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Sponsor Tag */}
-          <div className="flex items-center gap-2.5 rounded-full border border-[#e2d5c6] bg-[#fdf9f3] px-4 py-1.5 shadow-xs">
-            <div className="text-right leading-tight">
-              <p className="text-[11px] font-medium text-[#aa6048]">{t.sponsoredBy}</p>
-              <p className="mt-0.5 text-[11px] font-bold text-[#6a3420]">
-                {t.sponsorName}
-              </p>
-            </div>
-            <div className="grid size-8 place-items-center rounded-full bg-white border border-[#e2d5c6] p-0.5">
-              <TanmiahLogo size="sm" />
-            </div>
-          </div>
-
           {/* Actions */}
           <div className="flex items-center gap-2">
             <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#e2d5c6] bg-[#faf5ef] px-3 py-1.5 text-xs font-semibold text-[#8f3f24]">
@@ -1184,6 +1175,26 @@ export default function Home() {
 
         <footer className="pb-2 text-center text-[11px] text-[#8e6558]">
           {t.footerText}
+          {/* Who made the site (the owner's own words). The address is put together here so simple
+              address-harvesting bots reading the files don't pick it up. */}
+          <div dir="rtl" className="mt-1.5 space-y-0.5 leading-5">
+            <p>
+              تم إنشاء هذا الموقع بواسطة <b className="font-bold text-[#6a3420]">محمد الحسيني</b>
+            </p>
+            <p>
+              البريد الإلكتروني:{" "}
+              <a
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${OWNER_MAIL_USER}%40${OWNER_MAIL_DOMAIN}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                dir="ltr"
+                className="font-semibold text-[#a5492a] underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                title="راسلني على Gmail"
+              >
+                {OWNER_MAIL_USER}@{OWNER_MAIL_DOMAIN}
+              </a>
+            </p>
+          </div>
         </footer>
       </div>
     </main>

@@ -4,8 +4,6 @@ export const translations = {
   ar: {
     appName: "الداهية",
     tagline: "تراث المكان.. وذكاء اليوم",
-    sponsoredBy: "برعاية وإشراف",
-    sponsorName: "جمعية التنمية الأهلية بالقصب",
     onlineStatus: "متصل وجاهز",
     newChat: "محادثة جديدة",
     specialtyBadge: "تخصص حصري ومباشر",
@@ -75,8 +73,6 @@ export const translations = {
   en: {
     appName: "Al-Dahiya",
     tagline: "Heritage of the Place • Today's Intelligence",
-    sponsoredBy: "Sponsored & Supervised by",
-    sponsorName: "Al-Qasab Social Development Committee",
     onlineStatus: "Online & Ready",
     newChat: "New Chat",
     specialtyBadge: "Dedicated Focus",
