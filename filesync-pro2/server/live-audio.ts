@@ -256,6 +256,24 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     let answers = 0; // finished answers in this call
     let clientGone = false;
 
+    // The talk so far (both sides, last few lines): handed to the paid key if the free one cuts out mid-call
+    const callLog: { role: "user" | "model"; text: string }[] = [];
+    let heardNow = "", saidNow = "";
+    const trackTalk = (raw: string) => {
+      if (!raw.includes("Transcription") && !raw.includes("turnComplete")) return;
+      try {
+        const sc = JSON.parse(raw)?.serverContent;
+        if (!sc) return;
+        if (sc.inputTranscription?.text) heardNow += sc.inputTranscription.text;
+        if (sc.outputTranscription?.text) {
+          if (heardNow.trim()) { callLog.push({ role: "user", text: heardNow.trim() }); heardNow = ""; }
+          saidNow += sc.outputTranscription.text;
+        }
+        if (sc.turnComplete && saidNow.trim()) { callLog.push({ role: "model", text: saidNow.trim() }); saidNow = ""; }
+        while (callLog.length > 12) callLog.shift();
+      } catch {}
+    };
+
     // Collects the transcript of each spoken answer; logs it, flagging the known wrong forms
     let said = "";
     const logSpokenNames = (raw: string) => {
@@ -450,8 +468,12 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         ws.send(JSON.stringify(setupMessage));
       });
 
+      let connSetup = false; // this connection's own setup (a call can move to the paid key mid-way)
       ws.onMessage(async (text) => {
-        if (!setupDone && text.includes("setupComplete")) {
+        trackTalk(text);
+        if (!connSetup && text.includes("setupComplete")) {
+          connSetup = true;
+          const resumed = setupDone;
           setupDone = true;
           // Arabic calls: a short example exchange already "said" in the owner's spellings and the
           // lively tone, so the voice copies its own earlier words (sent before the page's context).
@@ -465,6 +487,14 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
                 turnComplete: false,
               },
             }));
+          }
+          if (resumed) {
+            const turns = callLog.map((l) => ({ role: l.role, parts: [{ text: l.text }] }));
+            if (turns.length) {
+              ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: lang === "en" ? "[The call continues: this is what was said so far. Carry on from here, no new greeting.]" : "[المكالمة مستمرة: هذا اللي انقال لين الحين. كمّل من هنا بدون ترحيب جديد.]" }] }, ...turns], turnComplete: false } }));
+            }
+            console.log(`[Gemini Live] Call carried on with the ${tier} key (${turns.length} lines of context)`);
+            return; // the page already has its call running
           }
         }
         // show_place is non-blocking: answered here at once (silently), the page only shows the photos
@@ -562,6 +592,17 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
             connect();
             return;
           }
+        }
+        // Cut off mid-call (free quota used up, session limit, server error): carry on with the next key
+        if (setupDone && code !== 1000 && keyIndex + 1 < keys.length && clientWs.isOpen()) {
+          pauseVoice("live", tier, `${code} ${why}`);
+          keyIndex++;
+          console.warn(`[Gemini Live] Cut off mid-call (${code}), carrying on with the ${keys[keyIndex].tier} key`);
+          gen++; turn = newTurn(); playUntil = 0; turnPassthrough = false; dropTurn = false; geminiTurnOpen = false;
+          if (saidNow.trim()) { callLog.push({ role: "model", text: saidNow.trim() }); saidNow = ""; }
+          toClient({ serverContent: { turnComplete: true } }); // end any half-said answer on the page
+          connect();
+          return;
         }
         if (clientWs.isOpen()) clientWs.close();
       });
