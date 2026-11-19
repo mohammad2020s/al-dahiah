@@ -87,8 +87,8 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
     </div>
 
     <div class="grid2">
-      <div class="card"><h2>من وين جوا</h2><p class="hint">الموقع أو التطبيق اللي جابهم</p><ol id="sources"></ol></div>
-      <div class="card"><h2>المدن</h2><p class="hint">تقريبية، من شبكة الزائر</p><ol id="cities"></ol></div>
+      <div class="card"><h2>من وين جوا</h2><p class="hint">الموقع أو التطبيق اللي جابهم. واتساب ما يعرّف بنفسه، فينحسب مع «مباشر».</p><ol id="sources"></ol></div>
+      <div class="card"><h2>المدن</h2><p class="hint">تقريبية: تنعرف من شبكة الإنترنت، فأغلب شبكات الجوال في نجد تطلع «الرياض» حتى لو الزائر في القصب.</p><ol id="cities"></ol></div>
       <div class="card"><h2>الأجهزة</h2><ol id="devices"></ol></div>
       <div class="card"><h2>أنظمة التشغيل</h2><ol id="os"></ol></div>
       <div class="card"><h2>الدول</h2><ol id="countries"></ol></div>
@@ -109,6 +109,9 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
   function n(x) { return nf.format(x || 0); }
   function dayLabel(d, long) { return new Date(d + "T12:00:00Z").toLocaleDateString("ar-SA-u-ca-gregory", long ? { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" } : { day: "numeric", month: "short", timeZone: "UTC" }); }
   function hourLabel(h) { var t = h % 12 === 0 ? 12 : h % 12; return n(t) + (h < 12 ? " ص" : " م"); }
+  // Cloudflare gives city names in English: the common ones in Arabic
+  var CITIES = [[/riyadh/i,"الرياض"],[/buraydah|buraidah/i,"بريدة"],[/unaizah|unayzah/i,"عنيزة"],[/bad[aā].?i/i,"البدائع"],[/jeddah|jiddah/i,"جدة"],[/mecca|makkah/i,"مكة"],[/medina|madinah/i,"المدينة المنورة"],[/dammam/i,"الدمام"],[/khobar/i,"الخبر"],[/dhahran/i,"الظهران"],[/hofuf|ahsa/i,"الأحساء"],[/shaqra/i,"شقراء"],[/qasab/i,"القصب"],[/dawadmi/i,"الدوادمي"],[/majma/i,"المجمعة"],[/zulfi/i,"الزلفي"],[/kharj/i,"الخرج"],[/hail|ha.il/i,"حائل"],[/tabuk/i,"تبوك"],[/abha/i,"أبها"],[/taif/i,"الطائف"],[/kuwait/i,"الكويت"],[/dubai/i,"دبي"],[/doha/i,"الدوحة"],[/manama/i,"المنامة"]];
+  function cityAr(c) { for (var i = 0; i < CITIES.length; i++) if (CITIES[i][0].test(c)) return CITIES[i][1]; return c; }
   var regions; try { regions = new Intl.DisplayNames(["ar"], { type: "region" }); } catch (e) {}
 
   function kpi(label, value, small) { return '<div class="kpi"><b>' + n(value) + '</b><span>' + label + '</span>' + (small ? '<small>' + small + '</small>' : '') + '</div>'; }
@@ -212,7 +215,7 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
       return { v: v, hl: v === maxH && v > 0, tick: h % (narrow ? 6 : 3) === 0 ? hourLabel(h) : "", tip: "<b>الساعة " + hourLabel(h) + "</b><br>" + n(v) + " زيارة" };
     }), { label: "عدد الزيارات في كل ساعة من اليوم", h: 220 });
     list($("sources"), d.sources);
-    list($("cities"), d.cities);
+    list($("cities"), d.cities, cityAr);
     list($("devices"), d.devices);
     list($("os"), d.os);
     list($("countries"), d.countries, function (c) { try { return (regions && regions.of(c)) || c; } catch (e) { return c; } });
