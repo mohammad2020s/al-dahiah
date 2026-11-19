@@ -61,6 +61,7 @@ import { DidYouKnow } from "../components/DidYouKnow";
 import { SaltPassport } from "../components/SaltPassport";
 import { Language, translations } from "../i18n";
 import { ContactSheet } from "../components/ContactSheet";
+import { SeasonShots } from "../components/SeasonShots";
 
 type WeatherData = {
   source: "google" | "fallback";
@@ -1171,6 +1172,8 @@ export default function Home() {
             </div>
           </section>
         </section>
+
+        <SeasonShots en={language === "en"} />
 
         <footer className="pb-2 text-center text-[11px] text-[#8e6558]">
           {t.footerText}

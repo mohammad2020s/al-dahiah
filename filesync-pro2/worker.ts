@@ -13,6 +13,8 @@ import { contactRouter, INBOX_PAGE_HTML, setMailBinding } from "./server/contact
 import { recordVisit, countToday, visitsRouter } from "./server/visits.ts";
 import { VISITORS_PAGE_HTML } from "./server/visitorsPage.ts";
 import { refreshXNews, xNewsRouter } from "./server/xNews.ts";
+import { shotsRouter } from "./server/shots.ts";
+import { SHOTS_PAGE_HTML } from "./server/shotsPage.ts";
 import { runCall, type Sock } from "./server/live-audio.ts";
 import { useD1, getStore } from "./server/store.ts";
 import { refreshMemory, loadTaught, loadRules } from "./server/pronMemory.ts";
@@ -67,6 +69,7 @@ app.use((req, res, next) => {
 app.use("/api", contactRouter);
 app.use("/api", visitsRouter);
 app.use("/api", xNewsRouter);
+app.use("/api", shotsRouter);
 app.use("/api", apiRouter);
 const ownerPage = (html: string) => (_req: express.Request, res: express.Response) => {
   res.set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" }).send(html);
@@ -76,6 +79,7 @@ app.get("/stamps", ownerPage(STAMPS_PAGE_HTML));
 app.get("/teach", ownerPage(TEACH_PAGE_HTML));
 app.get("/inbox", ownerPage(INBOX_PAGE_HTML));
 app.get("/visitors", ownerPage(VISITORS_PAGE_HTML));
+app.get("/shots", ownerPage(SHOTS_PAGE_HTML));
 app.listen(3000);
 const expressHandler = httpServerHandler({ port: 3000 });
 
@@ -247,7 +251,7 @@ export default {
       return Response.redirect("https://al-dahiah.com" + url.pathname + url.search, 301);
     }
     if (url.hostname === "www.al-dahiah.com") return Response.redirect("https://al-dahiah.com" + url.pathname + url.search, 301);
-    const dynamic = url.pathname === "/live" || url.pathname.startsWith("/api/") || url.pathname === "/stats" || url.pathname === "/stamps" || url.pathname === "/teach" || url.pathname === "/inbox" || url.pathname === "/visitors";
+    const dynamic = url.pathname === "/live" || url.pathname.startsWith("/api/") || url.pathname === "/stats" || url.pathname === "/stamps" || url.pathname === "/teach" || url.pathname === "/inbox" || url.pathname === "/visitors" || url.pathname === "/shots";
     if (!dynamic) return env.ASSETS.fetch(request);
 
     // Visit counter (one beacon per page load, from the page's own script)

@@ -13,6 +13,9 @@ let d1: any = null;
 let d1Store: Store | null = null;
 let redis: Store | null | undefined;
 
+/** The D1 database itself (for features with their own table), or null off Cloudflare. */
+export const getD1 = (): any => d1;
+
 export function useD1(db: any) {
   if (!db || d1 === db) return;
   d1 = db;
