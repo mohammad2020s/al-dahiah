@@ -1,6 +1,6 @@
 import { taughtRulesAr, ownerRulesAr, ownerCommandAr } from "./pronMemory.ts";
 import { OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
-import { isFileTopic, matchFileSections, isEventsQuestion } from "./qasabFile.ts";
+import { isFileTopic, matchFileSections, isEventsQuestion, QASAB_FILE_SECTIONS } from "./qasabFile.ts";
 import { cleanQuestion } from "./questionInsights.ts";
 import {
   matchPlaceTopic,
@@ -832,6 +832,15 @@ export function generateLocalKnowledgeFallback(
       return `Entry is free: register your visit at qasab-tickets.pages.dev (tap «Book your ticket» below) and get your ticket instantly; one ticket covers you and your companions. The season runs 19–28 November 2026, daily 4:00–11:00 pm, in Al-Qasab's heritage town.`;
     }
     return `التذكرة مجانية: سجّل زيارتك من موقع التذاكر qasab-tickets.pages.dev (تلقى زر «احجز تذكرتك» تحت) وتوصلك تذكرتك فوراً، تذكرة وحدة لك ولمرافقيك. والموسم من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً من ٤ العصر إلى ١١ الليل في مدينة القْصَب التراثية. حيّاكم يا ضيوف الذهب الأبيض!`;
+  }
+  // Events: from the visitor guide only, even when no model is free to answer
+  if (isEventsQuestion(query)) {
+    const guide = QASAB_FILE_SECTIONS.find((x) => x.id === "guide_schedule_by_day");
+    if (guide) {
+      return lang === "en"
+        ? `From the official visitor guide (in Arabic):\n${guide.text}`
+        : `من دليل الزائر الرسمي للموسم:\n${guide.text}`;
+    }
   }
   if (isFestivalQuestion(query) || (norm.includes("موسم") && (norm.includes("موعد") || norm.includes("متى")))) {
     if (lang === "en") {

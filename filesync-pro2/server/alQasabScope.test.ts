@@ -297,6 +297,7 @@ test("events come only from the visitor guide; the guide knows today's date", as
   assert.ok(!isEventsQuestion("وش قصة حميدان الشويعر؟"));
   for (const q of ["وش فيه بكرة؟", "متى بطولة الفروسية؟", "وين العرضة؟"]) assert.ok(isAlQasabTopic(q), q);
   assert.ok(!isAlQasabTopic("وش فيه بكرة في دبي؟"));
+  assert.match(generateLocalKnowledgeFallback("متى بطولة الفروسية؟", "ar"), /^من دليل الزائر الرسمي/);
   const today = fileContextFor("وش فعاليات اليوم؟");
   assert.match(today, /^### جدول الفعاليات الخاصة يوماً بيوم/);
   for (const t of ["العرضة السعودية", "سباق ملح القصب", "المملحة النموذجية", "منطقة الأطفال"]) assert.ok(fileContextFor("وش الفعاليات؟").includes(t), t);
