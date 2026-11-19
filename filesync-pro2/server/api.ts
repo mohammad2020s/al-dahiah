@@ -42,6 +42,7 @@ import {
   generateLocalKnowledgeFallback,
   isFamilyOrTribalQuestion,
   isCreatorQuestion,
+  todayLine,
   CREATOR_REPLY_AR,
   CREATOR_REPLY_EN,
   FORBIDDEN_FAMILY_REPLY_AR,
@@ -459,9 +460,11 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       const stream = laterAnswer ? welcomeStripper((t) => sendEvent({ type: "chunk", content: t })) : null;
       const result = await streamChatWithFallback({
         contents,
-        systemInstruction: withFileContext(buildAlQasabSystemPrompt(undefined, lang), userPrompt, rawHistory),
+        systemInstruction: withFileContext(buildAlQasabSystemPrompt(undefined, lang) + "\n\n" + todayLine(lang), userPrompt, rawHistory),
         // A poem or a list from the season file (teachers, stations) needs more room than a short answer
-        maxOutputTokens: /قصيد|قصايد|قصائد|ابيات|أبيات|شعر|poem|معلم|محطات|امثال|أمثال/i.test(userPrompt) ? 900 : 400,
+        // The model thinks before it answers and that counts here too: 400 left long event questions
+        // cut after a few words («يا هلا ومسهلا، فعاليات موسم»). The prompt keeps answers short.
+        maxOutputTokens: /قصيد|قصايد|قصائد|ابيات|أبيات|شعر|poem|معلم|محطات|امثال|أمثال/i.test(userPrompt) ? 3000 : 2000,
         // Never leave the visitor waiting longer than this. Each model gets 7 s to start
         // (a photo takes the models longer to look at: 15 s each, 35 s in all)
         budgetMs: photo ? 35_000 : 20_000,
@@ -592,7 +595,7 @@ function withFileContext(system: string, question: string, history: any[]): stri
   if (!context) return system;
   return `${system}
 
-OFFICIAL SALT SEASON FILE — sections relevant to this question (from the season's verified information file; this overrides anything above that disagrees). Answer from it: use its facts, names, dates, numbers, poems and proverbs exactly as written (poems word for word), in the visitor's language/dialect. When the visitor asks for a poem, verses, a list of names or the season stations, give it in full even if longer than the usual 1–3 sentences:
+OFFICIAL SALT SEASON FILE — sections relevant to this question (from the season's verified information file; this overrides anything above that disagrees). For EVENTS (what's on, days, times, places) use ONLY the sections «من دليل الزائر»: never add an event or a time that isn't written in them. Answer from it: use its facts, names, dates, numbers, poems and proverbs exactly as written (poems word for word), in the visitor's language/dialect. When the visitor asks for a poem, verses, a list of names or the season stations, give it in full even if longer than the usual 1–3 sentences:
 ${context}`;
 }
 

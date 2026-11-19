@@ -301,7 +301,7 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     id: "season_map",
     titleAr: "خريطة موسم ملح القْصَب ومحطاته",
     titleEn: "Salt Season map and stations",
-    keywords: ["خريطه الموسم", "محطات", "مسار الموسم", "وش فيه الموسم", "وش في الموسم", "وش فيه بالموسم", "فعاليات الموسم", "فعاليات موسم", "برنامج الموسم", "مناطق الموسم", "ركن الطفل", "منطقه الطفل", "season map", "stations", "what's on", "whats on", "season program"],
+    keywords: ["خريطه الموسم", "محطات", "مسار الموسم", "مناطق الموسم", "season map", "stations"],
     answerAr:
       "أبشر! هذي خريطة الموسم الرسمية تحت، تقدر تكبّرها وتحمّلها PDF، واضغط مكانك عليها ويدلك على أي محطة.\nترتيب الزيارة: الدخول ← ١ نفق تاريخ الملح (٢٥ متر) ← ٢ عن موسم ملح القْصَب ← ٣ تاريخ القْصَب والشعر ← ٤ ماما نورة وسولت ← ٥ الكتاتيب ← ٦ المسرح ← ٧ أيادينا ← ٨ متحف الشاي ← ٩ شارع الفن ← ١٠ سوق العبيدي ← ١١ الألعاب والأطفال ← الخروج.\nوعلى الخريطة بعد: ١٢ قصر الشيخ عبدالله الزاحم، ١٣ ديوانية المنيع، ١٤ خيمة الأولين، ١٥ تيه البلور، ١٦ مدرسة البنات الأولى، ١٧ بيت القْصَب النموذجي، ١٨ دار حميدان الشويعر، ١٩ مربط الخيول، ٢٠ دار الداغر، ٢١ منطقة المطاعم، ٢٢ قصر الراشد. والمقاهي: قهوة آرت، شاهي ناقع، قهوة بدور، ليفارنو، فيو.",
     answerEn:
@@ -508,25 +508,14 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     coordinates: { lat: 25.2546554, lng: 45.4738085 },
   },
   {
-    id: "events",
-    titleAr: "فعاليات القْصَب على مدار السنة",
-    titleEn: "Al-Qasab events through the year",
-    keywords: ["شتويه القصب", "شتويه", "كشته", "يوم التاسيس", "اليوم الوطني", "اسبوع البيئه", "عيد الفطر", "فعاليات السنه", "مدار السنه", "طول السنه", "events"],
-    answerAr:
-      "غير موسم الملح، القْصَب فيها فعاليات طول السنة:\n• شتوية القْصَب من ١ يناير إلى ١ مارس، والدخول مجاني.\n• الكشتة في حديقة الملك سلمان الخميس والجمعة من ديسمبر إلى فبراير.\n• يوم التأسيس ٢٢–٢٣ فبراير.\n• فعاليات عيد الفطر.\n• أسبوع البيئة كل سنة بين أبريل ومايو.\n• اليوم الوطني ٢٣ سبتمبر، تبدأ الفعاليات بعد العصر في القرية التراثية.\nوكلها ببلاش.",
-    answerEn:
-      "Besides the Salt Season, Al-Qasab has events all year:\n• Qasab Winter, 1 January–1 March, free.\n• The Kashta in King Salman Park, Thursdays and Fridays, December–February.\n• Founding Day, 22–23 February.\n• Eid Al-Fitr celebrations.\n• Environment Week, yearly in April–May.\n• National Day, 23 September, from after Asr in the heritage village.\nAll free.",
-    link: OFFICIAL_SITE,
-  },
-  {
     id: "season",
     titleAr: "موسم ملح القْصَب",
     titleEn: "Al-Qasab Salt Season",
     keywords: ["موسم", "مهرجان", "فعاليات", "festival", "season", "event grounds"],
     answerAr:
-      "موسم ملح القْصَب الرابع من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦ بإذن الله في مدينة القْصَب التراثية، يومياً من ٤ العصر إلى ١١ الليل، والدخول مجاني: سجّل زيارتك وخذ تذكرتك من qasab-tickets.pages.dev (تذكرة وحدة لك ولمرافقيك). الموسم يحتفي بإرث القْصَب في إنتاج الملح الطبيعي، وفيه المَمْلَحَة النموذجية وجناح ملح القْصَب ومحطة تاريخ الملح وأبواب القْصَب والقرّاية (الكتاتيب) و«ملح القصيد»، والأسر المنتجة والمطاعم والمقاهي، وبطولة فروسية وسيارات كلاسيكية وركن للطفل. نسخه السابقة: الأولى ٢–١١ مارس ٢٠٢٣ (٨٣ ألف زائر)، والثانية ٢–١٠ فبراير ٢٠٢٤ (٩٢ ألف)، والثالثة ٢٠–٢٧ فبراير ٢٠٢٥ (فوق ١٠٠ ألف)، والمتوقع هالسنة ١١٠ إلى ١٣٠ ألف زائر و٤٠ إلى ٥٠ عارض. وللتواصل: المدير التنفيذي المهندس محمد بن سعد القصيّب، جوال 0505807840، بريد ceo@qasabseason.com، وحساب الموسم @qasabsaltseason.",
+      "موسم ملح القْصَب الرابع «القْصَب عام ١٣٠٠هـ: عِش القْصَب كما كانت قبل قرن ونص» من الخميس ١٩ إلى السبت ٢٨ نوفمبر ٢٠٢٦، يومياً من ٤ العصر إلى ١١ الليل (ولكل فعالية وقتها)، في القرية التراثية والمَمْلَحَة النموذجية بالقْصَب، والدخول مجاني: سجّل زيارتك وخذ تذكرتك من qasab-tickets.pages.dev (تذكرة وحدة لك ولمرافقيك). وفيه حسب دليل الزائر الرسمي ٤٢ فعالية في ٦ أقسام: معالم القرية (٨)، تجربة الملح (٤)، التراث والثقافة (١٨)، الطفل والأسرة (٦)، الفروسية والعروض (٣)، المجتمع والشراكات (٣)، و٥٦ عارض بين مطاعم ومقاهي وأسر منتجة. تفاصيل الفعاليات وأيامها وأوقاتها من دليل الزائر بس. نسخه السابقة: الأولى ٢–١١ مارس ٢٠٢٣ (٨٣ ألف زائر)، والثانية ٢–١٠ فبراير ٢٠٢٤ (٩٢ ألف)، والثالثة ٢٠–٢٧ فبراير ٢٠٢٥ (فوق ١٠٠ ألف)، والمتوقع هالسنة ١١٠ إلى ١٣٠ ألف زائر. وحساب الموسم @qasabsaltseason.",
     answerEn:
-      "The 4th Al-Qasab Salt Season runs 19–28 November 2026 in Al-Qasab's heritage town, daily 4:00–11:00 pm, with free entry: register and get your ticket at qasab-tickets.pages.dev (one ticket covers you and your companions). It celebrates the town's natural-salt heritage with the model salt pan, the Al-Qasab salt pavilion, the salt-history station, Al-Qasab's gates, the old kuttab school and «Salt of Poetry», plus family producers, restaurants and cafes, an equestrian championship, classic cars and a kids' corner. Past editions: 2–11 March 2023 (83,793 visitors), 2–10 February 2024 (92,000) and 20–27 February 2025 (100,000+); 110,000–130,000 visitors and 40–50 exhibitors are expected this year. Contact: executive director Eng. Muhammad bin Saad Al-Qusayyib, mobile 0505807840, ceo@qasabseason.com; Instagram @qasabsaltseason.",
+      "The 4th Al-Qasab Salt Season, «Al-Qasab in 1300 AH: live Al-Qasab as it was a century and a half ago», runs Thursday 19 to Saturday 28 November 2026, daily 4:00–11:00 pm (each event has its own times), in the heritage village and the model salt pan, with free entry: register and get your ticket at qasab-tickets.pages.dev (one ticket covers you and your companions). The official visitor guide lists 42 events in 6 sections: village landmarks (8), the salt experience (4), heritage & culture (18), kids & family (6), horses & shows (3), community & partners (3), plus 56 exhibitors (restaurants, cafés, family producers). Event details, days and times come from the visitor guide only. Past editions: 2–11 March 2023 (83,793 visitors), 2–10 February 2024 (92,000) and 20–27 February 2025 (100,000+); 110,000–130,000 visitors are expected this year. Instagram @qasabsaltseason.",
     images: [
       { src: "/images/places/season-sign.jpg", captionAr: "لوحة «موسم ملح القصب» في أرض الموسم", captionEn: "The «Al-Qasab Salt Season» sign at the grounds", credit: GM },
       { src: "/images/places/village-gate-season.jpg", captionAr: "بوابة القرية التراثية بشعار ملح القصب وقت الموسم", captionEn: "The heritage village gate with the Malh Al-Qasab logo during the season", credit: GM },

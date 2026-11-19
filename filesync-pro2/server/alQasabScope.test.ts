@@ -289,3 +289,22 @@ test("asking who made the site gets the maker's name; other «who built» questi
   assert.match(buildAlQasabSystemPrompt(undefined, "ar"), /استثناء صاحب الموقع/);
   assert.match(buildAlQasabSystemPrompt(undefined, "en"), /Mohammed Alhusayni/);
 });
+
+test("events come only from the visitor guide; the guide knows today's date", async () => {
+  const { fileContextFor, isEventsQuestion, QASAB_FILE_SECTIONS } = await import("./qasabFile.ts");
+  assert.ok(!QASAB_FILE_SECTIONS.some((s) => s.id === "season_events"));
+  for (const q of ["وش فعاليات موسم الملح؟", "وش فيه اليوم؟", "متى العرضة؟ وش فيه بكرة", "what's on tonight?"]) assert.ok(isEventsQuestion(q), q);
+  assert.ok(!isEventsQuestion("وش قصة حميدان الشويعر؟"));
+  const today = fileContextFor("وش فعاليات اليوم؟");
+  assert.match(today, /^### جدول الفعاليات الخاصة يوماً بيوم/);
+  for (const t of ["العرضة السعودية", "سباق ملح القصب", "المملحة النموذجية", "منطقة الأطفال"]) assert.ok(fileContextFor("وش الفعاليات؟").includes(t), t);
+  assert.ok(!/كلاسيك|بطولة الفروسية|شتوية/.test(fileContextFor("وش الفعاليات؟") + buildAlQasabSystemPrompt(undefined, "ar")));
+  assert.match(buildAlQasabSystemPrompt(undefined, "ar"), /مصدرها الوحيد «دليل الزائر والفعاليات»/);
+  assert.match(buildAlQasabSystemPrompt(undefined, "en"), /RULE 1b — Events come ONLY from the official visitor guide/);
+  const { todayLine } = await import("./alQasabScope.ts");
+  const t = Date.UTC(2026, 10, 19, 13, 30); // 4:30 pm in Riyadh
+  assert.match(todayLine("ar", t), /الخميس ١٩ نوفمبر ٢٠٢٦/);
+  assert.match(todayLine("ar", t), /اليوم ١ من أيام موسم الملح/);
+  assert.match(todayLine("ar", t), /٤:٣٠ العصر/);
+  assert.match(todayLine("en", t), /Thursday 19 November 2026, 4:30 pm/);
+});

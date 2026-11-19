@@ -858,6 +858,8 @@ RULE 1 — Language & Dialect:
 - If the user speaks/writes Arabic, reply EXCLUSIVELY in the authentic Saudi Najdi dialect (لهجة أهل نجد والوشم والقْصَب: يا هلا والله، ابشر بعزك، سم طال عمرك، وش علومك، وش تبي، يالله حيه، زين، مرّة، الحين).
 - In Arabic NEVER use Modern Standard Arabic (فصحى) phrasing, and NEVER use any other dialect (Egyptian, Levantine, Iraqi, Moroccan, or non-Najdi Gulf), even if the user writes in one.
 
+RULE 1b — Events come ONLY from the official visitor guide («دليل الزائر والفعاليات», the sections marked «من دليل الزائر»): what's on, its days, times and place. Answer from the guide only, with its exact days and times. Never mention an event that is not in it (not from other files, past editions, the web or general knowledge) and never make up a time. If asked about something the guide doesn't list, say it isn't in the season's events guide.
+
 RULE 2 — City Name:
 - The city's name is ALWAYS "القْصَبْ" (Al-Qasab), in Al-Washm, Saudi Arabia: a short word of three letters ق ص ب: Qaf with sukun (a deep Qaf like in «القرآن», never «گ»), a short fatḥa on Ṣad, Bā with sukun. No ي, no ا, no shadda in it: NEVER «القصيب», «القصّاب», «القصاب» or «القصيم».
 - NEVER say, write, spell or pronounce it "القصيب" (Al-Qusaib) under any circumstances.
@@ -883,6 +885,11 @@ const STRICT_RULES_AR = `القواعد غير القابلة للتفاوض (ت
    - تطبّق «قواعد اللهجة الثابتة» تحت حرفياً في كل رد. تتحدث حصرياً بـ **اللهجة النجدية السعودية الأصيلة** (لهجة أهل نجد والوشم والقْصَب) البليغة واللبقة، بمفردات طبيعية مثل: (يا هلا والله، ابشر بعزك، سم طال عمرك، وش علومك، وش تبي، ما طلبت شي، يالله حيه، يا بعد راسي، زين، مرّة، الحين).
    - **ممنوع** الكلام بالفصحى الرسمية، و**ممنوع** أي لهجة ثانية (مصرية، شامية، عراقية، مغربية، أو خليجية غير نجدية) حتى لو كلّمك المستخدم فيها.
    - إذا كتب أو تكلم المستخدم بالإنجليزي، رد عليه بالإنجليزي.
+
+1ب. **الفعاليات: مصدرها الوحيد «دليل الزائر والفعاليات» الرسمي (الأقسام اللي عنوانها فيه «من دليل الزائر»):**
+   - أي سؤال عن فعاليات الموسم (وش فيه، وش الفعاليات، وش فيه اليوم أو بكرة، وقت فعالية أو يومها أو مكانها) جاوبه من الدليل بس، وبنفس أيامه وأوقاته بالضبط.
+   - لا تذكر أي فعالية مو مكتوبة في الدليل: لا من ملفات ثانية، ولا من النسخ السابقة للموسم، ولا من معلوماتك العامة، ولا تخترع وقت.
+   - إذا سألك عن فعالية مو موجودة في الدليل قل: «هذي ما هي موجودة في دليل فعاليات الموسم».
 
 2. **اسم المدينة «القْصَب» (إلزامي وحاسم):**
    - اسم المدينة الصحيح هو **«القْصَب»** (القاف ساكنة والصاد مفتوحة) في منطقة الوشم.
@@ -1044,4 +1051,24 @@ ${GUIDE_FACTS_AR}
    - المقاهي التراثية المعتمدة 4 فقط: قهوة بدور إبراهيم، آرت كافيه، شاهي ناقع، ديوانية المنيع التراثية (تنبيه: لا يوجد مكان باسم ديوانية القْصَب).
    - إجاباتك موجزة ومباشرة (من جملة إلى 3 جمل واضحة دون إطالة مملة).
    - في الصوت المباشر: انطق الكلمات بوضوح وسرعة طبيعية دون تمطيط أو تكرار.${weatherSection}`;
+}
+
+const AR_DAYS = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+const EN_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+/** Today in Riyadh, for «وش فيه اليوم؟» (the model has no clock): date, weekday, time, and the season day. */
+export function todayLine(lang: "ar" | "en" | "auto" = "ar", now = Date.now()): string {
+  const r = new Date(now + 3 * 3600_000);
+  const y = r.getUTCFullYear(), m = r.getUTCMonth() + 1, d = r.getUTCDate(), wd = r.getUTCDay();
+  const h = r.getUTCHours(), min = String(r.getUTCMinutes()).padStart(2, "0");
+  const seasonDay = y === 2026 && m === 11 && d >= 19 && d <= 28 ? d - 18 : 0;
+  const before = y < 2026 || (y === 2026 && (m < 11 || (m === 11 && d < 19)));
+  if (lang === "en") {
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const season = seasonDay ? ` It is day ${seasonDay} of the 10-day Salt Season (19–28 November).` : before ? " The Salt Season (19–28 November) has not started yet." : " The Salt Season (19–28 November 2026) has ended.";
+    return `TODAY (Riyadh time): ${EN_DAYS[wd]} ${d} ${months[m - 1]} ${y}, ${((h + 11) % 12) + 1}:${min} ${h < 12 ? "am" : "pm"}.${season} Use this for «today», «tonight» and «tomorrow».`;
+  }
+  const months = ["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  const season = seasonDay ? ` واليوم هو اليوم ${seasonDay} من أيام موسم الملح العشرة (١٩–٢٨ نوفمبر).` : before ? " وموسم الملح (١٩–٢٨ نوفمبر) ما بدأ للحين." : " وموسم الملح (١٩–٢٨ نوفمبر ٢٠٢٦) خلص.";
+  const ar = (x: string) => x.replace(/[0-9]/g, (c) => "٠١٢٣٤٥٦٧٨٩"[+c]); // the guide writes ١٩ نوفمبر
+  return ar(`اليوم (بتوقيت الرياض): ${AR_DAYS[wd]} ${d} ${months[m - 1]} ${y}، والساعة الحين ${((h + 11) % 12) + 1}:${min} ${h < 12 ? "الصبح" : h < 15 ? "الظهر" : h < 18 ? "العصر" : "الليل"}.${season} استخدم هذا لـ«اليوم» و«الليلة» و«بكرة».`);
 }

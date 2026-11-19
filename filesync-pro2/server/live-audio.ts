@@ -1,8 +1,8 @@
-import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE, applyNajdiPhoneticDiacritics } from "./alQasabScope.ts";
+import { buildAlQasabSystemPrompt, PRONUNCIATION_GUIDE, applyNajdiPhoneticDiacritics, todayLine } from "./alQasabScope.ts";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { buildSpeechPrompt, pcmSeconds, toPcm, maxSpeechSeconds, ttsSpelling } from "./api.ts";
 import { najdify } from "./najdiStyle.ts";
-import { QASAB_FILE_INDEX, fileContextFor } from "./qasabFile.ts";
+import { QASAB_FILE_INDEX, fileContextFor, isEventsQuestion } from "./qasabFile.ts";
 import { teach, spokenForm, applyTaught, ownerCommandAr } from "./pronMemory.ts";
 import { speakableTownName } from "./najdiStyle.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
@@ -23,6 +23,8 @@ export function liveSystemInstruction(lang: "ar" | "en" = "ar"): string {
 مكالمة صوتية — اقرأ هذا أول شي. ردودك في المكالمة قصيرة: جملتين أو ثلاث، وبعدها اسأل المتصل.
 
 ${buildAlQasabSystemPrompt(undefined, lang)}
+
+${todayLine(lang)}
 
 OFFICIAL SALT SEASON FILE: the details (poems, poets, proverbs, people, dates, numbers, season stations, events, history) are NOT written here. When the caller asks for something like that, call the tool lookup_info with a short Arabic query FIRST, then answer from what it returns (it is verified and overrides anything above). Its sections:
 ${QASAB_FILE_INDEX}
@@ -183,7 +185,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
                 : []),
               {
                 name: "lookup_info",
-                description: "Look up verified details from the official Al-Qasab salt season file (poems, poets, proverbs, people, dates, numbers, season stations, events, history). Call it before answering such a question.",
+                description: "Look up verified details from the official Al-Qasab salt season file (poems, poets, proverbs, people, dates, numbers, season stations, history) and the official visitor guide, the ONLY source for the season's events, their days and times. Call it before answering such a question, and never mention an event or time it doesn't return.",
                 parameters: {
                   type: "OBJECT",
                   properties: { query: { type: "STRING", description: "Short Arabic query, e.g. «قصيدة حميدان الشويعر» or «محطات الموسم»" } },
@@ -529,7 +531,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
                   functionResponses: look.map((c) => ({
                     id: c.id,
                     name: c.name,
-                    response: { result: spokenForm(fileContextFor(String(c.args?.query || ""), "", 3500) || "ما فيه معلومة عن هذا في الملف الرسمي.", speakableTownName) },
+                    response: { result: spokenForm(fileContextFor(String(c.args?.query || ""), "", isEventsQuestion(String(c.args?.query || "")) ? 9000 : 3500) || "ما فيه معلومة عن هذا في الملف الرسمي.", speakableTownName) },
                   })),
                 },
               }));
