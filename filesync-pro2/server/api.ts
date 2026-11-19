@@ -2,6 +2,7 @@ import { najdify, speakableTownName, OWNER_PRONUNCIATIONS_AR, stripWelcome, welc
 import { parseTeach, teach, forget, taughtList, applyTaught, taughtRulesAr, addRule, removeRule, rulesList, loadTaught, loadRules } from "./pronMemory.ts";
 import { getStore } from "./store.ts";
 import { countToday } from "./visits.ts";
+import { xNewsBlock } from "./xNews.ts";
 import { venueMapIntent } from "./venueMap.ts";
 import { Router, type Request, type Response } from "express";
 import { GoogleGenAI, Modality } from "@google/genai";
@@ -458,9 +459,11 @@ apiRouter.post("/chat/stream", chatLimit, async (req: Request, res: Response) =>
       // Not the first answer: no «يا هلا ومسهلا» again (held back from the stream too)
       const laterAnswer = rawHistory.some((t: any) => t?.role === "assistant" && String(t?.content || "").trim());
       const stream = laterAnswer ? welcomeStripper((t) => sendEvent({ type: "chunk", content: t })) : null;
+      // Latest posts from the season's official X account (empty until the X key is added)
+      const newsBlock = await xNewsBlock(lang).catch(() => "");
       const result = await streamChatWithFallback({
         contents,
-        systemInstruction: withFileContext(buildAlQasabSystemPrompt(undefined, lang) + "\n\n" + todayLine(lang), userPrompt, rawHistory),
+        systemInstruction: withFileContext(buildAlQasabSystemPrompt(undefined, lang) + "\n\n" + todayLine(lang) + (newsBlock ? "\n\n" + newsBlock : ""), userPrompt, rawHistory),
         // A poem or a list from the season file (teachers, stations) needs more room than a short answer
         // The model thinks before it answers and that counts here too: 400 left long event questions
         // cut after a few words («يا هلا ومسهلا، فعاليات موسم»). The prompt keeps answers short.

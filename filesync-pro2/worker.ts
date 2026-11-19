@@ -12,6 +12,7 @@ import { TEACH_PAGE_HTML } from "./server/teachPage.ts";
 import { contactRouter, INBOX_PAGE_HTML, setMailBinding } from "./server/contact.ts";
 import { recordVisit, countToday, visitsRouter } from "./server/visits.ts";
 import { VISITORS_PAGE_HTML } from "./server/visitorsPage.ts";
+import { refreshXNews, xNewsRouter } from "./server/xNews.ts";
 import { runCall, type Sock } from "./server/live-audio.ts";
 import { useD1, getStore } from "./server/store.ts";
 import { refreshMemory, loadTaught, loadRules } from "./server/pronMemory.ts";
@@ -65,6 +66,7 @@ app.use((req, res, next) => {
 // «راسلني» (visitors → the owner) and the owner's inbox
 app.use("/api", contactRouter);
 app.use("/api", visitsRouter);
+app.use("/api", xNewsRouter);
 app.use("/api", apiRouter);
 const ownerPage = (html: string) => (_req: express.Request, res: express.Response) => {
   res.set({ "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" }).send(html);
@@ -293,5 +295,11 @@ export default {
 
     if (url.pathname === "/live") return liveCall(request, url);
     return expressHandler.fetch!(request as any, env as any, ctx);
+  },
+  // Every 30 minutes: new posts from the season's official X account (only with X_BEARER_TOKEN)
+  async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    useD1(env.DB);
+    for (const [k, v] of Object.entries(env)) if (typeof v === "string" && process.env[k] === undefined) process.env[k] = v;
+    ctx.waitUntil(refreshXNews().then((r) => { if (r.status !== "no-token") console.log(`[X news] ${r.status}, ${r.added} new`); }));
   },
 };

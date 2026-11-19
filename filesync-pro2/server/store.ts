@@ -37,6 +37,10 @@ export function useD1(db: any) {
         case "HSET":
           await db.prepare("INSERT INTO kv (h, k, v) VALUES (?1, ?2, ?3) ON CONFLICT (h, k) DO UPDATE SET v = excluded.v").bind(h, k, v).run();
           return 1;
+        case "HGET": {
+          const row: any = await db.prepare("SELECT v FROM kv WHERE h = ?1 AND k = ?2").bind(h, k).first();
+          return row ? String(row.v) : null;
+        }
         case "HDEL":
           await db.prepare("DELETE FROM kv WHERE h = ?1 AND k = ?2").bind(h, k).run();
           return 1;

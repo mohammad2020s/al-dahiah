@@ -3,6 +3,7 @@ import { GoogleGenAI, Modality } from "@google/genai";
 import { buildSpeechPrompt, pcmSeconds, toPcm, maxSpeechSeconds, ttsSpelling } from "./api.ts";
 import { najdify } from "./najdiStyle.ts";
 import { QASAB_FILE_INDEX, fileContextFor, isEventsQuestion } from "./qasabFile.ts";
+import { xNewsBlock } from "./xNews.ts";
 import { teach, spokenForm, applyTaught, ownerCommandAr } from "./pronMemory.ts";
 import { speakableTownName } from "./najdiStyle.ts";
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
@@ -489,6 +490,13 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
                 turnComplete: false,
               },
             }));
+          }
+          // The latest posts from the season's official X account, once, before the caller speaks
+          if (!resumed) {
+            const news = await xNewsBlock(lang === "en" ? "en" : "ar", 5).catch(() => "");
+            if (news && ws.isOpen()) {
+              ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm((lang === "en" ? "(Background from the site owner, do not reply to it or mention it unless asked) " : "(معلومة من صاحب الموقع، لا ترد عليها ولا تذكرها إلا إذا انسألت عنها) ") + news, speakableTownName) }] }], turnComplete: false } }));
+            }
           }
           if (resumed) {
             const turns = callLog.map((l) => ({ role: l.role, parts: [{ text: l.text }] }));

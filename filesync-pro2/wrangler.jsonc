@@ -1,7 +1,7 @@
 // «الداهية» on Cloudflare Workers. Build: `npm run build` (Vite → dist/), then `npx wrangler deploy`.
 // Secrets (set in the Cloudflare dashboard, never in this file): GEMINI_API_KEY, GEMINI_PAID_API_KEY,
 // STATS_KEY, GOOGLE_MAPS_API_KEY, GOOGLE_WEATHER_API_KEY, OWNER_EMAIL (where «راسلني» messages go; kept out of
-// this public repo).
+// this public repo), X_BEARER_TOKEN (reads the season's official X account).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "al-dahiah",
@@ -22,6 +22,8 @@
     { "pattern": "al-dahiah.com", "custom_domain": true },
     { "pattern": "www.al-dahiah.com", "custom_domain": true }
   ],
+  // News from @QASABSALTSEASON on X every 30 minutes (needs the secret X_BEARER_TOKEN)
+  "triggers": { "crons": ["*/30 * * * *"] },
   "observability": { "enabled": true },
   "keep_vars": true,
   "vars": { "NODE_ENV": "production" }
