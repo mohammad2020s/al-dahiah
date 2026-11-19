@@ -1,6 +1,6 @@
 import { taughtRulesAr, ownerRulesAr, ownerCommandAr } from "./pronMemory.ts";
 import { OWNER_PRONUNCIATIONS_AR } from "./najdiStyle.ts";
-import { isFileTopic, matchFileSections } from "./qasabFile.ts";
+import { isFileTopic, matchFileSections, isEventsQuestion } from "./qasabFile.ts";
 import { cleanQuestion } from "./questionInsights.ts";
 import {
   matchPlaceTopic,
@@ -637,6 +637,8 @@ export function isAlQasabTopic(message: string, recentContext: string[] = []): b
 
   const foreignSignals = ["باريس", "فرنسا", "لندن", "مصر", "امريكا", "اوروبا", "دبي", "تركيا", "طيران", "تذكرة سفر", "تذكرة طيران", "سفر"];
   if (foreignSignals.some(f => normalized.includes(normalizeArabic(f)))) return false;
+  // The season's events (from the visitor guide): «وش فيه بكرة؟», «متى بطولة الفروسية؟», «وين العرضة؟»
+  if (isEventsQuestion(message) || matchFileSections(message).some((x) => x.id.startsWith("guide_"))) return true;
 
   const citySignals = [
     "القصب", "قصب", "موسم الملح", "ملح القصب", "المملحة", "ممالح", "الجفار", "السبخة", "الصبخة",

@@ -1227,7 +1227,7 @@ export function matchFileSections(text: string): FileSection[] {
 
 // The visitor guide's events sections: the only source for the season's events
 const EVENT_SECTION_IDS = ["guide_overview", "guide_village_salt", "guide_culture", "guide_family_shows", "guide_schedule_by_day"];
-const EVENT_WORDS = ["فعاليه", "فعاليات", "وش فيه", "وش في الموسم", "وش في القريه", "برنامج", "جدول", "عروض", "امسيه", "ورشه", "ورش", "مسابقه", "حفل", "event", "what's on", "whats on", "schedule", "program", "show"];
+const EVENT_WORDS = ["فعاليه", "فعاليات", "وش فيه", "وش في الموسم", "وش في القريه", "برنامج", "جدول", "عروض", "امسيه", "ورشه", "ورش", "مسابقه", "حفل", "بطوله", "فروسيه", "عرضه", "سامري", "event", "what's on", "whats on", "schedule", "program", "show"];
 const DAY_WORDS = ["اليوم", "الليله", "بكره", "بكرا", "الخميس", "الجمعه", "السبت", "الاحد", "الاثنين", "الثلاثاء", "الاربعاء", "today", "tonight", "tomorrow"];
 /** «وش الفعاليات؟», «وش فيه اليوم؟», «what's on tomorrow?» */
 export function isEventsQuestion(text: string): boolean {

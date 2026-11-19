@@ -295,6 +295,8 @@ test("events come only from the visitor guide; the guide knows today's date", as
   assert.ok(!QASAB_FILE_SECTIONS.some((s) => s.id === "season_events"));
   for (const q of ["وش فعاليات موسم الملح؟", "وش فيه اليوم؟", "متى العرضة؟ وش فيه بكرة", "what's on tonight?"]) assert.ok(isEventsQuestion(q), q);
   assert.ok(!isEventsQuestion("وش قصة حميدان الشويعر؟"));
+  for (const q of ["وش فيه بكرة؟", "متى بطولة الفروسية؟", "وين العرضة؟"]) assert.ok(isAlQasabTopic(q), q);
+  assert.ok(!isAlQasabTopic("وش فيه بكرة في دبي؟"));
   const today = fileContextFor("وش فعاليات اليوم؟");
   assert.match(today, /^### جدول الفعاليات الخاصة يوماً بيوم/);
   for (const t of ["العرضة السعودية", "سباق ملح القصب", "المملحة النموذجية", "منطقة الأطفال"]) assert.ok(fileContextFor("وش الفعاليات؟").includes(t), t);
