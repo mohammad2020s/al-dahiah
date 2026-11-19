@@ -258,13 +258,11 @@ export default {
     if (url.pathname === "/api/visit") {
       if (request.method === "POST") {
         const cf = (request as any).cf || {};
-        ctx.waitUntil(
-          request.text().then((t) => {
-            let body: any = {};
-            try { body = JSON.parse(t.slice(0, 2000)); } catch {}
-            return recordVisit(body, { country: cf.country, city: cf.city, ua: request.headers.get("user-agent") || "" });
-          }).catch(() => {})
-        );
+        // Read the body BEFORE answering: once the response is sent, Workers can no longer read it
+        // (that silently dropped every visit until 19 Nov). Counting then goes on in the background.
+        let body: any = {};
+        try { body = JSON.parse((await request.text()).slice(0, 2000)); } catch {}
+        ctx.waitUntil(recordVisit(body, { country: cf.country, city: cf.city, ua: request.headers.get("user-agent") || "" }).catch(() => {}));
       }
       return new Response(null, { status: 204, headers: { "Cache-Control": "no-store" } });
     }
