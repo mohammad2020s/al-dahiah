@@ -10,7 +10,7 @@ import { STATS_PAGE_HTML } from "./server/statsPage.ts";
 import { STAMPS_PAGE_HTML } from "./server/stampsPage.ts";
 import { TEACH_PAGE_HTML } from "./server/teachPage.ts";
 import { contactRouter, INBOX_PAGE_HTML, setMailBinding } from "./server/contact.ts";
-import { recordVisit, countToday, visitsRouter } from "./server/visits.ts";
+import { recordVisit, countToday, visitsRouter, heartbeat, callAlive } from "./server/visits.ts";
 import { VISITORS_PAGE_HTML } from "./server/visitorsPage.ts";
 import { refreshXNews, xNewsRouter } from "./server/xNews.ts";
 import { shotsRouter } from "./server/shots.ts";
@@ -182,6 +182,11 @@ function liveCall(request: Request, url: URL): Response {
     else openCalls.set(ip, n);
   });
   countToday("calls");
+  // «في مكالمة الحين» on the owner's page: refreshed every minute while the call is open
+  const callId = crypto.randomUUID().slice(0, 12);
+  callAlive(callId, true);
+  const alive = setInterval(() => callAlive(callId, true), 60_000);
+  server.addEventListener("close", () => { clearInterval(alive); callAlive(callId, false); });
   runCall(wrapAccepted(server), url, openOutbound);
   return new Response(null, { status: 101, webSocket: client } as ResponseInit);
 }
@@ -262,7 +267,8 @@ export default {
         // (that silently dropped every visit until 19 Nov). Counting then goes on in the background.
         let body: any = {};
         try { body = JSON.parse((await request.text()).slice(0, 2000)); } catch {}
-        ctx.waitUntil(recordVisit(body, { country: cf.country, city: cf.city, ua: request.headers.get("user-agent") || "" }).catch(() => {}));
+        if (body?.hb) ctx.waitUntil(heartbeat(String(body.vid || "")).catch(() => {})); // still on the page
+        else ctx.waitUntil(recordVisit(body, { country: cf.country, city: cf.city, ua: request.headers.get("user-agent") || "" }).catch(() => {}));
       }
       return new Response(null, { status: 204, headers: { "Cache-Control": "no-store" } });
     }

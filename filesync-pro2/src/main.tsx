@@ -42,9 +42,16 @@ try {
     }
     const src = new URLSearchParams(location.search).get("src") || "";
     const body = JSON.stringify({ vid, ref: document.referrer, src, lang: navigator.language, path: location.pathname });
-    if (!(navigator.sendBeacon && navigator.sendBeacon("/api/visit", new Blob([body], { type: "application/json" })))) {
-      fetch("/api/visit", { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true }).catch(() => {});
-    }
+    const send = (b: string) => {
+      if (!(navigator.sendBeacon && navigator.sendBeacon("/api/visit", new Blob([b], { type: "application/json" })))) {
+        fetch("/api/visit", { method: "POST", headers: { "Content-Type": "application/json" }, body: b, keepalive: true }).catch(() => {});
+      }
+    };
+    send(body);
+    // «الحين في الموقع»: a tiny heartbeat each minute while the page is open and on screen
+    const beat = () => { if (document.visibilityState === "visible") send(JSON.stringify({ vid, hb: true })); };
+    setInterval(beat, 60_000);
+    document.addEventListener("visibilitychange", beat);
   }
 } catch {}
 

@@ -9,7 +9,7 @@
 //   visits:totals  views / people (all time)
 import { Router, type Request, type Response } from "express";
 import { timingSafeEqual } from "node:crypto";
-import { getStore } from "./store.ts";
+import { getStore, getD1 } from "./store.ts";
 
 const riyadh = (t = Date.now()) => new Date(t + 3 * 3600_000);
 export const riyadhDay = (t = Date.now()) => riyadh(t).toISOString().slice(0, 10);
@@ -66,6 +66,7 @@ export async function recordVisit(
   if (BOT.test(ua)) return;
   const vid = String(body?.vid || "");
   if (!/^[a-z0-9]{8,40}$/i.test(vid)) return;
+  void heartbeat(vid).catch(() => {});
   const day = riyadhDay();
   try {
     await Promise.all([hincr("visits:views", day), hincr("visits:hours", String(riyadhHour())), hincr("visits:totals", "views")]);
@@ -90,6 +91,32 @@ export async function recordVisit(
   } catch (e: any) {
     console.warn(`[Visits] not counted: ${String(e?.message || e).slice(0, 160)}`);
   }
+}
+
+// «الحين في الموقع»: every open page sends a small heartbeat each minute (visits:live vid → ms);
+// a call in progress refreshes its own row (visits:calls-live id → ms). Counted over the last 150 s.
+const LIVE_WINDOW = 150_000;
+export async function heartbeat(vid: string) {
+  if (!/^[a-z0-9]{8,40}$/i.test(vid)) return;
+  await getStore()?.command(["HSET", "visits:live", vid, String(Date.now())]);
+}
+export function callAlive(id: string, on: boolean) {
+  const st = getStore();
+  if (!st) return;
+  void Promise.resolve(on ? st.command(["HSET", "visits:calls-live", id, String(Date.now())]) : st.command(["HDEL", "visits:calls-live", id])).catch(() => {});
+}
+export async function liveNow(): Promise<{ people: number; calls: number }> {
+  const since = Date.now() - LIVE_WINDOW;
+  const d1 = getD1();
+  if (d1) {
+    const q = (h: string) => d1.prepare("SELECT COUNT(*) AS n FROM kv WHERE h = ?1 AND CAST(v AS INTEGER) > ?2").bind(h, since).first();
+    const [p, c] = await Promise.all([q("visits:live"), q("visits:calls-live")]);
+    // tidy up rows older than 10 minutes
+    void d1.prepare("DELETE FROM kv WHERE h IN ('visits:live', 'visits:calls-live') AND CAST(v AS INTEGER) < ?1").bind(Date.now() - 600_000).run().catch(() => {});
+    return { people: Number(p?.n) || 0, calls: Number(c?.n) || 0 };
+  }
+  const count = async (h: string) => Object.values(await hash(h)).filter((v) => v > since).length;
+  return { people: await count("visits:live"), calls: await count("visits:calls-live") };
 }
 
 /** +1 for today on a daily counter («calls», «chats»). */
@@ -130,9 +157,11 @@ visitsRouter.get("/owner/visits", async (req: Request, res: Response) => {
     days.push({ day: d, people: uniq[d] || 0, views: views[d] || 0, fresh: fresh[d] || 0, calls: calls[d] || 0, chats: chats[d] || 0 });
   }
   const firstDay = Object.keys(views).sort()[0] || null;
+  const live = await liveNow().catch(() => ({ people: 0, calls: 0 }));
   res.set("Cache-Control", "no-store").json({
     today: riyadhDay(),
     firstDay,
+    live,
     days,
     totals: { people: totals.people || 0, views: totals.views || 0 },
     hours: Array.from({ length: 24 }, (_, h) => hours[String(h)] || 0),

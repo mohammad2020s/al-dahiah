@@ -24,6 +24,8 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
   .kpi { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:12px 14px; }
   .kpi b { display:block; font-size:30px; line-height:1.2; font-variant-numeric:tabular-nums; color:var(--ink); }
   .kpi span { color:var(--muted); font-size:13px; }
+  .dot { display:inline-block; width:12px; height:12px; border-radius:50%; background:#2f9e5b; margin-inline-end:8px; vertical-align:middle; animation:blink 1.6s infinite; }
+  @keyframes blink { 50% { opacity:.3; } }
   .kpi small { display:block; color:var(--muted); font-size:12px; margin-top:2px; }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   @media (max-width:760px) { .grid2 { grid-template-columns:1fr; } }
@@ -196,7 +198,9 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
     var narrow = $("daysChart").clientWidth < 600;
     var days = d.days, today = days[days.length - 1], yest = days[days.length - 2];
     var last7 = days.slice(-7).reduce(function (a, x) { return a + x.people; }, 0);
+    var live = d.live || { people: 0, calls: 0 };
     $("kpis").innerHTML =
+      '<div class="kpi" style="border-color:#a5492a;background:#fbf1ea"><b style="color:#a5492a"><span class="dot"></span>' + n(live.people) + '</b><span>الحين في الموقع</span><small>' + (live.calls ? n(live.calls) + " منهم في مكالمة مع الداهية" : "ما فيه مكالمة شغالة") + '</small></div>' +
       kpi("زوار اليوم", today.people, n(today.views) + " مرة انفتح الموقع") +
       kpi("زوار أمس", yest.people) +
       kpi("آخر ٧ أيام", last7, "زوار (مجموع الأيام)") +
@@ -220,8 +224,8 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
     list($("os"), d.os);
     list($("countries"), d.countries, function (c) { try { return (regions && regions.of(c)) || c; } catch (e) { return c; } });
     list($("langs"), d.langs);
-    $("updated").textContent = "آخر تحديث: " + new Date().toLocaleTimeString("ar-SA-u-ca-gregory", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Riyadh" }) + " · يتحدث كل دقيقة";
-    $("note").textContent = "العدّ بدأ " + (d.firstDay ? dayLabel(d.firstDay, true) : "اليوم") + ". «زائر» = جهاز واحد في اليوم، و«زيارة» = كل مرة ينفتح فيها الموقع. زياراتك أنت (الجهاز اللي فيه رمزك) ما تنحسب. ما ينحفظ أي اسم أو رقم IP.";
+    $("updated").textContent = "آخر تحديث: " + new Date().toLocaleTimeString("ar-SA-u-ca-gregory", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Riyadh" }) + " · يتحدث كل ٢٠ ثانية";
+    $("note").textContent = "العدّ بدأ " + (d.firstDay ? dayLabel(d.firstDay, true) : "اليوم") + ". «زائر» = جهاز واحد في اليوم، و«زيارة» = كل مرة ينفتح فيها الموقع، و«الحين في الموقع» = الأجهزة اللي فاتحة الموقع على الشاشة في آخر دقيقتين ونص. زياراتك أنت (الجهاز اللي فيه رمزك) ما تنحسب. ما ينحفظ أي اسم أو رقم IP.";
   }
 
   function showLogin(msg) { $("login").classList.remove("hidden"); $("data").classList.add("hidden"); $("actions").classList.add("hidden"); $("err").textContent = msg || ""; }
@@ -241,7 +245,7 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
   $("reload").onclick = function () { load(key()); };
   $("logout").onclick = function () { setKey(""); showLogin(""); };
   if (key()) load(key()); else showLogin("");
-  setInterval(function () { if (key() && !document.hidden) load(key()); }, 60000);
+  setInterval(function () { if (key() && !document.hidden) load(key()); }, 20000);
   var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { if (last) render(last); }, 200); });
 })();
 </script>
