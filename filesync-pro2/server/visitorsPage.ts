@@ -200,7 +200,7 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
     var last7 = days.slice(-7).reduce(function (a, x) { return a + x.people; }, 0);
     var live = d.live || { people: 0, calls: 0 };
     $("kpis").innerHTML =
-      '<div class="kpi" style="border-color:#a5492a;background:#fbf1ea"><b style="color:#a5492a"><span class="dot"></span>' + n(live.people) + '</b><span>الحين في الموقع</span><small>' + (live.calls ? n(live.calls) + " منهم في مكالمة مع الداهية" : "ما فيه مكالمة شغالة") + '</small></div>' +
+      '<div class="kpi" style="border-color:#a5492a;background:#fbf1ea"><b style="color:#a5492a"><span class="dot"></span>' + (live.people ? n(live.people) + (live.people === 1 ? ' شخص' : ' أشخاص') : '<span style="font-size:22px">ما فيه أحد الحين</span>') + '</b><span>الحين في الموقع</span><small>' + (live.calls ? n(live.calls) + " منهم في مكالمة مع الداهية" : "ما فيه مكالمة شغالة") + '</small></div>' +
       kpi("زوار اليوم", today.people, n(today.views) + " مرة انفتح الموقع") +
       kpi("زوار أمس", yest.people) +
       kpi("آخر ٧ أيام", last7, "زوار (مجموع الأيام)") +
