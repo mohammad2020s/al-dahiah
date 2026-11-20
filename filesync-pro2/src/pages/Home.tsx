@@ -62,6 +62,7 @@ import { SaltPassport } from "../components/SaltPassport";
 import { Language, translations } from "../i18n";
 import { ContactSheet } from "../components/ContactSheet";
 import { SeasonShots } from "../components/SeasonShots";
+import { SeasonSurvey } from "../components/SeasonSurvey";
 
 type WeatherData = {
   source: "google" | "fallback";
@@ -1173,6 +1174,7 @@ export default function Home() {
           </section>
         </section>
 
+        <SeasonSurvey en={language === "en"} />
         <SeasonShots en={language === "en"} />
 
         <footer className="pb-2 text-center text-[11px] text-[#8e6558]">
