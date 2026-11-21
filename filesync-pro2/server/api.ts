@@ -615,7 +615,7 @@ export function buildSpeechPrompt(transcript: string): string {
     "### DIRECTOR'S NOTES",
     // Tested 17 Nov (7 owner words, listener check): naming Najd/Najdi made the voice say every ق as
     // «گ» whatever the notes said; a neutral voice line + this positive ق line got all 7 words right.
-    "Voice: a lively, warm old Arab man, smiling and genuinely interested in the listener, natural brisk pace, never sleepy, never Egyptian. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in القَصَبْ and مَرقَب.",
+    "Voice: a very excited, energetic, warm old Arab man, beaming with joy and genuinely thrilled to talk to the listener, a loud full voice with lively rising and falling pitch, natural brisk pace, never flat, never sleepy, never Egyptian. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in الَقْصَبْ (a-laq-ṣab: fatha on the l, no vowel after the q) and مَرقَب.",
     "#### TRANSCRIPT",
     transcript,
   ].join("\n");
@@ -654,15 +654,13 @@ export function toPcm(buf: Buffer): Buffer {
 /** Seconds of 24 kHz 16-bit mono speech in a TTS answer. */
 export const pcmSeconds = (buf: Buffer) => toPcm(buf).length / 48000;
 /**
- * The last step before text goes to the TTS voice. «القْصَبْ» (sukun on ق) made the voice add a long
- * vowel later in the word about 1 time in 8 («القصيب»، «القصيم»); with a fatha on ق it said a short,
- * clean «qaSab» 8 times out of 8 in owner tests. Only what the voice reads changes; the written name
- * stays «القْصَبْ».
+ * The last step before text goes to the TTS voice. The town name is left as speakableTownName wrote
+ * it: «الَقْصَبْ» (fatha on the lam, sukun on ق), the owner's pronunciation since 21 Nov. Only what
+ * the voice reads changes; the written name stays «القْصَب».
  */
 export const ttsSpelling = (text: string) => {
   const M = "[\\u064B-\\u0652\\u0670]*";
   return text
-    .replace(/قْصَبْ/g, "قَصَبْ")
     // «الصْبَخَة» was read «الصَّبْخة» (doubled ص); «إصبَخَة» came out «إصْ-بَ-خَة» 4 times out of 4
     .replace(new RegExp(`(?<![\\p{L}\\p{M}])([وفبكل]${M})?(?:ا${M})?ل${M}ص${M}ب${M}خ${M}[ةه]${M}(?![\\p{L}\\p{M}])`, "gu"), (_m, pre?: string) => `${pre ? pre.replace(/[\u064B-\u0652]/g, "") : ""}إصبَخَة`)
     // «مَرْقَب» was read «مرگب»; «مَرقَب» (no sukun on ر) kept the deep ق
