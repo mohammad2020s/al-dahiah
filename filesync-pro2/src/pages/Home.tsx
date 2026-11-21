@@ -64,6 +64,7 @@ import { ContactSheet } from "../components/ContactSheet";
 import { SeasonShots } from "../components/SeasonShots";
 import { SeasonSurvey } from "../components/SeasonSurvey";
 import { TonightCard } from "../components/TonightCard";
+import { RaceRoutes, raceDay } from "../components/RaceRoutes";
 
 type WeatherData = {
   source: "google" | "fallback";
@@ -812,6 +813,7 @@ export default function Home() {
 
         {/* Big «كلّم الداهية», «أرسله لأهلك», and tonight's events from the visitor guide */}
         <TonightCard en={language === "en"} onAsk={(q) => askQuestion(q)} onCall={(el) => handleStartCall(el)} />
+        {raceDay() ? <RaceRoutes en={language === "en"} /> : null}
 
         {/* Two-column layout */}
         <section className="flex flex-col lg:flex-row gap-5 py-5 flex-1">
