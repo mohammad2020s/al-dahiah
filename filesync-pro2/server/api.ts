@@ -607,7 +607,11 @@ ${context}`;
  * list) were read out loud by gemini-3.8-flash-tts — one word took 3+ minutes of audio. The
  * pronunciation itself is carried by the diacritized text (القْصَبْ، الدَّاهِيِة، ديرَتْنَا…).
  */
-export function buildSpeechPrompt(transcript: string): string {
+// The read-aloud voice as it was on 20 Nov (the first ad, the owner's favourite tone): a lively, warm
+// old man, and the town name read «القَصَبْ». Used for ads made from the site (/api/speak style "classic").
+const CLASSIC_VOICE_NOTE = "Voice: a lively, warm old Arab man, smiling and genuinely interested in the listener, natural brisk pace, never sleepy, never Egyptian. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in القَصَبْ and مَرقَب.";
+
+export function buildSpeechPrompt(transcript: string, classic = false): string {
   const plain = transcript.replace(/[\u064B-\u0670\u065F]/g, "");
   if (!/[\u0600-\u06FF]/.test(plain)) return transcript;
   return [
@@ -615,7 +619,7 @@ export function buildSpeechPrompt(transcript: string): string {
     "### DIRECTOR'S NOTES",
     // Tested 17 Nov (7 owner words, listener check): naming Najd/Najdi made the voice say every ق as
     // «گ» whatever the notes said; a neutral voice line + this positive ق line got all 7 words right.
-    "Voice: a very excited, energetic, warm old Arab man, beaming with joy and genuinely thrilled to talk to the listener, a loud full voice with lively rising and falling pitch, natural brisk pace, never flat, never sleepy, never Egyptian. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in الَقْصَبْ (a-laq-ṣab: fatha on the l, no vowel after the q) and مَرقَب.",
+    classic ? CLASSIC_VOICE_NOTE : "Voice: a very excited, energetic, warm old Arab man, beaming with joy and genuinely thrilled to talk to the listener, a loud full voice with lively rising and falling pitch, natural brisk pace, never flat, never sleepy, never Egyptian. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in الَقْصَبْ (a-laq-ṣab: fatha on the l, no vowel after the q) and مَرقَب.",
     "#### TRANSCRIPT",
     transcript,
   ].join("\n");
@@ -658,9 +662,9 @@ export const pcmSeconds = (buf: Buffer) => toPcm(buf).length / 48000;
  * it: «الَقْصَبْ» (fatha on the lam, sukun on ق), the owner's pronunciation since 21 Nov. Only what
  * the voice reads changes; the written name stays «القْصَب».
  */
-export const ttsSpelling = (text: string) => {
+export const ttsSpelling = (text: string, classic = false) => {
   const M = "[\\u064B-\\u0652\\u0670]*";
-  return text
+  return (classic ? text.replace(/الَقْصَبْ/g, "القَصَبْ").replace(/للَقْصَبْ/g, "للقَصَبْ") : text)
     // «الصْبَخَة» was read «الصَّبْخة» (doubled ص); «إصبَخَة» came out «إصْ-بَ-خَة» 4 times out of 4
     .replace(new RegExp(`(?<![\\p{L}\\p{M}])([وفبكل]${M})?(?:ا${M})?ل${M}ص${M}ب${M}خ${M}[ةه]${M}(?![\\p{L}\\p{M}])`, "gu"), (_m, pre?: string) => `${pre ? pre.replace(/[\u064B-\u0652]/g, "") : ""}إصبَخَة`)
     // «مَرْقَب» was read «مرگب»; «مَرقَب» (no sukun on ر) kept the deep ق
@@ -835,7 +839,9 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   const expected = process.env.STATS_KEY || "";
   const given = String(req.headers["x-stats-key"] || "");
   const asOwner = !!req.body?.asIs && expected.length > 0 && given.length === expected.length && timingSafeEqual(Buffer.from(given), Buffer.from(expected));
-  const spoken = (asOwner ? String(text) : ttsSpelling(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text)))))).slice(0, 400);
+  // "classic": the 20 Nov voice and town-name reading, for ads (the owner liked that tone best)
+  const classic = req.body?.style === "classic";
+  const spoken = (asOwner ? String(text) : ttsSpelling(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text)))), classic)).slice(0, classic ? 700 : 400);
   const limit = maxSpeechSeconds(spoken);
   // Paid key first when there is one (the free speech quota is gone after a few answers a day)
   for (const { tier, key } of keys) {
@@ -854,7 +860,7 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
       let audio: any = null;
       for (const model of ["gemini-3.8-flash-tts", "gemini-3.1-flash-tts-preview"]) {
         try {
-          audio = audioOf(await ttsCall(model, buildSpeechPrompt(spoken)));
+          audio = audioOf(await ttsCall(model, buildSpeechPrompt(spoken, classic)));
           // Read the notes too (far too long)? Once more with the bare text
           if (audio?.data && pcmSeconds(Buffer.from(audio.data, "base64")) > limit) {
             console.warn(`[TTS] ${model} answer too long, retrying with the bare text`);
