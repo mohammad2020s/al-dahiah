@@ -63,6 +63,7 @@ import { Language, translations } from "../i18n";
 import { ContactSheet } from "../components/ContactSheet";
 import { SeasonShots } from "../components/SeasonShots";
 import { SeasonSurvey } from "../components/SeasonSurvey";
+import { TonightCard } from "../components/TonightCard";
 
 type WeatherData = {
   source: "google" | "fallback";
@@ -539,12 +540,14 @@ export default function Home() {
 
   const t = translations[language];
 
-  const handleStartCall = () => {
+  const handleStartCall = (from?: unknown) => {
     // Start fetching the call screen while the button animation plays
     loadVoiceCall();
     if (isCallAnimating || isVoiceCallOpen) return;
-    if (callButtonRef.current) {
-      const rect = callButtonRef.current.getBoundingClientRect();
+    // the animation grows from the button that was pressed (the chat's call button by default)
+    const origin = (from instanceof HTMLElement ? from : null) || callButtonRef.current;
+    if (origin) {
+      const rect = origin.getBoundingClientRect();
       setCallOriginRect({
         x: rect.left,
         y: rect.top,
@@ -806,6 +809,9 @@ export default function Home() {
           </div>
         </header>
         <div className="sadu-strip mx-8 rounded-b-lg opacity-90" aria-hidden="true" />
+
+        {/* Big «كلّم الداهية», «أرسله لأهلك», and tonight's events from the visitor guide */}
+        <TonightCard en={language === "en"} onAsk={(q) => askQuestion(q)} onCall={(el) => handleStartCall(el)} />
 
         {/* Two-column layout */}
         <section className="flex flex-col lg:flex-row gap-5 py-5 flex-1">
