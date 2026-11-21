@@ -73,6 +73,7 @@ function plan() {
 
 export function TonightCard({ en, onAsk, onCall }: { en: boolean; onAsk: (q: string) => void; onCall: (el: HTMLElement) => void }) {
   const [, tick] = useState(0);
+  const [all, setAll] = useState(false);
   useEffect(() => {
     const t = setInterval(() => tick((x) => x + 1), 60_000);
     return () => clearInterval(t);
@@ -125,7 +126,7 @@ export function TonightCard({ en, onAsk, onCall }: { en: boolean; onAsk: (q: str
             </span>
           </div>
           <ol className="mt-2 divide-y divide-[#f1e7dc]">
-            {p.rows.map((r, i) => {
+            {(all ? p.rows : p.rows.filter((r) => r.status !== "خلصت").slice(0, 4)).map((r, i) => {
               const isNext = r.name + r.label === p.nextName;
               const done = r.status === "خلصت";
               return (
@@ -135,7 +136,7 @@ export function TonightCard({ en, onAsk, onCall }: { en: boolean; onAsk: (q: str
                     onClick={() => onAsk(r.ask || `وش «${r.name}» ووين مكانها؟`)}
                     className={`flex w-full items-center gap-3 py-2 text-start transition hover:bg-[#fbf6ee] ${done ? "opacity-45" : ""}`}
                   >
-                    <span className={`w-[8.5rem] shrink-0 text-xs font-semibold ${isNext ? "text-[#a5492a]" : "text-[#6f5446]"}`}>{r.label}</span>
+                    <span className={`w-[6.8rem] shrink-0 text-[11px] font-semibold ${isNext ? "text-[#a5492a]" : "text-[#6f5446]"}`}>{r.label}</span>
                     <span className={`min-w-0 flex-1 text-sm ${isNext ? "font-bold text-[#3f2a22]" : "text-[#3f2a22]"}`}>{r.name}</span>
                     {r.status && !done ? (
                       <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${r.status === "الحين" ? "bg-[#2f9e5b] text-white" : "bg-[#fbeee6] text-[#a5492a]"}`}>{r.status}</span>
@@ -145,7 +146,12 @@ export function TonightCard({ en, onAsk, onCall }: { en: boolean; onAsk: (q: str
               );
             })}
           </ol>
-          <p className="mt-2 text-[11px] text-[#6f5446]">من دليل الزائر الرسمي، وغير هذي فيه فعاليات يومية كثيرة (اضغط أي فعالية تسأل الداهية عنها).</p>
+          {p.rows.length > 4 || p.rows.some((r) => r.status === "خلصت") ? (
+            <button type="button" onClick={() => setAll((x) => !x)} className="mt-1 text-xs font-bold text-[#a5492a]">
+              {all ? "أقل" : `كل فعاليات ${p.tomorrow ? "بكرة" : "اليوم"} (${ar(p.rows.length)})`}
+            </button>
+          ) : null}
+          <p className="mt-1 text-[11px] text-[#6f5446]">من دليل الزائر الرسمي، وغيرها فعاليات يومية كثيرة. اضغط أي فعالية تسأل الداهية عنها.</p>
         </div>
       ) : null}
     </section>
