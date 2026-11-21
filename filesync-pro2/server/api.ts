@@ -608,8 +608,8 @@ ${context}`;
  * pronunciation itself is carried by the diacritized text (القْصَبْ، الدَّاهِيِة، ديرَتْنَا…).
  */
 // The read-aloud voice as it was on 20 Nov (the first ad, the owner's favourite tone): a lively, warm
-// old man, and the town name read «القَصَبْ». Used for ads made from the site (/api/speak style "classic").
-const CLASSIC_VOICE_NOTE = "Voice: a lively, warm old Arab man, smiling and genuinely interested in the listener, natural brisk pace, never sleepy, never Egyptian. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in القَصَبْ and مَرقَب.";
+// old man (the owner's ad pronunciations below; town name «الَقْصَبْ» since 21 Nov). Used for ads made from the site (/api/speak style "classic").
+const CLASSIC_VOICE_NOTE = "Voice: a lively, warm old Arab man, smiling and genuinely interested in the listener, natural brisk pace, never sleepy, never Egyptian. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in الَقْصَبْ (a-laq-ṣab: fatha on the l, no vowel after the q) and مَرقَب. In القَرْيَة the ق is deep and heavy and the ر is light (thin, not rolled heavily). الَفْتِيتْ is said al-fteet: fatha on the l, no vowel on the f, a long ee, and a stopped t.";
 
 export function buildSpeechPrompt(transcript: string, classic = false): string {
   const plain = transcript.replace(/[\u064B-\u0670\u065F]/g, "");
@@ -662,9 +662,9 @@ export const pcmSeconds = (buf: Buffer) => toPcm(buf).length / 48000;
  * it: «الَقْصَبْ» (fatha on the lam, sukun on ق), the owner's pronunciation since 21 Nov. Only what
  * the voice reads changes; the written name stays «القْصَب».
  */
-export const ttsSpelling = (text: string, classic = false) => {
+export const ttsSpelling = (text: string) => {
   const M = "[\\u064B-\\u0652\\u0670]*";
-  return (classic ? text.replace(/الَقْصَبْ/g, "القَصَبْ").replace(/للَقْصَبْ/g, "للقَصَبْ") : text)
+  return text
     // «الصْبَخَة» was read «الصَّبْخة» (doubled ص); «إصبَخَة» came out «إصْ-بَ-خَة» 4 times out of 4
     .replace(new RegExp(`(?<![\\p{L}\\p{M}])([وفبكل]${M})?(?:ا${M})?ل${M}ص${M}ب${M}خ${M}[ةه]${M}(?![\\p{L}\\p{M}])`, "gu"), (_m, pre?: string) => `${pre ? pre.replace(/[\u064B-\u0652]/g, "") : ""}إصبَخَة`)
     // «مَرْقَب» was read «مرگب»; «مَرقَب» (no sukun on ر) kept the deep ق
@@ -839,9 +839,9 @@ apiRouter.post("/speak", speakLimit, async (req: Request, res: Response) => {
   const expected = process.env.STATS_KEY || "";
   const given = String(req.headers["x-stats-key"] || "");
   const asOwner = !!req.body?.asIs && expected.length > 0 && given.length === expected.length && timingSafeEqual(Buffer.from(given), Buffer.from(expected));
-  // "classic": the 20 Nov voice and town-name reading, for ads (the owner liked that tone best)
+  // "classic": the 20 Nov voice (the tone the owner liked best), for ads
   const classic = req.body?.style === "classic";
-  const spoken = (asOwner ? String(text) : ttsSpelling(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text)))), classic)).slice(0, classic ? 700 : 400);
+  const spoken = (asOwner ? String(text) : ttsSpelling(speakableTownName(applyTaught(applyNajdiPhoneticDiacritics(String(text)))))).slice(0, classic ? 700 : 400);
   const limit = maxSpeechSeconds(spoken);
   // Paid key first when there is one (the free speech quota is gone after a few answers a day)
   for (const { tier, key } of keys) {
