@@ -31,6 +31,7 @@ export const SHOTS_PAGE_HTML = `<!doctype html>
   .empty { color:var(--muted); font-size:13px; }
   .hidden { display:none; }
   .viewer { position:fixed; inset:0; background:rgba(20,12,9,.92); display:flex; align-items:center; justify-content:center; padding:16px; z-index:9; }
+  .viewer.hidden { display:none; } /* .viewer comes after .hidden, so it needs its own rule */
   .viewer img { max-width:100%; max-height:100%; border-radius:12px; }
 </style>
 </head>
