@@ -267,6 +267,7 @@ test("owner pronunciations are written into everything an AI voice reads", async
   assert.equal(speakableTownName("وموسم ملح القصب"), "وموسم ملح الَقْصَبْ");
   assert.equal(speakableTownName("بالقَصَب"), "بالَقْصَبْ");
   assert.equal(speakableTownName("الَقْصَبْ"), "الَقْصَبْ");
+  assert.equal(speakableTownName("سوّاه محمد الحسيني"), "سوّاه محمد الَحْسَيْنِي");
 });
 
 test("owner teaching: commands are understood and taught words reach the voice text", async () => {
