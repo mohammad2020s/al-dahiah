@@ -6,6 +6,10 @@ import { QASAB_FILE_INDEX, fileContextFor, isEventsQuestion } from "./qasabFile.
 import { xNewsBlock } from "./xNews.ts";
 import { teach, spokenForm, applyTaught, ownerCommandAr } from "./pronMemory.ts";
 import { speakableTownName } from "./najdiStyle.ts";
+// The call model speaks with its own voice from the text it is given. With «الَقْصَبْ» written in its
+// instructions it said «القصّاب»; «القْصَبْ» (as on 20 Nov, when the owner liked it) plus the phonetic
+// rule gives «ألَقْ-صَبْ». Read-aloud (TTS) keeps «الَقْصَبْ».
+const callSpelling = (text: string) => speakableTownName(text).replace(/(^|[^\p{L}\p{M}])([وف]?[بك]?)(ا|ل)لَقْصَبْ/gu, (_m, b: string, p: string, a: string) => `${b}${p}${a}لقْصَبْ`);
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
 
@@ -44,7 +48,7 @@ TICKETS: whenever the caller asks about tickets, booking, registering or entry t
 
 تعلّم النطق من المتصل: إذا صحّح لك المتصل نطق كلمة أو قالها بطريقة ثانية، اسمع نطقه بدقة وقلّده بالضبط (نفس الحركات والقاف والراء والمدّ) في باقي المكالمة كلها، إلا إذا خالف «قاموس النطق المعتمد من صاحب الموقع».
 
-اسم البلد بصوتك (قاعدة صارمة جداً): اسم البلد «القصَب» ينقال بالضبط «القْصَبْ»: اللام مفتوحة «لَ»، ثم قاف فصيحة عميقة ساكنة واضحة ومشدودة «قْ» (من آخر الحلق، مو «گ» ولا همزة) ملزوقة في «صَبْ»، فتحة قصيرة على الصاد، والباء ساكنة دايماً. يعني «ألَقْ-صَبْ». غلط: «الْقَصَب» (اللام ساكنة والفتحة على القاف)، و«القصَبَ» بحركة على الباء، و «الگصب» بالقاف النجدية، و«القصّاب» و«القصاب» (مدّ أو تشديد)، و«القصيب»، و«الجصب». قل الاسم في الترحيب مرة، وبعدها «ديرتنا» أو «البلد» عادي.
+اسم البلد بصوتك (قاعدة صارمة جداً): اسم البلد ينقال «القْصَبْ» بالضبط، ينطق «ألَقْ-صَبْ»: همزة مفتوحة، ثم «لَقْ» (لام مفتوحة وبعدها قاف فصيحة عميقة ساكنة من آخر الحلق، مو «گ»)، ثم «صَبْ» (صاد خفيفة بفتحة قصيرة وباء ساكنة). كلمة قصيرة وسريعة: مقطعين بعد الهمزة، بدون أي مد وبدون أي تشديد. (In English: say it "a-LAQ-ṣab" — short a, then "laq" with a deep q closing the syllable, then a short "ṣab". Never stretch it into a long "ā", never double the ṣ: that would be a different word, "butcher".) قل الاسم في الترحيب مرة، وبعدها «ديرتنا» أو «البلد» عادي.
 
 القاعدة صفر مرة ثانية (فوق كل شي): امشِ على «قاموس النطق المعتمد من صاحب الموقع» حرفياً: اسمك «الدَّاهِيِة» (دال مشدّدة مفتوحة بعدها ألف، هاء مكسورة بوضوح، ياء مكسورة بوضوح)، واسم البلد «القْصَبْ» (اللام مفتوحة والقاف فصيحة عميقة ساكنة، مو «گ») والباء ساكنة، و«ديرتنا» = «ديرَتْنَا» بالراء مفتوحة مرقّقة، وكل كلمات «عرف» الراء فيها مرقّقة («اعَرَّفْك»)، و«الصْبَخَة» = «اِصْبَخَة».
 تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف في الكلام العادي «گ» نجدية (گال، گَهْوة) إلا اسم البلد «القْصَبْ»، والثاء والذال بأصواتها، والكلام قصير وواضح، والصوت حماسي ومهتم فيه ابتسامة ولهفة على المتصل (تتفاعل مع كلامه أول شي)، بسرعة كلام طبيعية مايلة للسرعة (مو بطيء ولا نعسان ولا واطي)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.
@@ -149,7 +153,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
     // The voice only ever sees the owner's pronunciations (no «القصب» anywhere, only «القْصَب»…)
     const systemInstruction = spokenForm(
       liveSystemInstruction(lang),
-      speakableTownName
+      callSpelling
     ) +
       (isOwnerCall
         ? "\n\nالمتصل الحين هو صاحب الموقع (المعلّم). إذا علّمك نطق كلمة («قل كذا»، «انطقها كذا»، «لا، تنقال …»): اسمع نطقه بدقة، واكتب الكلمة بإملائها العادي، واكتب نطقها بالحروف العربية والحركات بالضبط مثل ما سمعته (استخدم «گ» للقاف النجدية، والسكون والشدة مثل ما قالها)، واستدعِ الأداة learn_pronunciation، وبعدها قل الكلمة بنطقه مرة وحدة وقل: «حفظتها». ولو قال «لا، غلط» عدّلها واستدعِ الأداة مرة ثانية بالنطق الجديد."
@@ -485,7 +489,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
               clientContent: {
                 turns: [
                   { role: "user", parts: [{ text: "مثال على طريقتك في الكلام (لا تعيده، بس امشِ على نطقه ونبرته): عرّفني بنفسك." }] },
-                  { role: "model", parts: [{ text: spokenForm("يا هلا والله ومرحبا، يا حيّ ذا الصوت! أنا الداهية، شايب من أهل القصب، ووالله إني مستانس إنك كلّمتني! أعرّفك على المملحة والجفار والصبخة والبلدة القديمة، وش تبي تعرف؟", speakableTownName) }] },
+                  { role: "model", parts: [{ text: spokenForm("يا هلا والله ومرحبا، يا حيّ ذا الصوت! أنا الداهية، شايب من أهل القصب، ووالله إني مستانس إنك كلّمتني! أعرّفك على المملحة والجفار والصبخة والبلدة القديمة، وش تبي تعرف؟", callSpelling) }] },
                 ],
                 turnComplete: false,
               },
@@ -495,7 +499,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           if (!resumed) {
             const news = await xNewsBlock(lang === "en" ? "en" : "ar", 5).catch(() => "");
             if (news && ws.isOpen()) {
-              ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm((lang === "en" ? "(Background from the site owner, do not reply to it or mention it unless asked) " : "(معلومة من صاحب الموقع، لا ترد عليها ولا تذكرها إلا إذا انسألت عنها) ") + news, speakableTownName) }] }], turnComplete: false } }));
+              ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm((lang === "en" ? "(Background from the site owner, do not reply to it or mention it unless asked) " : "(معلومة من صاحب الموقع، لا ترد عليها ولا تذكرها إلا إذا انسألت عنها) ") + news, callSpelling) }] }], turnComplete: false } }));
             }
           }
           if (resumed) {
@@ -539,7 +543,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
                   functionResponses: look.map((c) => ({
                     id: c.id,
                     name: c.name,
-                    response: { result: spokenForm(fileContextFor(String(c.args?.query || ""), "", isEventsQuestion(String(c.args?.query || "")) ? 9000 : 3500) || "ما فيه معلومة عن هذا في الملف الرسمي.", speakableTownName) },
+                    response: { result: spokenForm(fileContextFor(String(c.args?.query || ""), "", isEventsQuestion(String(c.args?.query || "")) ? 9000 : 3500) || "ما فيه معلومة عن هذا في الملف الرسمي.", callSpelling) },
                   })),
                 },
               }));
@@ -556,7 +560,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
         if (lang === "ar" && text.includes('"turnComplete"')) {
           answers++;
           if (ws.isOpen()) { // before every answer: the rules stay fresh in a long call
-            ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm("(تذكير من صاحب الموقع، لا ترد عليه ولا تذكره، بس طبّقه في الرد الجاي): خلك متحمس مرّة ومستانس، صوتك عالي ومليان طاقة وفرحة، نفس حماس أول المكالمة أو أكثر. واسم البلد «القْصَبْ»: اللام مفتوحة والقاف ساكنة. ولا تبدأ ردك بـ«يا هلا» ولا «ومسهلا» ولا «حيّاك الله» ولا أي ترحيب، الترحيب كان أول المكالمة بس: ادخل في الجواب على طول.\n" + ownerCommandAr(), speakableTownName) }] }], turnComplete: false } }));
+            ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: spokenForm("(تذكير من صاحب الموقع، لا ترد عليه ولا تذكره، بس طبّقه في الرد الجاي): خلك متحمس مرّة ومستانس، صوتك عالي ومليان طاقة وفرحة، نفس حماس أول المكالمة أو أكثر. واسم البلد «القْصَبْ»: اللام مفتوحة والقاف ساكنة. ولا تبدأ ردك بـ«يا هلا» ولا «ومسهلا» ولا «حيّاك الله» ولا أي ترحيب، الترحيب كان أول المكالمة بس: ادخل في الجواب على طول.\n" + ownerCommandAr(), callSpelling) }] }], turnComplete: false } }));
           }
         }
         // Own-voice calls (English, or no reading voice): «stop» still drops the rest of the answer
@@ -651,7 +655,7 @@ export function runCall(clientWs: Sock, reqUrl: URL, openSock: OpenSock) {
           try {
             const msg = JSON.parse(text);
             for (const turn of msg.clientContent?.turns || []) {
-              for (const part of turn.parts || []) if (typeof part.text === "string") part.text = spokenForm(part.text, speakableTownName);
+              for (const part of turn.parts || []) if (typeof part.text === "string") part.text = spokenForm(part.text, callSpelling);
             }
             text = JSON.stringify(msg);
           } catch {}
