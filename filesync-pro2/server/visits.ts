@@ -10,6 +10,7 @@
 import { Router, type Request, type Response } from "express";
 import { timingSafeEqual } from "node:crypto";
 import { getStore, getD1 } from "./store.ts";
+import { SOCIAL_VIEWS } from "./socialViews.ts";
 
 const riyadh = (t = Date.now()) => new Date(t + 3 * 3600_000);
 export const riyadhDay = (t = Date.now()) => riyadh(t).toISOString().slice(0, 10);
@@ -159,6 +160,7 @@ visitsRouter.get("/owner/visits", async (req: Request, res: Response) => {
   const firstDay = Object.keys(views).sort()[0] || null;
   const live = await liveNow().catch(() => ({ people: 0, calls: 0 }));
   res.set("Cache-Control", "no-store").json({
+    social: SOCIAL_VIEWS,
     today: riyadhDay(),
     firstDay,
     live,

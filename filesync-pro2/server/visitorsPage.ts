@@ -75,6 +75,13 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
   <div id="data" class="hidden">
     <div class="kpis" id="kpis"></div>
 
+    <div class="card" id="socialCard">
+      <h2>مشاهدات الموسم في المنصات</h2>
+      <p class="hint">مجموع مشاهدات الفيديوهات اللي عن موسم ملح القصب ٤ (٢٠٢٦)، كل منصة لحالها.</p>
+      <div class="kpis" id="social" style="margin:10px 0 0"></div>
+      <p class="hint" id="socialWhen"></p>
+    </div>
+
     <div class="card">
       <h2>الزوار كل يوم</h2>
       <p class="hint">آخر ٣٠ يوم. مرّر على العمود تشوف التفاصيل.</p>
@@ -193,8 +200,19 @@ export const VISITORS_PAGE_HTML = `<!doctype html>
   }
 
   var last = null;
+  function renderSocial(sv) {
+    if (!sv || !sv.platforms || !sv.platforms.length) { $("socialCard").classList.add("hidden"); return; }
+    $("socialCard").classList.remove("hidden");
+    var total = 0;
+    $("social").innerHTML = sv.platforms.map(function (p) {
+      if (p.views != null) total += p.views;
+      return '<div class="kpi"><b>' + (p.views != null ? n(p.views) : '<span style="font-size:20px">—</span>') + '</b><span>' + p.name + '</span><small>' + (p.views != null ? n(p.videos) + ' فيديو · ' : '') + p.how + '</small></div>';
+    }).join("") + '<div class="kpi" style="border-color:#a5492a;background:#fbf1ea"><b style="color:#a5492a">' + n(total) + '</b><span>المجموع</span><small>للمنصات اللي انحسبت</small></div>';
+    $("socialWhen").textContent = sv.updatedAt ? "آخر تحديث: " + new Date(sv.updatedAt).toLocaleString("ar-SA-u-ca-gregory", { timeZone: "Asia/Riyadh", dateStyle: "medium", timeStyle: "short" }) : "";
+  }
   function render(d) {
     last = d;
+    renderSocial(d.social);
     var narrow = $("daysChart").clientWidth < 600;
     var days = d.days, today = days[days.length - 1], yest = days[days.length - 2];
     var last7 = days.slice(-7).reduce(function (a, x) { return a + x.people; }, 0);
