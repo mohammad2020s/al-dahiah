@@ -173,8 +173,8 @@ export const BY_TOPIC: Record<string, Pair[]> = {
     ["متى موسم الملح؟", "When is the Salt Season?"],
   ],
   cafes: [
-    ["وين قهوة بدور؟", "Where is Bdor Coffee?"],
-    ["وين شاهي ناقع؟", "Where is Shahi Nagea?"],
+    ["وين قهوة بدور؟", "Where is Budoor Coffee?"],
+    ["وين شاهي ناقع؟", "Where is Shahi Naqi'?"],
     ["علمني عن البلدة القديمة", "Tell me about the old town"],
   ],
   weather: [

@@ -133,7 +133,7 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
   },
   {
     id: "salt_flat",
-    name: "ممالح القصب التاريخية والجفار",
+    name: "مملحة القصب (الجفار)",
     category: "معالم طبيعية وتراثية",
     address: "جنوب شرق مدينة القصب (4-5 كم)",
     description: "أشهر وأعرق ملاحات طبيعية في الجزيرة العربية لاستخراج الملح الصخري النقي منذ مئات السنين.",
@@ -174,7 +174,7 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
   },
   {
     id: "ibn_zahim_palace",
-    name: "قصر ابن زاحم التاريخي",
+    name: "قصر الشيخ عبدالله بن زاحم",
     category: "قصور وقلاع تاريخية",
     address: "القصب القديمة",
     description: "أحد أبرز القصور التاريخية والمعالم الشامخة في القصب الدالة على كرم وريادة أهلها.",
@@ -187,7 +187,7 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
   },
   {
     id: "al_marqab",
-    name: "برج المرقب الأثري بالقصب",
+    name: "مرقب القصب",
     category: "أبراج مراقبة تاريخية",
     address: "تل الثويليل شمال البلدة القديمة",
     description: "برج مراقبة طيني مخروطي على تل الثويليل، كان الرقيب يراقب منه البلدة ومواشيها.",
@@ -201,10 +201,10 @@ export const AL_QASAB_LANDMARKS: LandmarkLocation[] = [
   },
   {
     id: "cafes",
-    name: "مقاهي وديوانيات القصب التراثية (4 مقاهٍ معتمدة)",
+    name: "مقاهي القرية التراثية بالقصب",
     category: "ضيافة ومقاهٍ",
     address: "نطاق القرية التراثية بالقصب",
-    description: "أبرز مقاهي القصب: قهوة بدور إبراهيم (4.9 نجوم)، شاهي ناقع (4.7 نجوم)، آرت كافيه (4.8 نجوم)، ديوانية المنيع (4.8 نجوم).",
+    description: "المقاهي داخل القرية التراثية (حسب دليل الزائر): قهوة بدور، وقهوة آرت، وشاهي ناقع، وهذي الثلاث موجودة طوال السنة. وفي الموسم بعد: ليفارنو وفيو.",
     geocodingQuery: "coffee near Al Qasab 25.2994, 45.5060",
     directionsUrl: GOOGLE_MAPS_COFFEE_URL,
     coordinates: {
@@ -238,8 +238,7 @@ export interface CafePlace {
   id: string;
   name: string;
   category: string;
-  rating: number;
-  reviewsCount?: number;
+  rating?: number;
   description: string;
   locationDescription: string;
   coordinates: {
@@ -252,11 +251,9 @@ export interface CafePlace {
 export const AL_QASAB_CAFES: CafePlace[] = [
   {
     id: "bdor_coffee",
-    name: "قهوة بدور إبراهيم (Bdor Coffee)",
-    category: "قهوة سعودية وحلويات شعبية",
-    rating: 4.9,
-    reviewsCount: 185,
-    description: "قهوة سعودية أصيلة بالهيل والزعفران، وحلويات شعبية مميزة في أجواء قرية القصب التراثية.",
+    name: "قهوة بدور",
+    category: "مقهى",
+    description: "مقهى داخل القرية التراثية، موجود طوال السنة.",
     locationDescription: "داخل القرية التراثية بالقصب",
     coordinates: {
       lat: 25.2991008,
@@ -266,12 +263,10 @@ export const AL_QASAB_CAFES: CafePlace[] = [
   },
   {
     id: "art_coffee",
-    name: "آرت كافيه (Art Coffee)",
-    category: "قهوة مختصة وعصرية",
-    rating: 4.8,
-    reviewsCount: 240,
-    description: "مقهى راقٍ للقهوة المختصة (V60 وإسبريسو) وجلسات عصرية فنية بالقصب.",
-    locationDescription: "شارع القصب العام بجوار البلدة القديمة",
+    name: "قهوة آرت",
+    category: "مقهى",
+    description: "مقهى داخل القرية التراثية، موجود طوال السنة.",
+    locationDescription: "داخل القرية التراثية بالقصب",
     coordinates: {
       lat: 25.2997841,
       lng: 45.5051558,
@@ -280,12 +275,10 @@ export const AL_QASAB_CAFES: CafePlace[] = [
   },
   {
     id: "shahi_nagea",
-    name: "شاهي ناقع (Shahi Nagea)",
-    category: "شاي على الحطب ومشروبات ساخنة",
-    rating: 4.7,
-    reviewsCount: 160,
-    description: "شاي مخدر على الحطب بنكهات نجدية ونعناع حساوي وجلسات شعبية دافئة.",
-    locationDescription: "مدخل القرية التراثية بالقصب",
+    name: "شاهي ناقع",
+    category: "مقهى شاي",
+    description: "مقهى شاي داخل القرية التراثية، موجود طوال السنة.",
+    locationDescription: "داخل القرية التراثية بالقصب",
     coordinates: {
       lat: 25.2992775,
       lng: 45.5061188,
@@ -294,12 +287,10 @@ export const AL_QASAB_CAFES: CafePlace[] = [
   },
   {
     id: "diwaniyat_al_manie",
-    name: "ديوانية المنيع التراثية",
-    category: "مجلس ضيافة تراثي",
-    rating: 4.8,
-    reviewsCount: 125,
-    description: "مجلس ضيافة تراثي نجدي لاستقبال الضيوف وتقديم القهوة والشاي والتمر السكري الفاخر.",
-    locationDescription: "حي المنيع بالقرب من قصر ابن زاحم",
+    name: "ديوانية المنيع",
+    category: "ديوانية تراثية",
+    description: "ديوانية تراثية في القرية، رقم ١٣ على خريطة الموسم.",
+    locationDescription: "داخل القرية التراثية بالقصب",
     coordinates: {
       lat: 25.2996014,
       lng: 45.5066172,
@@ -788,8 +779,8 @@ export function generateLocalKnowledgeFallback(
   );
   if (namedCafe && !isTicketQuestion) {
     return lang === "en"
-      ? `${namedCafe.name} (${namedCafe.rating}★): ${namedCafe.category}. The map below shows its exact spot; tap "Take me there" for directions.`
-      : `${namedCafe.name} (${namedCafe.rating} نجوم) ${namedCafe.locationDescription}: ${namedCafe.description} تلقى موقعه على الخريطة تحت، اضغط «خذني لها» وأبشر.`;
+      ? `${namedCafe.name}: ${namedCafe.category}. The map below shows its exact spot; tap "Take me there" for directions.`
+      : `${namedCafe.name} ${namedCafe.locationDescription}: ${namedCafe.description} تلقى موقعه على الخريطة تحت، اضغط «خذني لها» وأبشر.`;
   }
   if (["احسن وقت", "افضل وقت", "متى ازور", "متى اروح", "best time", "when to visit"].some(k => nq.includes(normalizeArabic(k)) || norm.includes(k))) {
     return lang === "en"
@@ -798,8 +789,8 @@ export function generateLocalKnowledgeFallback(
   }
   if (["مطعم", "مطاعم", "غداء", "عشاء", "restaurant"].some(k => nq.includes(k) || norm.includes(k))) {
     return lang === "en"
-      ? "I don't have verified restaurant listings for Al-Qasab yet. For coffee and traditional hospitality there are 4 verified heritage cafes: Bdor Ibrahim, Art Coffee, Shahi Nagea and Diwaniyat Al-Manie."
-      : "والله ما عندي قائمة مطاعم موثقة في القْصَب للحين، لكن للقهوة والضيافة عندنا ٤ مقاهي تراثية معتمدة: قهوة بدور إبراهيم، وآرت كافيه، وشاهي ناقع، وديوانية المنيع.";
+      ? "In the season, the visitor guide lists the restaurants area (no. 21 on the season map) and participating places such as Mama Noura and SALT. For coffee, inside the heritage village: Budoor Coffee, Art Coffee and Shahi Naqi' (open all year), plus Livarno and View in the season."
+      : "في الموسم، دليل الزائر فيه منطقة المطاعم (رقم ٢١ على خريطة الموسم)، ومن المشاركين ماما نورة وسولت. وللقهوة داخل القرية التراثية: قهوة بدور، وقهوة آرت، وشاهي ناقع (موجودة طوال السنة)، وفي الموسم بعد ليفارنو وفيو.";
   }
   const place = isTicketQuestion ? null : matchPlaceTopic(query);
   if (place?.id === "season" && (isLocationQuestion(query) || isDirectionsQuestion(query))) {
@@ -817,9 +808,9 @@ export function generateLocalKnowledgeFallback(
   }
   if (isCafeQuestion(query)) {
     if (lang === "en") {
-      return `Here are the 4 verified heritage cafes in Al-Qasab:\n1. Bdor Ibrahim Coffee (4.9 نجوم): Authentic Saudi spiced coffee & folk sweets in the Heritage Village.\n2. Art Coffee (4.8 نجوم): Specialty brews & modern art seating.\n3. Shahi Nagea (4.7 نجوم): Traditional hot coal tea with Hasawi mint.\n4. Diwaniyat Al-Manie (4.8 نجوم): Heritage guest majlis.\nNote: There is no place named "Diwaniyat Al-Qasab".`;
+      return `The cafes inside Al-Qasab's heritage village (from the season's visitor guide):\n1. Budoor Coffee\n2. Art Coffee\n3. Shahi Naqi' (tea)\nAll three are open all year. During the Salt Season there are also Livarno and View.`;
     }
-    return `أبرز المقاهي المعتمدة في القْصَب التراثية:\n1. قهوة بدور إبراهيم (4.9 نجوم): قهوة سعودية أصيلة وضيافة نجدية بالقرية التراثية.\n2. آرت كافيه (Art Coffee) (4.8 نجوم): قهوة مختصة وجلسات راقية.\n3. شاهي ناقع (4.7 نجوم): شاي مخدر على الحطب بنكهات أصيلة.\n4. ديوانية المنيع التراثية (4.8 نجوم): مجلس ضيافة عريق.\n\nتنويه: لا يوجد مكان باسم ديوانية القصب.`;
+    return `المقاهي داخل القرية التراثية بالقْصَب (حسب دليل الزائر):\n1. قهوة بدور\n2. قهوة آرت\n3. شاهي ناقع\nوالثلاث موجودة طوال السنة. وفي موسم الملح بعد: ليفارنو وفيو.`;
   }
   if (isSabkhaQuestion(query)) {
     if (lang === "en") {
@@ -1034,7 +1025,7 @@ ${GUIDE_FACTS_EN}
 7. The 4th Salt Season: 19–28 November 2026, daily 4:00–11:00 pm, in Al-Qasab's heritage town; Instagram @qasabsaltseason.
 8. Tickets: entry is FREE, but visitors register for a ticket at qasab-tickets.pages.dev (a «Book your ticket» button appears under the answer); one ticket covers the visitor and companions. Never say tickets are picked up at the gate.
 9. Sabkha: a separate place from the salt pans; open plain ~3 km south of town, 5-10°C cooler at night in summer.
-10. Verified cafes: Bdor Ibrahim (4.9 stars), Art Coffee (4.8 stars), Shahi Nagea (4.7 stars), Diwaniyat Al-Manie (4.8 stars). (No Diwaniyat Al-Qasab).
+10. Cafes inside the heritage village (visitor guide): Budoor Coffee («قهوة بدور», nothing after it), Art Coffee, Shahi Naqi' (all year), plus Livarno and View in the season. Diwaniyat Al-Manie is a heritage diwaniya (no. 13 on the season map). (No Diwaniyat Al-Qasab).
 11. Scope: Exclusively Al-Qasab and its heritage, events, and live weather.${weatherSection}`;
   }
 
@@ -1059,7 +1050,7 @@ ${GUIDE_FACTS_AR}
    - موسم ملح القْصَب الرابع: من ١٩ إلى ٢٨ نوفمبر ٢٠٢٦، يومياً من ٤ العصر إلى ١١ الليل، في مدينة القْصَب التراثية، وحسابه @qasabsaltseason.
    - التذاكر: الدخول مجاني، بس الزائر يسجّل زيارته ويحصل على تذكرته من qasab-tickets.pages.dev (يطلع له زر «احجز تذكرتك» تحت الجواب)، وتذكرة وحدة له ولمرافقيه. لا تقول إن التذاكر تنصرف من البوابة.
    - صْبَخَة القْصَب: مكان مستقل غير مَمْلَحَة القْصَب، أرض مفتوحة جنوب البلد، تنخفض حرارتها ليلاً في الصيف بمقدار 5 إلى 10 درجات مئوية عن المحيط مما يمنحها نسيمًا باردًا.
-   - المقاهي التراثية المعتمدة 4 فقط: قهوة بدور إبراهيم، آرت كافيه، شاهي ناقع، ديوانية المنيع التراثية (تنبيه: لا يوجد مكان باسم ديوانية القْصَب).
+   - المقاهي داخل القرية التراثية (حسب دليل الزائر): قهوة بدور، قهوة آرت، شاهي ناقع (موجودة طوال السنة)، وفي الموسم ليفارنو وفيو. اكتب أسماءها كذا بالضبط (مثلاً «قهوة بدور» بدون أي اسم بعدها). وديوانية المنيع ديوانية تراثية (رقم ١٣ على خريطة الموسم). لا يوجد مكان باسم ديوانية القْصَب.
    - إجاباتك موجزة ومباشرة (من جملة إلى 3 جمل واضحة دون إطالة مملة).
    - في الصوت المباشر: انطق الكلمات بوضوح وسرعة طبيعية دون تمطيط أو تكرار.${weatherSection}`;
 }

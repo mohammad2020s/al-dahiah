@@ -301,10 +301,12 @@ function LocationMapCard({ location, language = "ar" }: { location: any; languag
                   <div>
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-bold text-[#38261f]">{place.name}</span>
-                      <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[11px] font-extrabold text-amber-800">
-                        <Star className="size-2.5 fill-amber-500 text-amber-500" />
-                        {place.rating} / 5
-                      </span>
+                      {place.rating ? (
+                        <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-50 border border-amber-200 px-1.5 py-0.5 text-[11px] font-extrabold text-amber-800">
+                          <Star className="size-2.5 fill-amber-500 text-amber-500" />
+                          {place.rating} / 5
+                        </span>
+                      ) : null}
                     </div>
                     <p className="mt-1 text-[11px] text-[#5d4437]">{place.description}</p>
                   </div>
