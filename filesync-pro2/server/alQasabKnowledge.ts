@@ -420,9 +420,9 @@ export const PLACE_TOPICS: PlaceTopic[] = [
     titleEn: "Restrooms",
     keywords: ["دوره مياه", "دورات مياه", "دورات المياه", "دوره المياه", "حمامات", "وين الحمام", "تواليت", "مرحاض", "toilet", "restroom", "bathroom", "wc"],
     answerAr:
-      "ما فيه دورات مياه عامة مسجّلة داخل البلد، بس أقرب شي لك دورات مياه المساجد: جامع القصر جنب قصر الزاحم وأرض الموسم، ومسجد الشعبة جنب القرية التراثية، ومسجد البلدية. وفي روضة العكرشية دورات مياه للرجال والنساء. وأيام الموسم اسأل في منطقة التسجيل أو خيمة الضيافة عن أقرب دورات مياه. تلقاها على الخريطة تحت (الدبابيس الزرقاء).",
+      "أيام الموسم فيه دورات مياه داخل القرية التراثية (حسب دليل الزائر): وحدة قرب «عن موسم ملح القصب» جنب المدخل، ووحدة غرب السوق، وتلقاها على خريطة الموسم. وبرّا الموسم أقرب شي دورات مياه المساجد: جامع القصر جنب قصر الزاحم، ومسجد الشعبة جنب القرية التراثية، ومسجد البلدية. وفي روضة العكرشية دورات مياه للرجال والنساء.",
     answerEn:
-      "There are no public toilets listed inside the town; the nearest are the mosque facilities: Al-Shu'ba Mosque next to the heritage village and the season grounds, and the Municipality Mosque. Rawdat Al-Akrashiya has men's and women's restrooms. During the Salt Season, ask at the registration area or the hospitality tent for the nearest ones. They're pinned in blue on the map below.",
+      "During the Salt Season there are restrooms inside the heritage village (from the visitor guide): one near «About the Salt Season» by the entrance, and one west of the market; both are on the season map. Outside the season, the nearest are the mosque facilities: Al-Shu'ba Mosque next to the heritage village, Al-Qasr Mosque by Al-Zahim Palace, and the Municipality Mosque. Rawdat Al-Akrashiya has men's and women's restrooms.",
   },
   {
     id: "official_site",
