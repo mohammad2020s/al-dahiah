@@ -12,6 +12,7 @@ import {
   MapPin,
 } from "lucide-react";
 import GrandpaCall from "./GrandpaCall";
+import { SurveySheet, done as surveyDone } from "./SeasonSurvey";
 import { matchPlaceTopic, placeById, type PlaceTopic } from "../../server/alQasabKnowledge.ts";
 
 // A burst of salt crystals flying out of a pressed button (pure CSS, see .vc-crystal in index.css)
@@ -137,6 +138,11 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
   const [showcase, setShowcase] = useState<Showcase | null>(null);
   // «احجز تذكرتك» button under the photo (the guide's show_tickets tool, or tickets come up in talk)
   const [ticketCta, setTicketCta] = useState(false);
+  // «شاركنا رأيك» button under the ticket one, after the caller's third question (owner, 27 Nov)
+  const [surveyCta, setSurveyCta] = useState(false);
+  const [surveyOpen, setSurveyOpen] = useState(false);
+  const callerHeardRef = useRef("");
+  const callQuestionsRef = useRef(0);
   const [showcaseIndex, setShowcaseIndex] = useState(0);
   const showcaseIdRef = useRef<string | null>(null);
   const transcriptRef = useRef("");
@@ -889,7 +895,14 @@ registerProcessor('mic-processor', MicProcessor);`;
             return;
           }
 
+          if (msg.serverContent?.inputTranscription?.text) callerHeardRef.current += " " + msg.serverContent.inputTranscription.text;
           if (msg.serverContent?.turnComplete || msg.turnComplete) {
+            // One caller question = an answer after the caller said real words (a bare greeting doesn't count)
+            const heard = callerHeardRef.current.replace(/[^\p{L}\s]/gu, " ").replace(/\s+/g, " ").trim();
+            callerHeardRef.current = "";
+            const words = heard.split(" ").filter((w) => w.length >= 2);
+            const greetingOnly = words.every((w) => /^(و?السلام|عليكم|ورحمة|الله|وبركاته|هلا|اهلا|أهلا|مرحبا|مساء|صباح|الخير|النور|hello|hi|hey|salam|good|morning|evening)$/i.test(w));
+            if (words.length && !greetingOnly && ++callQuestionsRef.current >= 3 && !surveyDone()) setSurveyCta(true);
             if (activeSourcesRef.current.size === 0) {
               if (turnCooldownTimerRef.current) {
                 clearTimeout(turnCooldownTimerRef.current);
@@ -1163,6 +1176,18 @@ registerProcessor('mic-processor', MicProcessor);`;
               {isEn ? "Book your ticket — free entry" : "احجز تذكرتك — الدخول مجاني"}
             </a>
           )}
+
+          {surveyCta && (
+            <button
+              type="button"
+              onClick={() => setSurveyOpen(true)}
+              className="vc-pop mt-3 flex items-center justify-center gap-2 w-full max-w-md mx-auto rounded-2xl bg-[#fbf6ee] px-4 py-3 text-base font-bold text-[#8f3d22] shadow-lg ring-2 ring-[#e0a03a]/60 active:scale-[0.97] transition"
+            >
+              <span aria-hidden="true">📝</span>
+              {isEn ? "Tell us about the season — one minute" : "شاركنا رأيك في الموسم — دقيقة وحدة"}
+            </button>
+          )}
+          {surveyOpen && <SurveySheet en={isEn} onClose={() => setSurveyOpen(false)} onDone={() => setSurveyCta(false)} />}
 
           <div className="flex items-center justify-center gap-1.5 h-8 px-4 my-4">
             {[0.2, 0.5, 0.8, 1, 0.7, 0.4, 0.9, 0.6, 0.3].map((factor, idx) => {

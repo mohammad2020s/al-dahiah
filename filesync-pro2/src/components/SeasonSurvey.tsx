@@ -10,15 +10,26 @@ const Q = {
   dahiah: ["ساعدني كثير", "ساعدني شوي", "ما استخدمته"],
   from: ["القصب", "شقراء والوشم", "الرياض", "القصيم", "مكان ثاني"],
 };
+// English labels shown on the English site; the Arabic value above is what is sent and stored
+const EN: Record<string, string> = {
+  "المملحة": "The salt pans", "القرية التراثية والدور": "Heritage village & houses", "العرضة والسامري": "Ardah & Samri",
+  "فعاليات الأطفال والعائلة": "Kids & family events", "المطاعم والقهوة": "Food & coffee", "السوق والحرف": "Market & crafts",
+  "الداهية (الدليل الذكي)": "Al-Dahiya (AI guide)",
+  "الزحام والتنظيم": "Crowds & organization", "المواقف": "Parking", "الأسعار": "Prices", "النظافة": "Cleanliness",
+  "اللوحات والإرشاد": "Signs & directions", "الفعاليات": "Events", "ما فيه شي، كل شي زين": "Nothing, all good",
+  "أكيد": "Definitely", "يمكن": "Maybe", "لا": "No",
+  "ساعدني كثير": "Helped a lot", "ساعدني شوي": "Helped a bit", "ما استخدمته": "Didn't use it",
+  "القصب": "Al-Qasab", "شقراء والوشم": "Shaqra & Al-Washm", "الرياض": "Riyadh", "القصيم": "Qassim", "مكان ثاني": "Somewhere else",
+};
 const DONE_KEY = "dahiah:surveyDone";
-const done = () => { try { return !!localStorage.getItem(DONE_KEY); } catch { return false; } };
+export const done = () => { try { return !!localStorage.getItem(DONE_KEY); } catch { return false; } };
 
-// Owner, 27 Nov: the survey opens by itself after the visitor's third question in the chat (once).
+// Owner, 27 Nov: the survey opens by itself after the visitor's third question in the chat (once);
+// in the voice call a button appears under the ticket button instead (VoiceCall.tsx).
 const ASKED_KEY = "dahiah:askedCount";
 const AUTO_KEY = "dahiah:surveyAutoShown";
 const OPEN_EVENT = "dahiah:openSurvey";
-export function noteQuestionAsked(en: boolean) {
-  if (en) return;
+export function noteQuestionAsked() {
   try {
     const n = (parseInt(localStorage.getItem(ASKED_KEY) || "0", 10) || 0) + 1;
     localStorage.setItem(ASKED_KEY, String(n));
@@ -37,18 +48,16 @@ export function SeasonSurvey({ en }: { en: boolean }) {
     window.addEventListener(OPEN_EVENT, show);
     return () => window.removeEventListener(OPEN_EVENT, show);
   }, []);
-  if (en) return null; // the survey is in Arabic (the season's visitors); the English site skips it
-
   return (
-    <section className="card-contour heritage-frame rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 shadow-sm">
+    <section dir={en ? "ltr" : "rtl"} className="card-contour heritage-frame rounded-[1.7rem] border border-[#e2d5c6] bg-white/95 p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-base font-bold text-[#3f2a22]">
             <ClipboardList className="size-5 text-[#a5492a]" />
-            شاركنا رأيك في الموسم
+            {en ? "Tell us about the season" : "شاركنا رأيك في الموسم"}
           </h2>
           <p className="mt-0.5 text-xs text-[#6f5446]">
-            {finished ? "وصلنا رأيك، الله يعطيك العافية!" : "٦ أسئلة بالضغط، دقيقة وحدة بس"}
+            {finished ? (en ? "Got it, thank you!" : "وصلنا رأيك، الله يعطيك العافية!") : en ? "6 quick taps, one minute" : "٦ أسئلة بالضغط، دقيقة وحدة بس"}
           </p>
         </div>
         {!finished && (
@@ -57,16 +66,16 @@ export function SeasonSurvey({ en }: { en: boolean }) {
             onClick={() => setOpen(true)}
             className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-[#a5492a] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#86391f] active:scale-[0.98]"
           >
-            ابدأ
+            {en ? "Start" : "ابدأ"}
           </button>
         )}
       </div>
-      {open && <SurveySheet onClose={() => setOpen(false)} onDone={() => setFinished(true)} />}
+      {open && <SurveySheet en={en} onClose={() => setOpen(false)} onDone={() => setFinished(true)} />}
     </section>
   );
 }
 
-function Chips({ options, value, onChange, many }: { options: string[]; value: string[]; onChange: (v: string[]) => void; many?: boolean }) {
+function Chips({ options, value, onChange, many, en }: { options: string[]; value: string[]; onChange: (v: string[]) => void; many?: boolean; en?: boolean }) {
   return (
     <div className="flex flex-wrap gap-2">
       {options.map((o) => {
@@ -79,7 +88,7 @@ function Chips({ options, value, onChange, many }: { options: string[]; value: s
             onClick={() => onChange(many ? (on ? value.filter((x) => x !== o) : [...value, o]) : on ? [] : [o])}
             className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${on ? "border-[#a5492a] bg-[#a5492a] text-white" : "border-[#e2d5c6] bg-[#fbf6ee] text-[#3f2a22] hover:border-[#a5492a]"}`}
           >
-            {o}
+            {en ? EN[o] || o : o}
           </button>
         );
       })}
@@ -87,7 +96,8 @@ function Chips({ options, value, onChange, many }: { options: string[]; value: s
   );
 }
 
-function SurveySheet({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
+export function SurveySheet({ en = false, onClose, onDone }: { en?: boolean; onClose: () => void; onDone?: () => void }) {
+  const L = (ar: string, e: string) => (en ? e : ar);
   const [rating, setRating] = useState(0);
   const [liked, setLiked] = useState<string[]>([]);
   const [improve, setImprove] = useState<string[]>([]);
@@ -100,23 +110,23 @@ function SurveySheet({ onClose, onDone }: { onClose: () => void; onDone: () => v
 
   async function send(e: React.FormEvent) {
     e.preventDefault();
-    if (!rating) return setError("قيّم تجربتك أول (من نجمة لخمس).");
+    if (!rating) return setError(L("قيّم تجربتك أول (من نجمة لخمس).", "Please rate your visit first (1 to 5 stars)."));
     setState("sending");
     setError("");
     try {
       const r = await fetch("/api/survey", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating, liked, improve, recommend: recommend[0], dahiah: dahiah[0], from: from[0], note, lang: "ar" }),
+        body: JSON.stringify({ rating, liked, improve, recommend: recommend[0], dahiah: dahiah[0], from: from[0], note, lang: en ? "en" : "ar" }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error || "");
       try { localStorage.setItem(DONE_KEY, new Date().toISOString()); } catch {}
       setState("sent");
-      onDone();
+      onDone?.();
     } catch (err: any) {
       setState("idle");
-      setError(err?.message || "ما قدرت أرسل رأيك، جرّب مرة ثانية.");
+      setError(err?.message || L("ما قدرت أرسل رأيك، جرّب مرة ثانية.", "Couldn't send it, please try again."));
     }
   }
 
@@ -125,10 +135,10 @@ function SurveySheet({ onClose, onDone }: { onClose: () => void; onDone: () => v
   return (
     <div className="fixed inset-0 z-[65] flex items-end justify-center bg-black/50 sm:items-center" onClick={onClose}>
       <div
-        dir="rtl"
+        dir={en ? "ltr" : "rtl"}
         role="dialog"
         aria-modal="true"
-        aria-label="شاركنا رأيك في الموسم"
+        aria-label={L("شاركنا رأيك في الموسم", "Tell us about the season")}
         onClick={(e) => e.stopPropagation()}
         className="tr-sheet max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-[1.8rem] border border-[#e2d5c6] bg-[#fdf9f3] p-4 pb-6 shadow-2xl sm:rounded-[1.8rem]"
       >
@@ -136,9 +146,9 @@ function SurveySheet({ onClose, onDone }: { onClose: () => void; onDone: () => v
         <div className="flex items-center justify-between">
           <h2 className="flex items-center gap-2 text-lg font-bold text-[#3f2a22]">
             <ClipboardList className="size-5 text-[#a5492a]" />
-            شاركنا رأيك في الموسم
+            {L("شاركنا رأيك في الموسم", "Tell us about the season")}
           </h2>
-          <button type="button" onClick={onClose} className="grid size-9 place-items-center rounded-full bg-[#f2e9dd] text-[#7d3a22]" aria-label="إغلاق">
+          <button type="button" onClick={onClose} className="grid size-9 place-items-center rounded-full bg-[#f2e9dd] text-[#7d3a22]" aria-label={L("إغلاق", "Close")}>
             <X className="size-4" />
           </button>
         </div>
@@ -146,44 +156,44 @@ function SurveySheet({ onClose, onDone }: { onClose: () => void; onDone: () => v
         {state === "sent" ? (
           <div className="py-8 text-center">
             <CircleCheck className="mx-auto size-12 text-emerald-600" />
-            <p className="mt-3 text-base font-bold text-[#3f2a22]">الله يعطيك العافية، وصلنا رأيك!</p>
-            <p className="mt-1 text-sm text-[#6f5446]">رأيك يساعد الموسم الجاي يصير أحسن.</p>
-            <button type="button" onClick={onClose} className="mt-5 rounded-xl bg-[#a5492a] px-5 py-2 text-sm font-bold text-white">تم</button>
+            <p className="mt-3 text-base font-bold text-[#3f2a22]">{L("الله يعطيك العافية، وصلنا رأيك!", "Thank you, we got your answers!")}</p>
+            <p className="mt-1 text-sm text-[#6f5446]">{L("رأيك يساعد الموسم الجاي يصير أحسن.", "Your answers help make the next season better.")}</p>
+            <button type="button" onClick={onClose} className="mt-5 rounded-xl bg-[#a5492a] px-5 py-2 text-sm font-bold text-white">{L("تم", "Done")}</button>
           </div>
         ) : (
           <form onSubmit={send} className="mt-4 space-y-5">
             <div>
-              <span className={label}>١. كيف كانت تجربتك في الموسم؟</span>
-              <div className="flex justify-center gap-2" role="radiogroup" aria-label="التقييم">
+              <span className={label}>{L("١. كيف كانت تجربتك في الموسم؟", "1. How was your visit to the season?")}</span>
+              <div className="flex justify-center gap-2" role="radiogroup" aria-label={L("التقييم", "Rating")}>
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <button key={s} type="button" role="radio" aria-checked={rating === s} aria-label={`${s} من ٥`} onClick={() => setRating(s)} className="p-1">
+                  <button key={s} type="button" role="radio" aria-checked={rating === s} aria-label={en ? `${s} of 5` : `${s} من ٥`} onClick={() => setRating(s)} className="p-1">
                     <Star className={`size-9 transition ${s <= rating ? "fill-[#e0a03a] text-[#e0a03a]" : "text-[#d9c3b0]"}`} />
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <span className={label}>٢. وش أكثر شي عجبك؟ <span className="text-xs font-medium text-[#6f5446]">(اختر أكثر من وحدة)</span></span>
-              <Chips options={Q.liked} value={liked} onChange={setLiked} many />
+              <span className={label}>{L("٢. وش أكثر شي عجبك؟", "2. What did you like most?")} <span className="text-xs font-medium text-[#6f5446]">{L("(اختر أكثر من وحدة)", "(pick any)")}</span></span>
+              <Chips en={en} options={Q.liked} value={liked} onChange={setLiked} many />
             </div>
             <div>
-              <span className={label}>٣. وش يحتاج تحسين؟ <span className="text-xs font-medium text-[#6f5446]">(اختر أكثر من وحدة)</span></span>
-              <Chips options={Q.improve} value={improve} onChange={setImprove} many />
+              <span className={label}>{L("٣. وش يحتاج تحسين؟", "3. What needs improving?")} <span className="text-xs font-medium text-[#6f5446]">{L("(اختر أكثر من وحدة)", "(pick any)")}</span></span>
+              <Chips en={en} options={Q.improve} value={improve} onChange={setImprove} many />
             </div>
             <div>
-              <span className={label}>٤. تنصح غيرك يزور الموسم؟</span>
-              <Chips options={Q.recommend} value={recommend} onChange={setRecommend} />
+              <span className={label}>{L("٤. تنصح غيرك يزور الموسم؟", "4. Would you recommend the season?")}</span>
+              <Chips en={en} options={Q.recommend} value={recommend} onChange={setRecommend} />
             </div>
             <div>
-              <span className={label}>٥. ساعدك «الداهية» في زيارتك؟</span>
-              <Chips options={Q.dahiah} value={dahiah} onChange={setDahiah} />
+              <span className={label}>{L("٥. ساعدك «الداهية» في زيارتك؟", "5. Did Al-Dahiya help your visit?")}</span>
+              <Chips en={en} options={Q.dahiah} value={dahiah} onChange={setDahiah} />
             </div>
             <div>
-              <span className={label}>٦. من وين جيت؟</span>
-              <Chips options={Q.from} value={from} onChange={setFrom} />
+              <span className={label}>{L("٦. من وين جيت؟", "6. Where did you come from?")}</span>
+              <Chips en={en} options={Q.from} value={from} onChange={setFrom} />
             </div>
             <label className="block">
-              <span className={label}>ملاحظة أو اقتراح <span className="text-xs font-medium text-[#6f5446]">(اختياري)</span></span>
+              <span className={label}>{L("ملاحظة أو اقتراح", "Comment or suggestion")} <span className="text-xs font-medium text-[#6f5446]">{L("(اختياري)", "(optional)")}</span></span>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -199,7 +209,7 @@ function SurveySheet({ onClose, onDone }: { onClose: () => void; onDone: () => v
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#a5492a] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#86391f] disabled:opacity-70"
             >
               {state === "sending" ? <Loader2 className="size-4 animate-spin" /> : null}
-              أرسل رأيي
+              {L("أرسل رأيي", "Send")}
             </button>
           </form>
         )}

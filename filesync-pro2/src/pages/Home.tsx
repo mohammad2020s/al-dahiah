@@ -696,7 +696,7 @@ export default function Home() {
           } catch {}
         }
       }
-      if (answered || accumulated.trim()) noteQuestionAsked(language === "en");
+      if (answered || accumulated.trim()) noteQuestionAsked();
     } catch (err: any) {
       if (err.name !== "AbortError") {
         setMessages(prev =>
