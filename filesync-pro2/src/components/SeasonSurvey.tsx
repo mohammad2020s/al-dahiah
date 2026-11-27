@@ -40,12 +40,24 @@ export function noteQuestionAsked() {
   } catch {}
 }
 
+// Right after a voice call with at least one question (once per visit)
+export function openSurveyAfterCall() {
+  try {
+    if (done() || sessionStorage.getItem("dahiah:surveyAfterCall")) return;
+    sessionStorage.setItem("dahiah:surveyAfterCall", "1");
+    setTimeout(() => window.dispatchEvent(new Event(OPEN_EVENT)), 700);
+  } catch {}
+}
+
 export function SeasonSurvey({ en }: { en: boolean }) {
   const [open, setOpen] = useState(false);
   const [finished, setFinished] = useState(done());
+  const [tapped, setTapped] = useState(0);
   useEffect(() => {
-    const show = () => { if (!done()) setOpen(true); };
+    const show = () => { if (!done()) { setTapped(0); setOpen(true); } };
     window.addEventListener(OPEN_EVENT, show);
+    // al-dahiah.com/?survey (the QR code at the season) opens it at once
+    try { if (new URLSearchParams(window.location.search).has("survey")) setOpen(true); } catch {}
     return () => window.removeEventListener(OPEN_EVENT, show);
   }, []);
   return (
@@ -57,20 +69,20 @@ export function SeasonSurvey({ en }: { en: boolean }) {
             {en ? "Tell us about the season" : "شاركنا رأيك في الموسم"}
           </h2>
           <p className="mt-0.5 text-xs text-[#6f5446]">
-            {finished ? (en ? "Got it, thank you!" : "وصلنا رأيك، الله يعطيك العافية!") : en ? "6 quick taps, one minute" : "٦ أسئلة بالضغط، دقيقة وحدة بس"}
+            {finished ? (en ? "Got it, thank you!" : "وصلنا رأيك، الله يعطيك العافية!") : en ? "Rate your visit with one tap" : "قيّم زيارتك بضغطة وحدة"}
           </p>
         </div>
-        {!finished && (
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-[#a5492a] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#86391f] active:scale-[0.98]"
-          >
-            {en ? "Start" : "ابدأ"}
-          </button>
-        )}
       </div>
-      {open && <SurveySheet en={en} onClose={() => setOpen(false)} onDone={() => setFinished(true)} />}
+      {!finished && (
+        <div className="mt-3 flex justify-center gap-1.5" role="radiogroup" aria-label={en ? "Rating" : "التقييم"}>
+          {[1, 2, 3, 4, 5].map((s) => (
+            <button key={s} type="button" role="radio" aria-checked={false} aria-label={en ? `${s} of 5` : `${s} من ٥`} onClick={() => { setTapped(s); setOpen(true); }} className="p-1 transition active:scale-90">
+              <Star className="size-9 text-[#d9c3b0] hover:fill-[#e0a03a] hover:text-[#e0a03a]" />
+            </button>
+          ))}
+        </div>
+      )}
+      {open && <SurveySheet en={en} initialRating={tapped} onClose={() => { setOpen(false); setTapped(0); }} onDone={() => setFinished(true)} />}
     </section>
   );
 }
@@ -96,41 +108,71 @@ function Chips({ options, value, onChange, many, en }: { options: string[]; valu
   );
 }
 
-export function SurveySheet({ en = false, onClose, onDone }: { en?: boolean; onClose: () => void; onDone?: () => void }) {
+export function SurveySheet({ en = false, initialRating = 0, onClose, onDone }: { en?: boolean; initialRating?: number; onClose: () => void; onDone?: () => void }) {
   const L = (ar: string, e: string) => (en ? e : ar);
+  // One tap first (the stars are sent at once), the other 5 questions after it are optional (owner, 27 Nov)
+  const [step, setStep] = useState<"stars" | "rated" | "more" | "sent">("stars");
   const [rating, setRating] = useState(0);
+  const [saved, setSaved] = useState<{ id: string; edit: string } | null>(null);
   const [liked, setLiked] = useState<string[]>([]);
   const [improve, setImprove] = useState<string[]>([]);
   const [recommend, setRecommend] = useState<string[]>([]);
   const [dahiah, setDahiah] = useState<string[]>([]);
   const [from, setFrom] = useState<string[]>([]);
   const [note, setNote] = useState("");
-  const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+
+  async function post(body: Record<string, unknown>) {
+    const r = await fetch("/api/survey", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, lang: en ? "en" : "ar" }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j?.error || "");
+    return j;
+  }
+
+  async function rate(s: number) {
+    if (sending) return;
+    setRating(s);
+    setSending(true);
+    setError("");
+    try {
+      const j = await post({ rating: s });
+      if (j?.id && j?.edit) setSaved({ id: j.id, edit: j.edit });
+      try { localStorage.setItem(DONE_KEY, new Date().toISOString()); } catch {}
+      onDone?.();
+      setStep("rated");
+    } catch (err: any) {
+      setError(err?.message || L("ما قدرت أرسل تقييمك، جرّب مرة ثانية.", "Couldn't send it, please try again."));
+    } finally {
+      setSending(false);
+    }
+  }
+
+  useEffect(() => { if (initialRating >= 1 && initialRating <= 5) rate(initialRating); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function send(e: React.FormEvent) {
     e.preventDefault();
-    if (!rating) return setError(L("قيّم تجربتك أول (من نجمة لخمس).", "Please rate your visit first (1 to 5 stars)."));
-    setState("sending");
+    setSending(true);
     setError("");
     try {
-      const r = await fetch("/api/survey", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating, liked, improve, recommend: recommend[0], dahiah: dahiah[0], from: from[0], note, lang: en ? "en" : "ar" }),
-      });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(j?.error || "");
-      try { localStorage.setItem(DONE_KEY, new Date().toISOString()); } catch {}
-      setState("sent");
-      onDone?.();
+      await post({ ...(saved || {}), rating, liked, improve, recommend: recommend[0], dahiah: dahiah[0], from: from[0], note });
+      setStep("sent");
     } catch (err: any) {
-      setState("idle");
       setError(err?.message || L("ما قدرت أرسل رأيك، جرّب مرة ثانية.", "Couldn't send it, please try again."));
+    } finally {
+      setSending(false);
     }
   }
 
   const label = "mb-2 block text-sm font-bold text-[#3f2a22]";
+  const thanks = (title: string, sub: string, extra?: React.ReactNode) => (
+    <div className="py-6 text-center">
+      <CircleCheck className="mx-auto size-12 text-emerald-600" />
+      <p className="mt-3 text-base font-bold text-[#3f2a22]">{title}</p>
+      <p className="mt-1 text-sm text-[#6f5446]">{sub}</p>
+      {extra}
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 z-[65] flex items-end justify-center bg-black/50 sm:items-center" onClick={onClose}>
@@ -153,43 +195,59 @@ export function SurveySheet({ en = false, onClose, onDone }: { en?: boolean; onC
           </button>
         </div>
 
-        {state === "sent" ? (
-          <div className="py-8 text-center">
-            <CircleCheck className="mx-auto size-12 text-emerald-600" />
-            <p className="mt-3 text-base font-bold text-[#3f2a22]">{L("الله يعطيك العافية، وصلنا رأيك!", "Thank you, we got your answers!")}</p>
-            <p className="mt-1 text-sm text-[#6f5446]">{L("رأيك يساعد الموسم الجاي يصير أحسن.", "Your answers help make the next season better.")}</p>
-            <button type="button" onClick={onClose} className="mt-5 rounded-xl bg-[#a5492a] px-5 py-2 text-sm font-bold text-white">{L("تم", "Done")}</button>
+        {step === "stars" && (
+          <div className="py-5 text-center">
+            <p className="text-base font-bold text-[#3f2a22]">{L("كيف كانت تجربتك في الموسم؟", "How was your visit to the season?")}</p>
+            <p className="mt-1 text-xs text-[#6f5446]">{L("ضغطة وحدة بس", "Just one tap")}</p>
+            <div className="mt-4 flex justify-center gap-2" role="radiogroup" aria-label={L("التقييم", "Rating")}>
+              {[1, 2, 3, 4, 5].map((s) => (
+                <button key={s} type="button" role="radio" aria-checked={rating === s} aria-label={en ? `${s} of 5` : `${s} من ٥`} disabled={sending} onClick={() => rate(s)} className="p-1 transition active:scale-90">
+                  <Star className={`size-11 transition ${s <= rating ? "fill-[#e0a03a] text-[#e0a03a]" : "text-[#d9c3b0] hover:text-[#e0a03a]"}`} />
+                </button>
+              ))}
+            </div>
+            {sending ? <Loader2 className="mx-auto mt-3 size-5 animate-spin text-[#a5492a]" /> : null}
+            {error ? <p className="mt-3 text-xs font-semibold text-red-700">{error}</p> : null}
           </div>
-        ) : (
+        )}
+
+        {step === "rated" &&
+          thanks(
+            L("الله يعطيك العافية، وصلنا تقييمك!", "Thank you, we got your rating!"),
+            L("تكمّل ٥ أسئلة سريعة بالضغط؟ (اختياري)", "Answer 5 more quick taps? (optional)"),
+            <div className="mt-5 flex justify-center gap-2">
+              <button type="button" onClick={() => setStep("more")} className="rounded-xl bg-[#a5492a] px-5 py-2 text-sm font-bold text-white">{L("كمّل", "Continue")}</button>
+              <button type="button" onClick={onClose} className="rounded-xl bg-[#f2e9dd] px-5 py-2 text-sm font-bold text-[#7d3a22]">{L("لا، شكراً", "No, thanks")}</button>
+            </div>
+          )}
+
+        {step === "sent" &&
+          thanks(
+            L("الله يعطيك العافية، وصلنا رأيك!", "Thank you, we got your answers!"),
+            L("رأيك يساعد الموسم الجاي يصير أحسن.", "Your answers help make the next season better."),
+            <button type="button" onClick={onClose} className="mt-5 rounded-xl bg-[#a5492a] px-5 py-2 text-sm font-bold text-white">{L("تم", "Done")}</button>
+          )}
+
+        {step === "more" && (
           <form onSubmit={send} className="mt-4 space-y-5">
             <div>
-              <span className={label}>{L("١. كيف كانت تجربتك في الموسم؟", "1. How was your visit to the season?")}</span>
-              <div className="flex justify-center gap-2" role="radiogroup" aria-label={L("التقييم", "Rating")}>
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <button key={s} type="button" role="radio" aria-checked={rating === s} aria-label={en ? `${s} of 5` : `${s} من ٥`} onClick={() => setRating(s)} className="p-1">
-                    <Star className={`size-9 transition ${s <= rating ? "fill-[#e0a03a] text-[#e0a03a]" : "text-[#d9c3b0]"}`} />
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <span className={label}>{L("٢. وش أكثر شي عجبك؟", "2. What did you like most?")} <span className="text-xs font-medium text-[#6f5446]">{L("(اختر أكثر من وحدة)", "(pick any)")}</span></span>
+              <span className={label}>{L("وش أكثر شي عجبك؟", "What did you like most?")} <span className="text-xs font-medium text-[#6f5446]">{L("(اختر أكثر من وحدة)", "(pick any)")}</span></span>
               <Chips en={en} options={Q.liked} value={liked} onChange={setLiked} many />
             </div>
             <div>
-              <span className={label}>{L("٣. وش يحتاج تحسين؟", "3. What needs improving?")} <span className="text-xs font-medium text-[#6f5446]">{L("(اختر أكثر من وحدة)", "(pick any)")}</span></span>
+              <span className={label}>{L("وش يحتاج تحسين؟", "What needs improving?")} <span className="text-xs font-medium text-[#6f5446]">{L("(اختر أكثر من وحدة)", "(pick any)")}</span></span>
               <Chips en={en} options={Q.improve} value={improve} onChange={setImprove} many />
             </div>
             <div>
-              <span className={label}>{L("٤. تنصح غيرك يزور الموسم؟", "4. Would you recommend the season?")}</span>
+              <span className={label}>{L("تنصح غيرك يزور الموسم؟", "Would you recommend the season?")}</span>
               <Chips en={en} options={Q.recommend} value={recommend} onChange={setRecommend} />
             </div>
             <div>
-              <span className={label}>{L("٥. ساعدك «الداهية» في زيارتك؟", "5. Did Al-Dahiya help your visit?")}</span>
+              <span className={label}>{L("ساعدك «الداهية» في زيارتك؟", "Did Al-Dahiya help your visit?")}</span>
               <Chips en={en} options={Q.dahiah} value={dahiah} onChange={setDahiah} />
             </div>
             <div>
-              <span className={label}>{L("٦. من وين جيت؟", "6. Where did you come from?")}</span>
+              <span className={label}>{L("من وين جيت؟", "Where did you come from?")}</span>
               <Chips en={en} options={Q.from} value={from} onChange={setFrom} />
             </div>
             <label className="block">
@@ -205,10 +263,10 @@ export function SurveySheet({ en = false, onClose, onDone }: { en?: boolean; onC
             {error ? <p className="text-xs font-semibold text-red-700">{error}</p> : null}
             <button
               type="submit"
-              disabled={state === "sending"}
+              disabled={sending}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#a5492a] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#86391f] disabled:opacity-70"
             >
-              {state === "sending" ? <Loader2 className="size-4 animate-spin" /> : null}
+              {sending ? <Loader2 className="size-4 animate-spin" /> : null}
               {L("أرسل رأيي", "Send")}
             </button>
           </form>

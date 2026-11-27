@@ -38,8 +38,29 @@ surveyRouter.post("/survey", async (req: Request, res: Response) => {
   if (!d) return res.status(503).json({ error: en ? "Not available right now." : "مو متاح الحين." });
   const rating = Math.round(Number(req.body?.rating));
   if (!(rating >= 1 && rating <= 5)) return res.status(400).json({ error: en ? "Please rate your visit first." : "قيّم تجربتك أول (من نجمة لخمس)." });
+  // The rest of the answers for a rating sent a moment ago (one tap first, then the optional questions)
+  const id = String(req.body?.id || ""), edit = String(req.body?.edit || "");
+  if (id && edit) {
+    await ready;
+    const row: any = await d.prepare("SELECT data FROM survey WHERE id = ?1").bind(id).first();
+    let old: any = null;
+    try { old = row ? JSON.parse(row.data) : null; } catch {}
+    const okEdit = old?.edit && old.edit.length === edit.length && timingSafeEqual(Buffer.from(old.edit), Buffer.from(edit));
+    if (!okEdit) return res.status(403).json({ error: en ? "Couldn't update your answers." : "ما قدرت أحدّث إجاباتك." });
+    const merged = { ...answers(req, rating, en), edit: old.edit };
+    await d.prepare("UPDATE survey SET data = ?2 WHERE id = ?1").bind(id, JSON.stringify(merged)).run();
+    return res.json({ ok: true });
+  }
   if (!limit(clientIp(req)).ok) return res.status(429).json({ error: en ? "Thanks, we already have your answers." : "شكراً، وصلتنا إجاباتك." });
-  const data = {
+  const newId = randomUUID(), newEdit = randomUUID();
+  const data = { ...answers(req, rating, en), edit: newEdit };
+  await ready;
+  await d.prepare("INSERT INTO survey (id, at, data) VALUES (?1, ?2, ?3)").bind(newId, new Date().toISOString(), JSON.stringify(data)).run();
+  res.json({ ok: true, id: newId, edit: newEdit });
+});
+
+function answers(req: Request, rating: number, en: boolean) {
+  return {
     rating,
     liked: pickMany(req.body?.liked, SURVEY.liked),
     improve: pickMany(req.body?.improve, SURVEY.improve),
@@ -49,10 +70,7 @@ surveyRouter.post("/survey", async (req: Request, res: Response) => {
     note: String(req.body?.note || "").replace(/[\u0000-\u001F\u007F<>]/g, " ").replace(/\s+/g, " ").trim().slice(0, 500),
     lang: en ? "en" : "ar",
   };
-  await ready;
-  await d.prepare("INSERT INTO survey (id, at, data) VALUES (?1, ?2, ?3)").bind(randomUUID(), new Date().toISOString(), JSON.stringify(data)).run();
-  res.json({ ok: true });
-});
+}
 
 surveyRouter.get("/owner/survey", async (req: Request, res: Response) => {
   if (!isOwner(req)) return res.status(403).json({ error: "forbidden" });

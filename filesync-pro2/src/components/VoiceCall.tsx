@@ -12,7 +12,7 @@ import {
   MapPin,
 } from "lucide-react";
 import GrandpaCall from "./GrandpaCall";
-import { SurveySheet, done as surveyDone } from "./SeasonSurvey";
+import { SurveySheet, done as surveyDone, openSurveyAfterCall } from "./SeasonSurvey";
 import { matchPlaceTopic, placeById, type PlaceTopic } from "../../server/alQasabKnowledge.ts";
 
 // A burst of salt crystals flying out of a pressed button (pure CSS, see .vc-crystal in index.css)
@@ -451,9 +451,11 @@ export const VoiceCall: React.FC<VoiceCallProps> = ({
     if (closingVia) return;
     fire(via);
     setClosingVia(via);
+    const askSurvey = callQuestionsRef.current >= 1;
     setTimeout(() => {
       setClosingVia(null);
       onClose();
+      if (askSurvey) openSurveyAfterCall();
     }, prefersReducedMotion() ? 0 : 440);
   }, [closingVia, fire, onClose]);
 
