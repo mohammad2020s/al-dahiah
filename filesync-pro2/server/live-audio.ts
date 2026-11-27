@@ -9,7 +9,15 @@ import { speakableTownName } from "./najdiStyle.ts";
 // The call model speaks with its own voice from the text it is given. With «الَقْصَبْ» written in its
 // instructions it said «القصّاب»; «القْصَبْ» (as on 20 Nov, when the owner liked it) plus the phonetic
 // rule gives «ألَقْ-صَبْ». Read-aloud (TTS) keeps «الَقْصَبْ».
-const callSpelling = (text: string) => speakableTownName(text).replace(/(^|[^\p{L}\p{M}])([وف]?[بك]?)(ا|ل)لَقْصَبْ/gu, (_m, b: string, p: string, a: string) => `${b}${p}${a}لقْصَبْ`);
+// Owner, 27 Nov, for the call voice: «اَلْدَّاهِيِةْ» and «المَمْلَحَة» written exactly like this.
+const CM = "[\\u064B-\\u065F\\u0670]*";
+const MAMLAHA = new RegExp(`(?<![\\p{L}\\p{M}])((?:[وف]${CM})?(?:[بكل]${CM})?)(ا${CM}ل${CM}|ل${CM}ل${CM})?م${CM}م${CM}ل${CM}ح${CM}([ةه]|ت)${CM}(?![\\p{L}\\p{M}])`, "gu");
+const callSpelling = (text: string) =>
+  speakableTownName(text)
+    .replace(/(^|[^\p{L}\p{M}])([وف]?[بك]?)(ا|ل)لَقْصَبْ/gu, (_m, b: string, p: string, a: string) => `${b}${p}${a}لقْصَبْ`)
+    .replace(/(^|[^\p{L}\p{M}])([وف]?[بك]?)الدَّاهِيِة(?![\p{L}\p{M}])/gu, (_m, b: string, p: string) => `${b}${p}${p ? "الْدَّاهِيِةْ" : "اَلْدَّاهِيِةْ"}`)
+    .replace(MAMLAHA, (_m, pre: string, al: string | undefined, end: string) =>
+      `${pre}${al ? (al.replace(/[\u064B-\u065F\u0670]/g, "") === "لل" ? "للمَمْلَحَ" : "المَمْلَحَ") : "مَمْلَحَ"}${end === "ت" ? "ت" : "ة"}`);
 import { PLACE_TOPICS } from "./alQasabKnowledge.ts";
 import { voiceKeys, pauseVoice } from "./geminiFallback.ts";
 
@@ -51,6 +59,9 @@ RATING THE SEASON (owner, 27 Nov): when the caller thanks you or says goodbye (�
 تعلّم النطق من المتصل: إذا صحّح لك المتصل نطق كلمة أو قالها بطريقة ثانية، اسمع نطقه بدقة وقلّده بالضبط (نفس الحركات والقاف والراء والمدّ) في باقي المكالمة كلها، إلا إذا خالف «قاموس النطق المعتمد من صاحب الموقع».
 
 اسم البلد بصوتك (قاعدة صارمة جداً): اسم البلد ينقال «القْصَبْ» بالضبط، ينطق «ألَقْ-صَبْ»: همزة مفتوحة، ثم «لَقْ» (لام مفتوحة وبعدها قاف فصيحة عميقة ساكنة من آخر الحلق، مو «گ»)، ثم «صَبْ» (صاد خفيفة بفتحة قصيرة وباء ساكنة). كلمة قصيرة وسريعة: مقطعين بعد الهمزة، بدون أي مد وبدون أي تشديد. (In English: say it "a-LAQ-ṣab" — short a, then "laq" with a deep q closing the syllable, then a short "ṣab". Never stretch it into a long "ā", never double the ṣ: that would be a different word, "butcher".) قل الاسم في الترحيب مرة، وبعدها «ديرتنا» أو «البلد» عادي.
+
+اسمك بصوتك (قاعدة صارمة جداً من صاحب الموقع): «اَلْدَّاهِيِةْ» ينقال «اَدْ-دَا-هِيِهْ»: دال مشدّدة بعدها ألف ممدودة، ثم هاء مكسورة بوضوح، ثم ياء مكسورة بوضوح، ثم هاء خفيفة ساكنة في الآخر. (In English: say it "ad-DAA-hi-yih": a doubled d, a long "aa", then a clear "hi", then a clear "yih" ending in a soft h. Never "ad-dahya", never "ad-daahya", never end it with "-ya" or "-yah".)
+«المَمْلَحَة» بصوتك (قاعدة صارمة جداً من صاحب الموقع): تنقال «اَلْ-مَمْ-لَ-حَة»: الميم الأولى مفتوحة، والميم الثانية ساكنة ملزوقة فيها، ثم لام مفتوحة، ثم حاء مفتوحة من الحلق، وتاء مربوطة تنقال هاء خفيفة. (In English: say it "al-MAM-la-ḥa": "mam" with a short a and the second m closing the syllable, then "la", then a throaty "ḥa". Never "al-mimlaḥa", never "al-mamalaḥa", never "al-malḥa", never "al-mallaḥa".)
 
 القاعدة صفر مرة ثانية (فوق كل شي): امشِ على «قاموس النطق المعتمد من صاحب الموقع» حرفياً: اسمك «الدَّاهِيِة» (دال مشدّدة مفتوحة بعدها ألف، هاء مكسورة بوضوح، ياء مكسورة بوضوح)، واسم البلد «القْصَبْ» (اللام مفتوحة والقاف فصيحة عميقة ساكنة، مو «گ») والباء ساكنة، و«ديرتنا» = «ديرَتْنَا» بالراء مفتوحة مرقّقة، وكل كلمات «عرف» الراء فيها مرقّقة («اعَرَّفْك»)، و«الصْبَخَة» = «اِصْبَخَة».
 تذكير أخير قبل كل جملة: الجيم معطّشة «ج»، والقاف في الكلام العادي «گ» نجدية (گال، گَهْوة) إلا اسم البلد «القْصَبْ»، والثاء والذال بأصواتها، والكلام قصير وواضح، والصوت حماسي ومهتم فيه ابتسامة ولهفة على المتصل (تتفاعل مع كلامه أول شي)، بسرعة كلام طبيعية مايلة للسرعة (مو بطيء ولا نعسان ولا واطي)، والراء مفخّمة مع الفتحة والضمة ومرقّقة مع الكسرة والياء. أبداً مو لهجة مصرية.
