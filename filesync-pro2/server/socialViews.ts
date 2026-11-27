@@ -3,10 +3,10 @@
 // says when it was made. A platform that could not be read says why instead of a number.
 export type SocialCount = { id: "tiktok" | "x" | "snapchat"; name: string; views: number | null; videos: number; how: string };
 export const SOCIAL_VIEWS: { updatedAt: string; platforms: SocialCount[] } = {
-  updatedAt: "2026-11-26T18:52:19Z",
+  updatedAt: "2026-11-27T07:40:52Z",
   platforms: [
     { id: "tiktok", name: "تيك توك", views: 4574831, videos: 305, how: "كل فيديوهات وسم #موسم_ملح_القصب و#موسم_ملح_القصب_4 (من ١٣ نوفمبر ٢٠٢٦)" },
-    { id: "x", name: "إكس (تويتر)", views: null, videos: 0, how: "ما انحسب: البحث في إكس يطلب تسجيل دخول" },
-    { id: "snapchat", name: "سناب شات", views: null, videos: 0, how: "ما انحسب: سناب ما يعرض مشاهدات سنابات الناس" },
+    { id: "x", name: "إكس (تويتر)", views: 1925429, videos: 150, how: "تغريدات الفيديو اللي فيها #موسم_ملح_القصب أو #موسم_ملح_القصب_4 أو «موسم ملح القصب» (من ٤ أكتوبر ٢٠٢٦)" },
+    { id: "snapchat", name: "سناب شات", views: null, videos: 0, how: "ما انحسب: سناب ويب فيه المحادثات بس، وما يعرض سنابات الموسم ولا مشاهداتها" },
   ],
 };
