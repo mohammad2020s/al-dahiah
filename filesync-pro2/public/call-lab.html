@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>مختبر مكالمة الداهية</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, "Segoe UI", Tahoma, sans-serif; background: #f1e7da; color: #3f2a22; }
+  header { background: #8f3d22; color: #fbf6ee; padding: 14px 18px; }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; font-size: 13px; color: #ffe1d3; }
+  main { max-width: 760px; margin: 0 auto; padding: 14px; }
+  .bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  button { border: 0; border-radius: 12px; padding: 10px 16px; font: inherit; font-weight: 700; cursor: pointer; background: #a5492a; color: #fff; }
+  button.light { background: #fbf6ee; color: #8f3d22; border: 1px solid #e2d5c6; }
+  button:disabled { opacity: .5; cursor: default; }
+  #status { font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: #fbf6ee; border: 1px solid #e2d5c6; }
+  #log { display: flex; flex-direction: column; gap: 10px; min-height: 200px; }
+  .msg { border-radius: 16px; padding: 10px 14px; line-height: 1.8; white-space: pre-wrap; }
+  .me { align-self: flex-start; background: #a5492a; color: #fff; max-width: 85%; }
+  .him { align-self: flex-end; background: #fff; border: 1px solid #e2d5c6; max-width: 92%; }
+  .him small, .me small { display: block; font-size: 11px; opacity: .7; }
+  form { display: flex; gap: 8px; margin-top: 14px; position: sticky; bottom: 0; background: #f1e7da; padding: 10px 0; }
+  textarea { flex: 1; border-radius: 14px; border: 1px solid #d9c3b0; padding: 10px; font: inherit; resize: vertical; min-height: 48px; }
+  label { font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>مختبر مكالمة الداهية</h1>
+  <p>نفس المكالمة اللي في الموقع بالضبط: تكتب سؤالك، ويرد الداهية بصوته، وكلامه يطلع مكتوب تحت.</p>
+</header>
+<main>
+  <div class="bar">
+    <button id="connect">ابدأ المكالمة</button>
+    <button id="hang" class="light" disabled>سكّر</button>
+    <label><input type="checkbox" id="sound" checked> شغّل الصوت</label>
+    <span id="status">مسكّرة</span>
+  </div>
+  <div id="log"></div>
+  <form id="f">
+    <textarea id="q" placeholder="اكتب سؤالك للداهية…" disabled></textarea>
+    <button id="send" disabled>أرسل</button>
+  </form>
+</main>
+<script>
+// Owner, 27 Nov: a page to talk to the call guide in writing (the same /live call as the site),
+// so the guide's spoken answers can be read and his dialect checked and corrected.
+// window.lab.say(text) → resolves with what he said (transcript of his voice) when his answer ends.
+(() => {
+  const $ = (id) => document.getElementById(id);
+  let ws = null, ctx = null, playAt = 0, cur = null, waiters = [];
+  const turns = [];
+  const setStatus = (s) => { $("status").textContent = s; };
+  const add = (cls, text, note) => {
+    const d = document.createElement("div");
+    d.className = "msg " + cls;
+    d.innerHTML = note ? `<small>${note}</small>` : "";
+    const t = document.createElement("span"); t.textContent = text; d.appendChild(t);
+    $("log").appendChild(d); d.scrollIntoView({ block: "end" });
+    return t;
+  };
+  function play(b64) {
+    if (!$("sound").checked) return;
+    try {
+      ctx ||= new AudioContext({ sampleRate: 24000 });
+      const s = atob(b64), n = s.length >> 1, f = new Float32Array(n);
+      for (let i = 0; i < n; i++) { let v = s.charCodeAt(2 * i) | (s.charCodeAt(2 * i + 1) << 8); if (v >= 32768) v -= 65536; f[i] = v / 32768; }
+      const buf = ctx.createBuffer(1, n, 24000); buf.copyToChannel(f, 0);
+      const src = ctx.createBufferSource(); src.buffer = buf; src.connect(ctx.destination);
+      playAt = Math.max(playAt, ctx.currentTime + 0.05); src.start(playAt); playAt += buf.duration;
+    } catch {}
+  }
+  function connect() {
+    if (ws) return Promise.resolve();
+    setStatus("يتصل…");
+    return new Promise((ok, fail) => {
+      ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/live?lang=ar`);
+      ws.onclose = () => { ws = null; setStatus("مسكّرة"); $("connect").disabled = false; $("hang").disabled = true; $("q").disabled = $("send").disabled = true; };
+      ws.onerror = () => fail(new Error("ws"));
+      ws.onmessage = async (ev) => {
+        const raw = typeof ev.data === "string" ? ev.data : await ev.data.text();
+        let m; try { m = JSON.parse(raw); } catch { return; }
+        if (m.setupComplete) { setStatus("المكالمة شغّالة"); $("connect").disabled = true; $("hang").disabled = false; $("q").disabled = $("send").disabled = false; ok(); return; }
+        if (m.toolCall) {
+          const fr = (m.toolCall.functionCalls || []).map((c) => ({ id: c.id, name: c.name, response: { result: "shown" } }));
+          if (!m.toolCall.answered && fr.length) ws.send(JSON.stringify({ toolResponse: { functionResponses: fr } }));
+          return;
+        }
+        const sc = m.serverContent; if (!sc) return;
+        if (!cur) { cur = { text: "", audio: 0, el: add("him", "", "الداهية") }; }
+        for (const p of sc.modelTurn?.parts || []) if (p.inlineData?.data) { cur.audio += atob(p.inlineData.data).length / 48000; play(p.inlineData.data); }
+        if (sc.outputTranscription?.text) { cur.text += sc.outputTranscription.text; cur.el.textContent = cur.text; }
+        if (sc.turnComplete) {
+          const t = { text: cur.text.trim(), seconds: +cur.audio.toFixed(1) };
+          cur.el.parentElement.querySelector("small").textContent = `الداهية · ${t.seconds} ث`;
+          turns.push(t); cur = null; setStatus("المكالمة شغّالة");
+          const w = waiters.shift(); if (w) w(t);
+        }
+      };
+    });
+  }
+  async function say(text) {
+    await connect();
+    add("me", text, "أنت");
+    setStatus("الداهية يرد…");
+    const p = new Promise((r) => waiters.push(r));
+    ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text }] }], turnComplete: true } }));
+    return Promise.race([p, new Promise((r) => setTimeout(() => r({ text: "(ما رد خلال ٦٠ ثانية)", seconds: 0 }), 60000))]);
+  }
+  $("connect").onclick = () => { ctx ||= new AudioContext({ sampleRate: 24000 }); connect().catch(() => setStatus("ما قدر يتصل")); };
+  $("hang").onclick = () => ws && ws.close();
+  $("f").onsubmit = (e) => { e.preventDefault(); const v = $("q").value.trim(); if (!v) return; $("q").value = ""; say(v); };
+  $("q").onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("f").requestSubmit(); } };
+  window.lab = { say, connect, hang: () => ws && ws.close(), turns };
+})();
+</script>
+</body>
+</html>
