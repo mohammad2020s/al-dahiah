@@ -40,6 +40,11 @@ export function noteQuestionAsked() {
   } catch {}
 }
 
+// A «قيّم الموسم» button pressed somewhere in the site: open it even if they rated before
+export function openSurvey() {
+  window.dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: { force: true } }));
+}
+
 // Right after a voice call with at least one question (once per visit)
 export function openSurveyAfterCall() {
   try {
@@ -54,7 +59,7 @@ export function SeasonSurvey({ en }: { en: boolean }) {
   const [finished, setFinished] = useState(done());
   const [tapped, setTapped] = useState(0);
   useEffect(() => {
-    const show = () => { if (!done()) { setTapped(0); setOpen(true); } };
+    const show = (e: Event) => { if ((e as CustomEvent).detail?.force || !done()) { setTapped(0); setOpen(true); } };
     window.addEventListener(OPEN_EVENT, show);
     // al-dahiah.com/?survey (the QR code at the season) opens it at once
     try { if (new URLSearchParams(window.location.search).has("survey")) setOpen(true); } catch {}

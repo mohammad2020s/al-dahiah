@@ -62,8 +62,9 @@ import { SaltPassport } from "../components/SaltPassport";
 import { Language, translations } from "../i18n";
 import { ContactSheet } from "../components/ContactSheet";
 import { SeasonShots } from "../components/SeasonShots";
-import { SeasonSurvey, noteQuestionAsked } from "../components/SeasonSurvey";
+import { SeasonSurvey, noteQuestionAsked, openSurvey, done as surveyDone } from "../components/SeasonSurvey";
 import { TonightCard } from "../components/TonightCard";
+import { ClosingDayBanner } from "../components/ClosingDayBanner";
 import { RaceRoutes, raceDay } from "../components/RaceRoutes";
 
 type WeatherData = {
@@ -99,7 +100,12 @@ type ChatMessage = {
   venueMap?: { to?: string; from?: string } | null;
   /** «صوّر واسأل»: the visitor's photo (small preview data URL) */
   photo?: string;
+  /** The visitor said thanks / goodbye: the guide asks for a one-tap rating under his answer */
+  rateAsk?: boolean;
 };
+
+// «شكراً» / «مع السلامة» and the like (owner, 27 Nov: the guide asks for the rating then)
+const THANKS_RE = /(شكر|مشكور|يعطيك العافي|الله يعافيك|جزاك الله|ما قصرت|ماقصرت|مع السلام|في امان الله|في أمان الله|فمان الله|باي|thank|thanks|thx|bye|goodbye)/i;
 
 type PendingPhoto = { preview: string; data: string; mimeType: string };
 
@@ -672,6 +678,7 @@ export default function Home() {
               );
             } else if (data.type === "done") {
               answered = true;
+              const rateAsk = THANKS_RE.test(text) && !surveyDone();
               setMessages(prev =>
                 prev.map(m =>
                   m.id === assistantId
@@ -688,6 +695,7 @@ export default function Home() {
                         link: data.link && typeof data.link.url === "string" ? data.link : undefined,
                         followUps: Array.isArray(data.followUps) ? data.followUps.slice(0, 3) : undefined,
                         venueMap: data.venueMap && typeof data.venueMap === "object" ? data.venueMap : undefined,
+                        rateAsk,
                       }
                     : m
                 )
@@ -817,6 +825,7 @@ export default function Home() {
         <div className="sadu-strip mx-8 rounded-b-lg opacity-90" aria-hidden="true" />
 
         {/* Big «كلّم الداهية», «أرسله لأهلك», and tonight's events from the visitor guide */}
+        <ClosingDayBanner en={language === "en"} />
         <TonightCard en={language === "en"} onAsk={(q) => askQuestion(q)} onCall={(el) => handleStartCall(el)} />
         {raceDay() ? <RaceRoutes en={language === "en"} /> : null}
 
@@ -1038,6 +1047,21 @@ export default function Home() {
                       )}
                       {m.role === "assistant" && m.showMap && m.locationData && (
                         <LocationMapCard location={m.locationData} language={language} />
+                      )}
+                      {m.role === "assistant" && m.rateAsk && (
+                        <div className="pg-enter mt-3 rounded-2xl border border-[#e0a03a]/60 bg-[#fdf6e9] px-3 py-2.5">
+                          <p className="text-sm font-semibold text-[#3f2a22]">
+                            {language === "en" ? "And if you don't mind, rate the season with one tap:" : "وإذا ما عليك أمر، قيّم الموسم بضغطة:"}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={openSurvey}
+                            className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#a5492a] px-3 py-1.5 text-xs font-bold text-white transition active:scale-95"
+                          >
+                            <span aria-hidden="true">⭐</span>
+                            {language === "en" ? "Rate the season" : "قيّم الموسم"}
+                          </button>
+                        </div>
                       )}
                       {m.role === "assistant" && m.id === lastAssistantId && !isStreaming && m.followUps && m.followUps.length > 0 && (
                         <div className="pg-enter mt-3 flex flex-wrap gap-2" aria-label={language === "en" ? "Ask next" : "اسأل بعدها"}>

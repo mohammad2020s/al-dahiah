@@ -905,6 +905,8 @@ registerProcessor('mic-processor', MicProcessor);`;
             const words = heard.split(" ").filter((w) => w.length >= 2);
             const greetingOnly = words.every((w) => /^(و?السلام|عليكم|ورحمة|الله|وبركاته|هلا|اهلا|أهلا|مرحبا|مساء|صباح|الخير|النور|hello|hi|hey|salam|good|morning|evening)$/i.test(w));
             if (words.length && !greetingOnly && ++callQuestionsRef.current >= 3 && !surveyDone()) setSurveyCta(true);
+            // «شكراً» / «مع السلامة»: the guide asks for a rating, the button shows under the ticket one
+            if (/(شكر|مشكور|يعطيك العافي|جزاك الله|ما قصرت|ماقصرت|مع السلام|امان الله|أمان الله|فمان الله|باي|thank|bye)/i.test(heard) && !surveyDone()) setSurveyCta(true);
             if (activeSourcesRef.current.size === 0) {
               if (turnCooldownTimerRef.current) {
                 clearTimeout(turnCooldownTimerRef.current);
