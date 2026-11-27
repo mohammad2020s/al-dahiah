@@ -611,8 +611,8 @@ ${context}`;
 // old man (the owner's ad pronunciations below; town name «الَقْصَبْ» since 21 Nov). Used for ads made from the site (/api/speak style "classic").
 const CLASSIC_VOICE_NOTE = "Voice: a lively, warm old Arab man, smiling and genuinely interested in the listener, natural brisk pace, never sleepy, never Egyptian. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in الَقْصَبْ (a-laq-ṣab: fatha on the l, no vowel after the q) and مَرقَب. In القَرْيَة the ق is deep and heavy and the ر is light (thin, not rolled heavily). الَفْتِيتْ is said al-fteet: fatha on the l, no vowel on the f, a long ee, and a stopped t.";
 
-// "formal": a dignified Fusha announcer for official ads (owner, 27 Nov: «اجعل الصوت رسمي»).
-const FORMAL_VOICE_NOTE = "Voice: a dignified, formal Arabic news and events announcer, a deep, clear and confident voice, measured natural pace, calm authority and quiet warmth, precise Fusha articulation, never sleepy, never Egyptian, never exaggerated. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in الَقْصَبْ (a-laq-ṣab: fatha on the l, no vowel after the q). In القَرْيَة the ق is deep and heavy and the ر is light.";
+// "formal": a dignified announcer tone for official ads, reading the local dialect as written (owner, 27 Nov: «رسمي لكن باللهجة القصبية»).
+const FORMAL_VOICE_NOTE = "Voice: a dignified, formal Arabic news and events announcer, a deep, clear and confident voice, measured natural pace, calm authority and quiet warmth, never sleepy, never Egyptian, never exaggerated. The transcript is in everyday spoken dialect: he keeps it exactly as written, word for word, in that same dialect, and never turns any word into formal Fusha or changes its vowels. He pronounces every ق exactly like the q in القرآن (Quran) and قطر (Qatar), including in الَقْصَبْ (a-laq-ṣab: fatha on the l, no vowel after the q). In القَرْيَة the ق is deep and heavy and the ر is light.";
 
 export function buildSpeechPrompt(transcript: string, classic: boolean | "formal" = false): string {
   const plain = transcript.replace(/[\u064B-\u0670\u065F]/g, "");
