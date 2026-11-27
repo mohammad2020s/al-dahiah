@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CircleCheck, ClipboardList, Loader2, Star, X } from "lucide-react";
 
 // «شاركنا رأيك في الموسم»: a one-minute survey (answers → /api/survey, totals on the owner's /survey).
@@ -13,9 +13,30 @@ const Q = {
 const DONE_KEY = "dahiah:surveyDone";
 const done = () => { try { return !!localStorage.getItem(DONE_KEY); } catch { return false; } };
 
+// Owner, 27 Nov: the survey opens by itself after the visitor's third question in the chat (once).
+const ASKED_KEY = "dahiah:askedCount";
+const AUTO_KEY = "dahiah:surveyAutoShown";
+const OPEN_EVENT = "dahiah:openSurvey";
+export function noteQuestionAsked(en: boolean) {
+  if (en) return;
+  try {
+    const n = (parseInt(localStorage.getItem(ASKED_KEY) || "0", 10) || 0) + 1;
+    localStorage.setItem(ASKED_KEY, String(n));
+    if (n < 3 || done() || localStorage.getItem(AUTO_KEY)) return;
+    localStorage.setItem(AUTO_KEY, new Date().toISOString());
+    // A moment after the third answer, so the visitor sees it first
+    setTimeout(() => window.dispatchEvent(new Event(OPEN_EVENT)), 3500);
+  } catch {}
+}
+
 export function SeasonSurvey({ en }: { en: boolean }) {
   const [open, setOpen] = useState(false);
   const [finished, setFinished] = useState(done());
+  useEffect(() => {
+    const show = () => { if (!done()) setOpen(true); };
+    window.addEventListener(OPEN_EVENT, show);
+    return () => window.removeEventListener(OPEN_EVENT, show);
+  }, []);
   if (en) return null; // the survey is in Arabic (the season's visitors); the English site skips it
 
   return (

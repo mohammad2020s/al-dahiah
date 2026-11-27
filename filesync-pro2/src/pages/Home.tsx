@@ -62,7 +62,7 @@ import { SaltPassport } from "../components/SaltPassport";
 import { Language, translations } from "../i18n";
 import { ContactSheet } from "../components/ContactSheet";
 import { SeasonShots } from "../components/SeasonShots";
-import { SeasonSurvey } from "../components/SeasonSurvey";
+import { SeasonSurvey, noteQuestionAsked } from "../components/SeasonSurvey";
 import { TonightCard } from "../components/TonightCard";
 import { RaceRoutes, raceDay } from "../components/RaceRoutes";
 
@@ -620,6 +620,7 @@ export default function Home() {
     setIsStreaming(true);
 
     let accumulated = "";
+    let answered = false;
 
     try {
       let ownerKey = "";
@@ -670,6 +671,7 @@ export default function Home() {
                 prev.map(m => m.id === assistantId ? { ...m, content: accumulated } : m)
               );
             } else if (data.type === "done") {
+              answered = true;
               setMessages(prev =>
                 prev.map(m =>
                   m.id === assistantId
@@ -694,6 +696,7 @@ export default function Home() {
           } catch {}
         }
       }
+      if (answered || accumulated.trim()) noteQuestionAsked(language === "en");
     } catch (err: any) {
       if (err.name !== "AbortError") {
         setMessages(prev =>
