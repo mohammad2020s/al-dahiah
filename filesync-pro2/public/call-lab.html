@@ -93,6 +93,8 @@
         if (!cur) { cur = { text: "", audio: 0, el: add("him", "", "الداهية") }; }
         for (const p of sc.modelTurn?.parts || []) if (p.inlineData?.data) { cur.audio += atob(p.inlineData.data).length / 48000; play(p.inlineData.data); }
         if (sc.outputTranscription?.text) { cur.text += sc.outputTranscription.text; cur.el.textContent = cur.text; }
+        // An empty turn (he looked something up first): his real answer comes in the next one
+        if (sc.turnComplete && !cur.text.trim() && !cur.audio) return;
         if (sc.turnComplete) {
           const t = { text: cur.text.trim(), seconds: +cur.audio.toFixed(1) };
           cur.el.parentElement.querySelector("small").textContent = `الداهية · ${t.seconds} ث`;
